@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rental Plans — Admin (Wireframe)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,700;1,400&family=Balsamiq+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════════════
+   EZFacility Design Token System
+   Semantic variables switch between light and dark mode.
+   Base color primitives stay constant.
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── Primitive tokens (never used directly in components) ── */
+:root {
+  --primitive-green:      #00C28A;
+  --primitive-green-dark: #00A876;
+  --primitive-black:      #182023;
+  --primitive-blue-black: #23373F;
+  --primitive-gray:       #597179;
+  --primitive-gray-75:    #67838C;
+  --primitive-gray-50:    #A1BDC6;
+  --primitive-gray-25:    #F0F6F8;
+  --primitive-white:      #FFFFFF;
+  --primitive-red:        #E05252;
+  --primitive-red-subtle: rgba(224,82,82,0.10);
+
+  /* Dark palette primitives */
+  --primitive-dark-base:    #0F1B1F;
+  --primitive-dark-surface: #182023;
+  --primitive-dark-raised:  #23373F;
+  --primitive-dark-border:  rgba(255,255,255,0.10);
+  --primitive-dark-border-light: rgba(255,255,255,0.06);
+  --primitive-dark-input:   #1E2C31;
+  --primitive-dark-nav:     #0F1B1F;
+
+  --font: 'Fira Sans', sans-serif;
+}
+
+/* ── Light Mode semantic tokens ── */
+[data-theme="light"] {
+  /* Backgrounds */
+  --color-bg:             var(--primitive-gray-25);
+  --color-surface:        var(--primitive-white);
+  --color-surface-raised: var(--primitive-gray-25);
+  --color-nav-bg:         var(--primitive-blue-black);
+  --color-header-bg:      var(--primitive-blue-black);
+
+  /* Text */
+  --color-text:           var(--primitive-black);
+  --color-text-secondary: var(--primitive-gray-75);
+  --color-text-muted:     var(--primitive-gray-50);
+  --color-text-nav:       var(--primitive-gray-50);
+  --color-text-nav-active:var(--primitive-white);
+
+  /* Borders */
+  --color-border:         #DDE7EA;
+  --color-border-light:   #EEF2F4;
+
+  /* Interactive */
+  --color-green:          var(--primitive-green);
+  --color-green-dark:     var(--primitive-green-dark);
+  --color-red:            var(--primitive-red);
+
+  /* Form inputs */
+  --color-input-bg:       var(--primitive-white);
+  --color-input-border:   var(--primitive-gray-50);
+  --color-input-text:     var(--primitive-black);
+  --color-input-placeholder: var(--primitive-gray-50);
+
+  /* Side panel */
+  --color-panel-bg:       var(--primitive-white);
+  --color-panel-title-text: var(--primitive-black);
+  --color-panel-close:    var(--primitive-gray-75);
+
+  /* Tab row (dark navy bg in both modes, as per EZFacility spec) */
+  --color-tab-row-bg:     var(--primitive-blue-black);
+  --color-tab-inactive:   rgba(255,255,255,0.50);
+  --color-tab-inactive-hover: rgba(255,255,255,0.80);
+  --color-tab-active-bg:  var(--primitive-green);
+  --color-tab-active-text:var(--primitive-white);
+
+  /* Section titles */
+  --color-section-title:  var(--primitive-gray-50);
+  --color-section-border: #EEF2F4;
+
+  /* View mode fields */
+  --color-view-label:     var(--primitive-gray-50);
+  --color-view-value:     var(--primitive-black);
+  --color-view-empty:     var(--primitive-gray-50);
+
+  /* Table */
+  --color-table-bg:       var(--primitive-white);
+  --color-table-header-bg:var(--primitive-gray-25);
+  --color-table-header-text: var(--primitive-gray);
+  --color-row-hover:      #F0F9F6;
+  --color-row-selected:   #E6F8F3;
+
+  /* Badges */
+  --color-badge-active-bg:  rgba(0,194,138,0.12);
+  --color-badge-active-text:#007A56;
+  --color-badge-inactive-bg:rgba(89,113,121,0.12);
+  --color-badge-inactive-text: var(--primitive-gray);
+  --color-pill-bg:          rgba(35,55,63,0.08);
+  --color-pill-text:        var(--primitive-blue-black);
+
+  /* Footer */
+  --color-footer-bg:      var(--primitive-white);
+
+  /* Overlay */
+  --color-overlay:        rgba(24,32,35,0.40);
+
+  /* Warning */
+  --color-warning-bg:     #FFF8E1;
+  --color-warning-border: #FFE082;
+  --color-warning-text:   #856404;
+
+  /* Theme toggle */
+  --color-toggle-btn-bg:  rgba(255,255,255,0.10);
+  --color-toggle-btn-text:rgba(255,255,255,0.80);
+  --color-toggle-btn-border:rgba(255,255,255,0.20);
+}
+
+/* ── Dark Mode semantic tokens ── */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --color-bg:             var(--primitive-dark-base);
+  --color-surface:        var(--primitive-dark-surface);
+  --color-surface-raised: var(--primitive-dark-raised);
+  --color-nav-bg:         var(--primitive-dark-nav);
+  --color-header-bg:      var(--primitive-dark-nav);
+
+  /* Text */
+  --color-text:           var(--primitive-gray-25);
+  --color-text-secondary: var(--primitive-gray-50);
+  --color-text-muted:     var(--primitive-gray-75);
+  --color-text-nav:       var(--primitive-gray-75);
+  --color-text-nav-active:var(--primitive-white);
+
+  /* Borders */
+  --color-border:         var(--primitive-dark-border);
+  --color-border-light:   var(--primitive-dark-border-light);
+
+  /* Interactive (unchanged) */
+  --color-green:          var(--primitive-green);
+  --color-green-dark:     var(--primitive-green-dark);
+  --color-red:            #FF6B6B;
+
+  /* Form inputs */
+  --color-input-bg:       var(--primitive-dark-input);
+  --color-input-border:   rgba(255,255,255,0.15);
+  --color-input-text:     var(--primitive-gray-25);
+  --color-input-placeholder: var(--primitive-gray-75);
+
+  /* Side panel */
+  --color-panel-bg:       var(--primitive-dark-surface);
+  --color-panel-title-text:var(--primitive-gray-25);
+  --color-panel-close:    var(--primitive-gray-75);
+
+  /* Tab row — stays dark, matches EZFacility dark mode */
+  --color-tab-row-bg:     var(--primitive-dark-nav);
+  --color-tab-inactive:   rgba(255,255,255,0.40);
+  --color-tab-inactive-hover: rgba(255,255,255,0.70);
+  --color-tab-active-bg:  var(--primitive-green);
+  --color-tab-active-text:var(--primitive-white);
+
+  /* Section titles */
+  --color-section-title:  var(--primitive-gray-75);
+  --color-section-border: rgba(255,255,255,0.08);
+
+  /* View mode fields */
+  --color-view-label:     var(--primitive-gray-75);
+  --color-view-value:     var(--primitive-gray-25);
+  --color-view-empty:     var(--primitive-gray-75);
+
+  /* Table */
+  --color-table-bg:       var(--primitive-dark-surface);
+  --color-table-header-bg:var(--primitive-dark-raised);
+  --color-table-header-text: var(--primitive-gray-75);
+  --color-row-hover:      rgba(0,194,138,0.06);
+  --color-row-selected:   rgba(0,194,138,0.10);
+
+  /* Badges */
+  --color-badge-active-bg:  rgba(0,194,138,0.15);
+  --color-badge-active-text:#00C28A;
+  --color-badge-inactive-bg:rgba(255,255,255,0.08);
+  --color-badge-inactive-text: var(--primitive-gray-50);
+  --color-pill-bg:          rgba(255,255,255,0.10);
+  --color-pill-text:        var(--primitive-gray-25);
+
+  /* Footer */
+  --color-footer-bg:      var(--primitive-dark-surface);
+
+  /* Overlay */
+  --color-overlay:        rgba(0,0,0,0.55);
+
+  /* Warning */
+  --color-warning-bg:     rgba(133,100,4,0.15);
+  --color-warning-border: rgba(255,224,130,0.25);
+  --color-warning-text:   #FFD54F;
+
+  /* Theme toggle */
+  --color-toggle-btn-bg:  rgba(255,255,255,0.08);
+  --color-toggle-btn-text:rgba(255,255,255,0.70);
+  --color-toggle-btn-border:rgba(255,255,255,0.15);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Base Reset
+   ═══════════════════════════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Header / Top bar
+   ═══════════════════════════════════════════════════════════ */
+.header {
+  background: var(--color-header-bg);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.header-logo { color: var(--color-green); font-weight: 700; font-size: 16px; }
+.header-logo span { color: var(--primitive-white); }
+.header-div { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+.header-facility { color: var(--primitive-gray-50); font-size: 13px; }
+.header-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.hicon { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+
+/* Theme toggle button (in header) */
+.theme-toggle-btn {
+  height: 28px;
+  padding: 0 10px;
+  background: var(--color-toggle-btn-bg);
+  border: 1px solid var(--color-toggle-btn-border);
+  border-radius: 14px;
+  color: var(--color-toggle-btn-text);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+}
+.theme-toggle-btn:hover { background: rgba(255,255,255,0.15); color: var(--primitive-white); }
+
+/* ═══════════════════════════════════════════════════════════
+   Layout
+   ═══════════════════════════════════════════════════════════ */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── Nav sidebar ── */
+.nav {
+  width: 180px;
+  background: var(--color-nav-bg);
+  flex-shrink: 0;
+  padding: 8px 0;
+  overflow-y: auto;
+  transition: background 0.2s;
+}
+.nav-group-label {
+  color: rgba(255,255,255,0.35);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 14px 16px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: var(--color-text-nav);
+  font-size: 13px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.12s;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); color: var(--primitive-white); }
+.nav-item.active {
+  color: var(--color-text-nav-active);
+  font-weight: 700;
+  border-left-color: var(--color-green);
+  background: rgba(0,194,138,0.08);
+}
+.ndot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; flex-shrink: 0; }
+.nav-item.active .ndot { background: var(--color-green); opacity: 1; }
+
+/* ── Main content area ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+/* ── Page header ── */
+.page-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.page-title { font-size: 20px; font-weight: 700; }
+.page-actions { margin-left: auto; display: flex; gap: 8px; }
+
+/* Buttons */
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+.btn-primary { background: var(--color-green); color: var(--primitive-white); }
+.btn-primary:hover { background: var(--color-green-dark); }
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+}
+.btn-secondary:hover { background: var(--color-surface-raised); }
+
+/* ── Toolbar ── */
+/* ── Page-level tabs (Active / Archived) ── */
+.page-tabs {
+  display: flex;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 24px;
+  gap: 0;
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.page-tab {
+  padding: 12px 4px;
+  margin-right: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: var(--font);
+}
+.page-tab:hover:not(.active) { color: var(--color-text); }
+.page-tab.active { color: var(--color-text); border-bottom-color: var(--color-green); }
+.page-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+.page-tab.active .page-tab-count {
+  background: var(--color-green);
+  color: #fff;
+}
+
+/* ── Bulk actions bar ── */
+.bulk-bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+.bulk-bar.visible { display: flex; }
+.bulk-bar-count { font-weight: 700; color: var(--color-text); }
+.bulk-action-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 4px;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 13px;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+.bulk-action-btn:hover { background: var(--color-surface-raised); border-color: var(--color-text-secondary); }
+.bulk-action-btn.danger { color: var(--color-red); border-color: var(--color-red); }
+.bulk-action-btn.danger:hover { background: var(--color-red-subtle); }
+.bulk-deselect {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0 4px;
+}
+.bulk-deselect:hover { color: var(--color-text); }
+
+/* ── Row checkboxes ── */
+.cb-col { width: 40px; padding: 0 0 0 14px !important; }
+.row-cb { width: 15px; height: 15px; cursor: pointer; accent-color: var(--color-green); }
+[data-wireframe="true"] .row-cb { accent-color: #555; }
+
+/* ── Three-dot menu button & dropdown ── */
+.menu-btn {
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 18px;
+  line-height: 1;
+  letter-spacing: 0;
+  flex-shrink: 0;
+  transition: all 0.1s;
+  position: relative;
+}
+.menu-btn:hover, .menu-btn.open { border-color: var(--color-text); color: var(--color-text); background: var(--color-surface-raised); }
+
+.row-menu-wrap { display: inline-block; }
+/* Dropdown is a portal — lives outside the table, positioned via JS */
+#row-dropdown-portal {
+  display: none;
+  position: fixed;   /* fixed so overflow:auto on table-wrap never clips it */
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+  z-index: 200;
+  min-width: 140px;
+  overflow: hidden;
+  transition: background 0.2s;
+}
+#row-dropdown-portal.open { display: block; }
+.row-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background 0.1s;
+  white-space: nowrap;
+  font-family: var(--font);
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+.row-dropdown-item:hover { background: var(--color-surface-raised); }
+.row-dropdown-item.danger { color: var(--color-red); }
+.row-dropdown-item.danger:hover { background: var(--primitive-red-subtle, rgba(224,82,82,0.08)); }
+
+.toolbar {
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.search-wrap { position: relative; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 13px; }
+.search-input {
+  height: 32px;
+  width: 240px;
+  padding: 0 10px 0 30px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--color-green); }
+.search-input::placeholder { color: var(--color-input-placeholder); }
+.count-label { margin-left: auto; color: var(--color-text-muted); font-size: 13px; }
+
+/* ── Filters button ── */
+.filter-wrap { position: relative; }
+.filter-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  background: var(--color-input-bg);
+  color: var(--color-text-secondary);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.filter-btn:hover { border-color: var(--color-text-secondary); }
+.filter-btn.active { border-color: var(--color-green); color: var(--color-green); background: var(--color-surface); }
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--color-green);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+[data-wireframe="true"] .filter-badge { background: #555; }
+
+/* ── Filter popover ── */
+.filter-popover {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 150;
+  min-width: 220px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 12px 0 8px;
+}
+.filter-popover.open { display: block; }
+[data-wireframe="true"] .filter-popover { border-radius: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+.filter-popover-section { padding: 0 14px 10px; }
+.filter-popover-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+.filter-popover-options { display: flex; flex-direction: column; gap: 2px; }
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.filter-option:hover { background: var(--color-surface-raised); }
+.filter-option input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--color-green); cursor: pointer; flex-shrink: 0; }
+[data-wireframe="true"] .filter-option input[type="checkbox"] { accent-color: #555; }
+.filter-popover-divider { border: none; border-top: 1px solid var(--color-border-light); margin: 4px 0 8px; }
+.filter-popover-footer { padding: 0 14px; display: flex; justify-content: flex-end; }
+.filter-clear-btn {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px 4px;
+}
+.filter-clear-btn:hover { color: var(--color-red); }
+
+/* ═══════════════════════════════════════════════════════════
+   Table
+   ═══════════════════════════════════════════════════════════ */
+.table-wrap { flex: 1; overflow-y: auto; padding: 16px 24px 24px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-table-bg);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+  transition: background 0.2s;
+}
+thead th {
+  background: var(--color-table-header-bg);
+  color: var(--color-table-header-text);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+th.sortable { cursor: pointer; }
+th.sortable:hover { color: var(--color-text); }
+.sarr { margin-left: 4px; opacity: 0.45; font-size: 10px; }
+tbody tr { border-bottom: 1px solid var(--color-border-light); cursor: pointer; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--color-row-hover); }
+tbody tr.selected { background: var(--color-row-selected); }
+tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertical-align: middle; transition: color 0.2s; }
+.td-name { font-weight: 700; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+.badge-active { background: var(--color-badge-active-bg); color: var(--color-badge-active-text); }
+.badge-inactive { background: var(--color-badge-inactive-bg); color: var(--color-badge-inactive-text); }
+.bdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.model-pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 700; background: var(--color-pill-bg); color: var(--color-pill-text); }
+
+/* Row actions */
+.row-actions { display: flex; gap: 4px; }
+.action-btn {
+  width: 28px; height: 28px;
+  border-radius: 4px;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  transition: all 0.1s;
+  flex-shrink: 0;
+}
+.action-btn:hover { border-color: var(--color-text); color: var(--color-text); }
+.action-btn.danger:hover { border-color: var(--color-red); color: var(--color-red); }
+
+/* ── Pagination ── */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  flex-shrink: 0;
+  transition: background 0.2s, border-color 0.2s;
+}
+.page-info { color: var(--color-text-secondary); font-size: 13px; }
+.page-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px;
+  border-radius: 4px;
+  border: 1px solid var(--color-input-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+.page-btn:hover { border-color: var(--color-text); color: var(--color-text); }
+.page-btn.active { background: var(--color-text); color: var(--color-surface); border-color: var(--color-text); }
+
+/* ═══════════════════════════════════════════════════════════
+   SIDE PANEL — EZFacility pattern
+   Matches: Reservation Details / Create / Edit side panels
+   ═══════════════════════════════════════════════════════════ */
+
+/* Overlay */
+.overlay { display: none; position: absolute; inset: 0; background: var(--color-overlay); z-index: 20; transition: background 0.2s; }
+.overlay.open { display: block; }
+
+/* Panel container */
+.side-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 460px;
+  background: var(--color-panel-bg);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.20);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s ease, background 0.2s;
+  z-index: 30;
+}
+.side-panel.open { transform: translateX(0); }
+
+/* ── Panel header: Side panels/Panel title component ── */
+.panel-header { flex-shrink: 0; background: var(--color-panel-bg); transition: background 0.2s; }
+.panel-title-area {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 20px 14px;
+  gap: 12px;
+}
+.panel-title-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-panel-title-text);
+  line-height: 1.25;
+  transition: color 0.2s;
+}
+.panel-title-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  transition: color 0.2s;
+}
+.panel-close-btn {
+  width: 32px; height: 32px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-panel-close);
+  font-size: 18px;
+  line-height: 1;
+  margin-top: -2px;
+  transition: all 0.12s;
+}
+.panel-close-btn:hover { background: var(--color-surface-raised); color: var(--color-text); }
+
+/* ── Tab row: Side panels/Tab row component ──
+   EZFacility spec: dark navy bg, teal filled active tab, white text.
+   Both light AND dark modes keep the dark tab row background —
+   in dark mode it shifts to an even deeper shade. */
+.panel-tabs {
+  display: flex;
+  background: var(--color-tab-row-bg);
+  padding: 0 8px;
+  gap: 2px;
+  transition: background 0.2s;
+}
+.panel-tab {
+  padding: 11px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-tab-inactive);
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  transition: all 0.15s;
+  white-space: nowrap;
+  border: none;
+  background: none;
+  font-family: var(--font);
+}
+.panel-tab:hover:not(.active) {
+  color: var(--color-tab-inactive-hover);
+  background: rgba(255,255,255,0.06);
+}
+.panel-tab.active {
+  background: var(--color-tab-active-bg);
+  color: var(--color-tab-active-text);
+}
+
+/* ── Panel body ── */
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--color-panel-bg);
+  transition: background 0.2s;
+}
+
+/* Scrollbar styling */
+.panel-body::-webkit-scrollbar { width: 6px; }
+.panel-body::-webkit-scrollbar-track { background: transparent; }
+.panel-body::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+
+/* ── Section groupings ── */
+.panel-section { margin-bottom: 24px; }
+.panel-section:last-child { margin-bottom: 0; }
+.panel-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--color-section-title);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-section-border);
+  transition: color 0.2s, border-color 0.2s;
+}
+
+/* ── View mode: read-only field rows ── */
+.view-field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.view-field:last-child { margin-bottom: 0; }
+.view-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-view-label);
+  transition: color 0.2s;
+}
+.view-value { font-size: 14px; color: var(--color-view-value); line-height: 1.4; transition: color 0.2s; }
+.view-value.empty { color: var(--color-view-empty); font-style: italic; }
+.view-row { display: flex; gap: 16px; }
+.view-row .view-field { flex: 1; }
+.view-divider { height: 1px; background: var(--color-border); margin: 4px 0 20px; }
+
+/* ── Edit / Create mode: EZFacility form inputs ──
+   Field labels: Fira Sans Bold 14px (Required token)
+   Inputs: 44px height, 1px border, 4px radius ── */
+.form-field { margin-bottom: 16px; }
+.form-field:last-child { margin-bottom: 0; }
+
+/* Field Labels/Required — Fira Sans Bold 14px */
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 6px;
+  transition: color 0.2s;
+}
+.field-label .req { color: var(--color-red); margin-left: 1px; }
+.field-label .opt { color: var(--color-text-muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+/* Text Input — Form inputs/Text Inputs */
+.form-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
+}
+.form-input:focus { border-color: var(--color-green); }
+.form-input::placeholder { color: var(--color-input-placeholder); }
+.form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Textarea */
+.form-textarea {
+  width: 100%;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  resize: vertical;
+  line-height: 1.5;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
+}
+.form-textarea:focus { border-color: var(--color-green); }
+.form-textarea::placeholder { color: var(--color-input-placeholder); }
+
+/* Select — Form inputs/Selects */
+.form-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 14px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg) url("data:image/svg+xml,%3Csvg width='10' height='6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2367838C'/%3E%3C/svg%3E") no-repeat right 12px center;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
+}
+.form-select:focus { border-color: var(--color-green); }
+
+/* Field hint text */
+.field-hint { font-size: 12px; color: var(--color-text-muted); margin-top: 5px; line-height: 1.4; transition: color 0.2s; }
+
+/* Warning inline (locked field notice, etc.) */
+.field-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-warning-text);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: 4px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  line-height: 1.4;
+  transition: all 0.2s;
+}
+
+/* Toggle */
+.toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.toggle-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.toggle-label { font-size: 14px; color: var(--color-text); transition: color 0.2s; }
+.toggle-label-hint { font-size: 12px; color: var(--color-text-muted); transition: color 0.2s; }
+.toggle {
+  width: 40px; height: 22px;
+  background: var(--color-green);
+  border-radius: 11px;
+  position: relative;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.toggle.off { background: var(--color-input-border); }
+.toggle-knob {
+  width: 16px; height: 16px;
+  background: var(--primitive-white);
+  border-radius: 50%;
+  position: absolute;
+  top: 3px; right: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+  transition: right 0.2s, left 0.2s;
+}
+.toggle.off .toggle-knob { right: auto; left: 3px; }
+
+/* Radio option cards */
+.radio-group { display: flex; gap: 10px; }
+.radio-option {
+  flex: 1;
+  border: 2px solid var(--color-input-border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: var(--color-input-bg);
+}
+.radio-option.selected { border-color: var(--color-green); background: rgba(0,194,138,0.05); }
+.radio-option.disabled { opacity: 0.40; cursor: not-allowed; pointer-events: none; }
+.radio-option-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+.radio-option-label::before {
+  content: '';
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--color-input-border);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.radio-option.selected .radio-option-label::before {
+  border-color: var(--color-green);
+  background: var(--color-green);
+  box-shadow: inset 0 0 0 3px var(--color-input-bg);
+}
+.radio-option-desc { font-size: 12px; color: var(--color-text-muted); margin-left: 20px; transition: color 0.2s; }
+
+/* Inline layout helpers */
+.inline-row { display: flex; align-items: center; gap: 8px; }
+.inline-label { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; transition: color 0.2s; }
+.form-row { display: flex; gap: 12px; }
+.form-row .form-field { flex: 1; }
+.input-with-prefix { position: relative; }
+.input-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.input-with-prefix .form-input { padding-left: 24px; }
+
+/* ── Panel footer — EZFacility layout ──
+   Ghost green Cancel on left, filled primary on right ── */
+.panel-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-border);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-footer-bg);
+  transition: background 0.2s, border-color 0.2s;
+}
+.footer-left { display: flex; align-items: center; gap: 8px; }
+.footer-right { display: flex; align-items: center; gap: 8px; }
+
+/* Panel button variants */
+.panel-btn {
+  height: 36px;
+  padding: 0 18px;
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  border: none;
+}
+/* Filled green — Save / Next */
+.panel-btn-primary { background: var(--color-green); color: var(--primitive-white); }
+.panel-btn-primary:hover { background: var(--color-green-dark); }
+/* Ghost green text — Cancel (matches EZFacility Cancel) */
+.panel-btn-cancel { background: none; color: var(--color-green); border: none; padding: 0 4px; }
+.panel-btn-cancel:hover { color: var(--color-green-dark); text-decoration: underline; }
+/* Bordered secondary — Close in view mode */
+.panel-btn-secondary { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-input-border); }
+.panel-btn-secondary:hover { background: var(--color-surface-raised); }
+/* Destructive text — Archive */
+.panel-btn-destructive { background: none; color: var(--color-red); border: none; padding: 0 4px; font-size: 13px; font-weight: 700; }
+.panel-btn-destructive:hover { text-decoration: underline; }
+/* Destructive filled — Delete / permanent actions */
+.panel-btn-destructive-filled { background: var(--color-red); color: #fff; border: none; }
+.panel-btn-destructive-filled:hover { background: #c94040; }
+[data-wireframe="true"] .panel-btn-destructive-filled { background: #555; color: #fff; border: none; }
+
+/* ═══════════════════════════════════════════════════════════
+   WIREFRAME STYLESHEET
+   ───────────────────────────────────────────────────────────
+   Activated by:  data-wireframe="true" on <html>
+   Purpose:       Visually signals this is a lo-fi prototype,
+                  not a finished design. Overrides all semantic
+                  color tokens with a neutral gray palette and
+                  switches to Balsamiq Sans (the standard
+                  wireframe/sketch typeface). Developers and
+                  stakeholders won't mistake placeholder
+                  styles for production specs.
+   ═══════════════════════════════════════════════════════════ */
+
+[data-wireframe="true"] {
+  /* ── Font override: Balsamiq Sans gives the classic lo-fi sketch feel ── */
+  --font: 'Balsamiq Sans', 'Comic Sans MS', cursive;
+
+  /* ── Gray-scale primitive overrides ── */
+  --wf-bg:          #F4F4F4;
+  --wf-surface:     #FFFFFF;
+  --wf-raised:      #EBEBEB;
+  --wf-nav:         #2C2C2C;
+  --wf-text:        #1A1A1A;
+  --wf-text-sec:    #555555;
+  --wf-text-muted:  #888888;
+  --wf-border:      #BBBBBB;
+  --wf-border-lt:   #DEDEDE;
+  --wf-input-bg:    #FAFAFA;
+  --wf-active:      #444444;   /* replaces green — button fill, tab active, etc. */
+  --wf-active-text: #FFFFFF;
+  --wf-danger:      #555555;
+
+  /* ── Re-map all semantic tokens to grays ── */
+  --color-bg:               var(--wf-bg);
+  --color-surface:          var(--wf-surface);
+  --color-surface-raised:   var(--wf-raised);
+  --color-nav-bg:           var(--wf-nav);
+  --color-header-bg:        var(--wf-nav);
+
+  --color-text:             var(--wf-text);
+  --color-text-secondary:   var(--wf-text-sec);
+  --color-text-muted:       var(--wf-text-muted);
+  --color-text-nav:         rgba(255,255,255,0.55);
+  --color-text-nav-active:  #FFFFFF;
+
+  --color-border:           var(--wf-border);
+  --color-border-light:     var(--wf-border-lt);
+
+  --color-green:            var(--wf-active);
+  --color-green-dark:       #333333;
+  --color-red:              var(--wf-danger);
+
+  --color-input-bg:         var(--wf-input-bg);
+  --color-input-border:     var(--wf-border);
+  --color-input-text:       var(--wf-text);
+  --color-input-placeholder:#AAAAAA;
+
+  --color-panel-bg:         var(--wf-surface);
+  --color-panel-title-text: var(--wf-text);
+  --color-panel-close:      var(--wf-text-sec);
+
+  /* Tab row: dull dark bar, gray active tab */
+  --color-tab-row-bg:       #3A3A3A;
+  --color-tab-inactive:     rgba(255,255,255,0.45);
+  --color-tab-inactive-hover:rgba(255,255,255,0.75);
+  --color-tab-active-bg:    #777777;
+  --color-tab-active-text:  #FFFFFF;
+
+  --color-section-title:    #AAAAAA;
+  --color-section-border:   #E5E5E5;
+
+  --color-view-label:       #AAAAAA;
+  --color-view-value:       var(--wf-text);
+  --color-view-empty:       #BBBBBB;
+
+  --color-table-bg:         var(--wf-surface);
+  --color-table-header-bg:  var(--wf-raised);
+  --color-table-header-text:#666666;
+  --color-row-hover:        #F0F0F0;
+  --color-row-selected:     #E8E8E8;
+
+  /* Badges — all neutral gray */
+  --color-badge-active-bg:  rgba(0,0,0,0.07);
+  --color-badge-active-text:#333333;
+  --color-badge-inactive-bg:rgba(0,0,0,0.07);
+  --color-badge-inactive-text:#555555;
+  --color-pill-bg:          rgba(0,0,0,0.07);
+  --color-pill-text:        #333333;
+
+  --color-footer-bg:        var(--wf-surface);
+  --color-overlay:          rgba(0,0,0,0.30);
+
+  --color-warning-bg:       rgba(0,0,0,0.04);
+  --color-warning-border:   var(--wf-border);
+  --color-warning-text:     var(--wf-text-sec);
+
+  --color-toggle-btn-bg:    rgba(255,255,255,0.10);
+  --color-toggle-btn-text:  rgba(255,255,255,0.70);
+  --color-toggle-btn-border:rgba(255,255,255,0.20);
+}
+
+/* Wireframe font applied globally when mode is active */
+[data-wireframe="true"],
+[data-wireframe="true"] input,
+[data-wireframe="true"] textarea,
+[data-wireframe="true"] select,
+[data-wireframe="true"] button {
+  font-family: var(--font);
+}
+
+/* Flatten box shadows in wireframe mode */
+[data-wireframe="true"] table,
+[data-wireframe="true"] .side-panel {
+  box-shadow: none;
+  border: 1px solid var(--wf-border);
+}
+[data-wireframe="true"] .action-btn { box-shadow: none; }
+
+/* Remove smooth transitions in wireframe mode — keep it snappy */
+[data-wireframe="true"] * { transition: none !important; }
+
+/* ═══════════════════════════════════════════════════════════
+   CONFIRMATION MODAL
+   Replaces the native browser confirm() prompt.
+   Inherits the active theme (design or wireframe) automatically
+   through the same semantic CSS variables used everywhere else.
+   ═══════════════════════════════════════════════════════════ */
+
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  width: 100%;
+  max-width: 400px;
+  margin: 0 20px;
+  overflow: hidden;
+  font-family: var(--font);
+}
+
+.modal-header {
+  padding: 20px 20px 0;
+}
+.modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.modal-body {
+  padding: 10px 20px 20px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface-raised);
+}
+
+/* Wireframe mode: flatten modal to match lo-fi aesthetic */
+[data-wireframe="true"] .modal {
+  box-shadow: none;
+  border-radius: 4px;
+}
+[data-wireframe="true"] .modal-footer {
+  background: var(--color-surface);
+}
+
+/* ── Wireframe mode indicator banner ──
+   Persistent, non-intrusive stamp in the bottom-left corner.
+   Dismissible, but defaults to visible. ── */
+.wf-badge {
+  display: none;
+  position: fixed;
+  bottom: 12px;
+  left: 12px;
+  z-index: 9999;
+  background: #2C2C2C;
+  color: #FFFFFF;
+  font-family: 'Balsamiq Sans', cursive;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 2px solid #555;
+  opacity: 0.85;
+  pointer-events: none;
+}
+[data-wireframe="true"] .wf-badge { display: block; }
+
+/* ── Wireframe mode: theme toggle styling note ──
+   Hide the light/dark toggle when wireframe mode is on —
+   theme doesn't meaningfully apply to a gray-scale wireframe. ── */
+[data-wireframe="true"] .theme-toggle-btn {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-logo">EZ<span>Facility</span></div>
+  <div class="header-div"></div>
+  <div class="header-facility">Riverside Sports Complex</div>
+  <div class="header-right">
+    <button class="theme-toggle-btn" onclick="toggleWireframe()" id="wfBtn" style="margin-right:4px;">⬜ Wireframe</button>
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">☀ Light</button>
+    <div class="hicon"></div>
+    <div class="hicon"></div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-group-label">Schedule</div>
+    <div class="nav-item"><div class="ndot"></div>Bookings</div>
+    <div class="nav-item"><div class="ndot"></div>Rentals</div>
+    <div class="nav-group-label">Clients</div>
+    <div class="nav-item"><div class="ndot"></div>Members</div>
+    <div class="nav-item"><div class="ndot"></div>Packages</div>
+    <div class="nav-group-label">Admin</div>
+    <div class="nav-item"><div class="ndot"></div>Membership Plans</div>
+    <div class="nav-item active"><div class="ndot"></div>Rental Plans</div>
+    <div class="nav-item"><div class="ndot"></div>Rental Rates</div>
+    <div class="nav-item"><div class="ndot"></div>Resources</div>
+    <div class="nav-group-label">Reports</div>
+    <div class="nav-item"><div class="ndot"></div>Sales Summary</div>
+    <div class="nav-item"><div class="ndot"></div>Usage</div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main" id="main">
+
+    <div class="page-header">
+      <div class="page-title">Rental Plans</div>
+      <div class="page-actions">
+        <button class="btn btn-secondary">Sell Rental Plan</button>
+        <button class="btn btn-primary" onclick="openCreate()">+ Add Rental Plan</button>
+      </div>
+    </div>
+
+    <!-- Page-level tabs: Active / Archived -->
+    <div class="page-tabs">
+      <button class="page-tab active" id="tabActive" onclick="switchPageTab('active')">
+        Active <span class="page-tab-count" id="countActive">6</span>
+      </button>
+      <button class="page-tab" id="tabArchived" onclick="switchPageTab('archived')">
+        Archived <span class="page-tab-count" id="countArchived">0</span>
+      </button>
+    </div>
+
+    <!-- Bulk actions bar — visible only when rows are checked -->
+    <div class="bulk-bar" id="bulkBar">
+      <span class="bulk-bar-count" id="bulkCount">0</span>&nbsp;selected
+      <div id="bulkActions"></div>
+      <button class="bulk-deselect" onclick="clearSelection()" title="Clear selection">✕ Deselect all</button>
+    </div>
+
+    <div class="toolbar">
+      <!-- Bulk actions (left) — rendered by JS, hidden when nothing selected -->
+      <div id="toolbarBulkActions" style="display:none; align-items:center; gap:6px;"></div>
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Search plans…" oninput="onSearch(this.value)">
+      </div>
+
+      <!-- Filters button + popover -->
+      <div class="filter-wrap" id="filterWrap">
+        <button class="filter-btn" id="filterBtn" onclick="toggleFilterPopover(event)">
+          <span>⊞</span> Filters <span class="filter-badge" id="filterBadge" style="display:none"></span>
+        </button>
+        <div class="filter-popover" id="filterPopover">
+          <div class="filter-popover-section">
+            <div class="filter-popover-label">Status</div>
+            <div class="filter-popover-options">
+              <label class="filter-option"><input type="checkbox" id="fStatus-Active" onchange="onFilterChange()"> Active</label>
+              <label class="filter-option"><input type="checkbox" id="fStatus-Inactive" onchange="onFilterChange()"> Inactive</label>
+            </div>
+          </div>
+          <hr class="filter-popover-divider">
+          <div class="filter-popover-section">
+            <div class="filter-popover-label">Purchase Model</div>
+            <div class="filter-popover-options">
+              <label class="filter-option"><input type="checkbox" id="fModel-Hours" onchange="onFilterChange()"> Hours</label>
+              <label class="filter-option"><input type="checkbox" id="fModel-Occurrences" onchange="onFilterChange()"> Occurrences</label>
+            </div>
+          </div>
+          <hr class="filter-popover-divider">
+          <div class="filter-popover-footer">
+            <button class="filter-clear-btn" onclick="clearFilters()">Clear filters</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="count-label" id="countLabel">6 plans</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="cb-col"><input type="checkbox" class="row-cb" id="selectAll" title="Select all" onchange="toggleSelectAll(this)"></th>
+            <th class="sortable">Name <span class="sarr">↕</span></th>
+            <th>Status</th>
+            <th>Purchase Model</th>
+            <th class="sortable">Standard Price <span class="sarr">↕</span></th>
+            <th>Member Price</th>
+            <th style="width:80px;text-align:right;padding-right:18px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div class="page-info">Showing 1–6 of 6</div>
+      <div class="page-btns">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+    <!-- Row action dropdown portal — rendered outside the scrolling table
+         so it's never clipped by overflow:auto on .table-wrap -->
+    <div id="row-dropdown-portal"></div>
+
+    <!-- Confirmation modal — replaces native confirm() -->
+    <div class="modal-backdrop" id="confirmBackdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="modal-header">
+          <div class="modal-title" id="confirmTitle"></div>
+        </div>
+        <div class="modal-body" id="confirmBody"></div>
+        <div class="modal-footer">
+          <button class="panel-btn panel-btn-secondary" id="confirmCancel">Cancel</button>
+          <button class="panel-btn panel-btn-primary"   id="confirmOk"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wireframe mode badge — visible only when data-wireframe="true" -->
+    <div class="wf-badge">Lo-Fi Wireframe · Not a design spec</div>
+
+    <!-- ════════════════════════════════════════════
+         SIDE PANEL — EZFacility structure
+         • Header: panel-title-area (Panel title component)
+         • Tab row: dark navy bg, teal filled active tab
+         • Body: scrollable content (view / edit / create)
+         • Footer: ghost Cancel (left) + primary action (right)
+    ════════════════════════════════════════════ -->
+    <div class="side-panel" id="sidePanel">
+      <div class="panel-header" id="panelHeader"></div>
+      <div class="panel-body" id="panelBody"></div>
+      <div class="panel-footer" id="panelFooter"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────
+const plans = [
+  { id:1, name:'Court Time Bundle — 10hrs',    status:'Active',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
+  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Active',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, desc:'5 drop-in visits, valid any time.', archived:false },
+  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Active',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  desc:'Flexible hourly pickleball court access.', archived:false },
+  { id:4, name:'Field Rental Block — 8hrs',    status:'Active',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, desc:'', archived:false },
+  { id:5, name:'Room Booking Pack — 10 visits',status:'Inactive', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, desc:'Meeting room access pack.', archived:false },
+  { id:6, name:'Annual Court Pass — 100hrs',   status:'Active',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  desc:'Best value for regular court users.', archived:false },
+];
+
+let currentMode = null;
+let currentPlan = null;
+let selectedRow = null;
+let searchQuery  = '';
+let isDirty = false; // true only after the user has changed a field
+let selectedIds  = new Set(); // ids of checked rows
+// filterStatus / filterModel: Sets of selected values; empty = "all"
+let filterStatus = new Set();
+let filterModel  = new Set();
+let currentTab = 'active'; // 'active' | 'archived'
+let openMenuId = null;     // id of the plan whose row menu is open
+
+// ── Confirmation modal ────────────────────────────────────
+// Replaces native confirm(). Usage:
+//   showConfirm({ title, body, ok, danger, onConfirm })
+//   danger:true styles the confirm button red (for destructive actions)
+let _confirmCallback = null;
+
+function showConfirm({ title, body, ok = 'Confirm', danger = false, onConfirm }) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmBody').textContent  = body;
+  const okBtn = document.getElementById('confirmOk');
+  okBtn.textContent = ok;
+  okBtn.className   = 'panel-btn ' + (danger ? 'panel-btn-destructive-filled' : 'panel-btn-primary');
+  _confirmCallback  = onConfirm;
+  document.getElementById('confirmBackdrop').classList.add('open');
+  okBtn.focus();
+}
+function hideConfirm() {
+  document.getElementById('confirmBackdrop').classList.remove('open');
+  _confirmCallback = null;
+}
+document.getElementById('confirmOk').addEventListener('click', () => {
+  const cb = _confirmCallback;
+  hideConfirm();
+  if (cb) cb();
+});
+document.getElementById('confirmCancel').addEventListener('click', hideConfirm);
+// Close on backdrop click
+document.getElementById('confirmBackdrop').addEventListener('click', e => {
+  if (e.target === e.currentTarget) hideConfirm();
+});
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('confirmBackdrop').classList.contains('open')) {
+    hideConfirm();
+  }
+});
+
+// ── Wireframe mode toggle ────────────────────────────────
+function toggleWireframe() {
+  const html = document.documentElement;
+  const isWf = html.getAttribute('data-wireframe') === 'true';
+  html.setAttribute('data-wireframe', isWf ? 'false' : 'true');
+  const btn = document.getElementById('wfBtn');
+  btn.textContent = isWf ? '⬜ Wireframe' : '✅ Wireframe ON';
+  btn.style.background = isWf ? '' : 'rgba(255,255,255,0.22)';
+  btn.style.color = isWf ? '' : '#FFFFFF';
+}
+// Default: wireframe mode ON (this is a wireframe, after all)
+document.documentElement.setAttribute('data-wireframe', 'true');
+document.getElementById('wfBtn').textContent = '✅ Wireframe ON';
+document.getElementById('wfBtn').style.background = 'rgba(255,255,255,0.22)';
+
+// ── Theme toggle ──────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeBtn').textContent = isDark ? '☀ Light' : '🌙 Dark';
+}
+// Respect OS preference on first load
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+  document.getElementById('themeBtn').textContent = '🌙 Dark';
+}
+
+// ── Page tab switching ────────────────────────────────────
+function switchPageTab(tab) {
+  currentTab = tab;
+  closePanel();
+  closeAllMenus();
+  searchQuery = '';
+  selectedIds.clear();
+  clearFilters(true); // skip re-render; switchPageTab calls renderTable itself
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
+  document.getElementById('tabActive').classList.toggle('active', tab === 'active');
+  document.getElementById('tabArchived').classList.toggle('active', tab === 'archived');
+  renderTable();
+}
+
+// ── Tab counts ────────────────────────────────────────────
+function updateTabCounts() {
+  document.getElementById('countActive').textContent   = plans.filter(p => !p.archived).length;
+  document.getElementById('countArchived').textContent = plans.filter(p =>  p.archived).length;
+}
+
+// ── Row menu helpers ──────────────────────────────────────
+// Uses a single portal element positioned via getBoundingClientRect
+// so it's never clipped by overflow:auto on the table container.
+function toggleMenu(id, event) {
+  event.stopPropagation();
+  const wasOpen = openMenuId === id;
+  closeAllMenus();
+  if (wasOpen) return;
+
+  openMenuId = id;
+  const btn    = document.getElementById('menu-btn-' + id);
+  const portal = document.getElementById('row-dropdown-portal');
+
+  // Build the correct menu items for the current tab
+  const p = plans.find(p => p.id === id);
+  portal.innerHTML = currentTab === 'active'
+    ? `<button class="row-dropdown-item" onclick="closeAllMenus();openEdit(${id})">Edit</button>
+       <button class="row-dropdown-item danger" onclick="archivePlanById(${id})">Archive</button>`
+    : `<button class="row-dropdown-item" onclick="restorePlan(${id})">Restore</button>
+       <button class="row-dropdown-item danger" onclick="deletePermanently(${id})">Delete</button>`;
+
+  // Position: align right edge of portal with right edge of button,
+  // open downward by default — flip upward if not enough room below.
+  portal.classList.add('open');
+  const btnRect     = btn.getBoundingClientRect();
+  const portalH     = portal.offsetHeight;
+  const spaceBelow  = window.innerHeight - btnRect.bottom - 6;
+  const top = spaceBelow >= portalH
+    ? btnRect.bottom + 4                   // open down
+    : btnRect.top - portalH - 4;           // flip up
+  const left = btnRect.right - portal.offsetWidth;
+
+  portal.style.top  = top  + 'px';
+  portal.style.left = left + 'px';
+
+  if (btn) btn.classList.add('open');
+}
+
+function closeAllMenus() {
+  if (openMenuId !== null) {
+    const btn = document.getElementById('menu-btn-' + openMenuId);
+    if (btn) btn.classList.remove('open');
+    openMenuId = null;
+  }
+  const portal = document.getElementById('row-dropdown-portal');
+  if (portal) portal.classList.remove('open');
+}
+
+// ── Archive / Restore / Delete ────────────────────────────
+function archivePlanById(id) {
+  closeAllMenus();
+  const p = plans.find(p => p.id === id);
+  if (!p) return;
+  p.archived = true;
+  if (currentPlan && currentPlan.id === id) closePanel();
+  updateTabCounts();
+  renderTable();
+}
+function restorePlan(id) {
+  closeAllMenus();
+  plans.find(p => p.id === id).archived = false;
+  updateTabCounts();
+  renderTable();
+}
+function deletePermanently(id) {
+  closeAllMenus();
+  const p = plans.find(p => p.id === id);
+  showConfirm({
+    title: `Delete "${p.name}"?`,
+    body: 'This action cannot be undone. The plan will be permanently removed.',
+    ok: 'Delete',
+    danger: true,
+    onConfirm: () => {
+      plans.splice(plans.indexOf(p), 1);
+      updateTabCounts();
+      renderTable();
+    }
+  });
+}
+
+// ── Filter popover ────────────────────────────────────────
+function toggleFilterPopover(e) {
+  e.stopPropagation();
+  document.getElementById('filterPopover').classList.toggle('open');
+  syncFilterBtnState();
+}
+function closeFilterPopover() {
+  document.getElementById('filterPopover').classList.remove('open');
+  syncFilterBtnState();
+}
+function syncFilterBtnState() {
+  const total = filterStatus.size + filterModel.size;
+  const btn   = document.getElementById('filterBtn');
+  const badge = document.getElementById('filterBadge');
+  btn.classList.toggle('active', total > 0);
+  if (total > 0) { badge.style.display = 'inline-flex'; badge.textContent = total; }
+  else           { badge.style.display = 'none'; }
+}
+function onFilterChange() {
+  filterStatus.clear();
+  filterModel.clear();
+  ['Active','Inactive'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
+  ['Hours','Occurrences'].forEach(v => { if (document.getElementById('fModel-'+v)?.checked) filterModel.add(v); });
+  syncFilterBtnState();
+  renderTable();
+}
+function clearFilters(skipRender) {
+  filterStatus.clear(); filterModel.clear();
+  ['fStatus-Active','fStatus-Inactive','fModel-Hours','fModel-Occurrences'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
+  syncFilterBtnState();
+  if (!skipRender) renderTable();
+}
+// Close popover when clicking outside
+document.addEventListener('click', e => {
+  if (!document.getElementById('filterWrap')?.contains(e.target)) closeFilterPopover();
+});
+
+// ── Shared filter predicate ───────────────────────────────
+function planMatchesFilters(p) {
+  // Tab
+  if (currentTab === 'active' ? p.archived : !p.archived) return false;
+  // Search
+  const q = searchQuery;
+  if (q && !(
+    p.name.toLowerCase().includes(q) ||
+    p.model.toLowerCase().includes(q) ||
+    p.pricingModel.toLowerCase().includes(q) ||
+    String(p.stdPrice).includes(q) ||
+    (p.desc || '').toLowerCase().includes(q)
+  )) return false;
+  // Status filter
+  if (filterStatus.size > 0 && !filterStatus.has(p.status)) return false;
+  // Model filter (p.model is e.g. "Hours" or "Occurrences")
+  if (filterModel.size > 0 && !filterModel.has(p.model)) return false;
+  return true;
+}
+
+// ── Bulk selection ────────────────────────────────────────
+function visibleIds() {
+  return plans.filter(planMatchesFilters).map(p => p.id);
+}
+
+function handleRowClick(event, id) {
+  // Don't open panel if the click was on the checkbox cell (already stopped) or menu
+  if (event.target.closest('.menu-btn') || event.target.closest('.row-menu-wrap')) return;
+  if (currentTab === 'active') openView(id);
+}
+
+function toggleRowCheck(id, el) {
+  if (el.checked) selectedIds.add(id);
+  else selectedIds.delete(id);
+  syncSelectAll();
+  updateBulkBar();
+}
+
+function toggleSelectAll(el) {
+  const ids = visibleIds();
+  if (el.checked) ids.forEach(id => selectedIds.add(id));
+  else ids.forEach(id => selectedIds.delete(id));
+  // Reflect in individual checkboxes
+  ids.forEach(id => {
+    const cb = document.getElementById('cb-' + id);
+    if (cb) cb.checked = el.checked;
+  });
+  updateBulkBar();
+}
+
+function syncSelectAll() {
+  const sa = document.getElementById('selectAll');
+  if (!sa) return;
+  const ids = visibleIds();
+  if (ids.length === 0) { sa.checked = false; sa.indeterminate = false; return; }
+  const checkedCount = ids.filter(id => selectedIds.has(id)).length;
+  sa.checked       = checkedCount === ids.length;
+  sa.indeterminate = checkedCount > 0 && checkedCount < ids.length;
+}
+
+function clearSelection() {
+  selectedIds.clear();
+  document.querySelectorAll('.row-cb').forEach(cb => cb.checked = false);
+  syncSelectAll();
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const n = selectedIds.size;
+
+  // Floating selection bar (count + deselect)
+  const bar = document.getElementById('bulkBar');
+  document.getElementById('bulkCount').textContent = n;
+  bar.classList.toggle('visible', n > 0);
+  // Keep floating bar's own actions slot empty — actions live in toolbar now
+  document.getElementById('bulkActions').innerHTML = '';
+
+  // Toolbar inline bulk actions slot
+  const slot = document.getElementById('toolbarBulkActions');
+  if (n === 0) {
+    slot.style.display = 'none';
+    slot.innerHTML = '';
+    return;
+  }
+  slot.style.display = 'flex';
+  const actionsBtns = currentTab === 'active'
+    ? `<button class="bulk-action-btn" onclick="bulkArchive()">Archive</button>`
+    : `<button class="bulk-action-btn" onclick="bulkRestore()">Restore</button>
+       <button class="bulk-action-btn danger" onclick="bulkDelete()">Delete</button>`;
+  slot.innerHTML = actionsBtns;
+}
+
+function bulkArchive() {
+  const ids = [...selectedIds];
+  ids.forEach(id => {
+    const p = plans.find(p => p.id === id);
+    if (p) p.archived = true;
+  });
+  selectedIds.clear();
+  // Close panel if the currently-open plan was archived
+  if (currentPlan && ids.includes(currentPlan.id)) closePanel();
+  updateTabCounts();
+  renderTable();
+}
+
+function bulkRestore() {
+  const ids = [...selectedIds];
+  ids.forEach(id => {
+    const p = plans.find(p => p.id === id);
+    if (p) p.archived = false;
+  });
+  selectedIds.clear();
+  updateTabCounts();
+  renderTable();
+}
+
+function bulkDelete() {
+  const n = selectedIds.size;
+  showConfirm({
+    title: `Delete ${n} plan${n !== 1 ? 's' : ''}?`,
+    body: `This will permanently remove ${n} plan${n !== 1 ? 's' : ''}. This action cannot be undone.`,
+    ok: 'Delete',
+    danger: true,
+    onConfirm: () => {
+      const ids = [...selectedIds];
+      ids.forEach(id => {
+        const idx = plans.findIndex(p => p.id === id);
+        if (idx !== -1) plans.splice(idx, 1);
+      });
+      selectedIds.clear();
+      if (currentPlan && ids.includes(currentPlan.id)) closePanel();
+      updateTabCounts();
+      renderTable();
+    }
+  });
+}
+
+// ── Search ────────────────────────────────────────────────
+function onSearch(val) {
+  searchQuery = val.trim().toLowerCase();
+  renderTable();
+}
+
+// ── Render table ──────────────────────────────────────────
+function renderTable() {
+  const visible = plans.filter(planMatchesFilters);
+  const countLabel = document.getElementById('countLabel');
+  if (countLabel) countLabel.textContent = visible.length + ' plan' + (visible.length !== 1 ? 's' : '');
+
+  document.getElementById('tableBody').innerHTML = visible.length === 0
+    ? `<tr><td colspan="7" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
+        ${currentTab === 'active' ? 'No active rental plans.' : 'No archived rental plans.'}
+       </td></tr>`
+    : visible.map(p => `
+    <tr id="row-${p.id}" onclick="handleRowClick(event,${p.id})" style="${currentTab==='archived'?'cursor:default;':''}">
+      <td class="cb-col" onclick="event.stopPropagation()">
+        <input type="checkbox" class="row-cb" id="cb-${p.id}" ${selectedIds.has(p.id)?'checked':''} onchange="toggleRowCheck(${p.id},this)">
+      </td>
+      <td class="td-name">${p.name}</td>
+      <td><span class="badge badge-${p.status==='Active'?'active':'inactive'}"><span class="bdot"></span>${p.status}</span></td>
+      <td><span class="model-pill">${p.model}</span></td>
+      <td>${p.stdPrice}</td>
+      <td>${p.memPrice}</td>
+      <td style="text-align:right;padding-right:14px;">
+        <div class="row-menu-wrap">
+          <button class="menu-btn" id="menu-btn-${p.id}" title="Actions" onclick="toggleMenu(${p.id},event)">&#8942;</button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  syncSelectAll();
+  updateBulkBar();
+}
+
+// ── Panel open/close ──────────────────────────────────────
+function openPanel() {
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sidePanel').classList.add('open');
+}
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sidePanel').classList.remove('open');
+  if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
+  currentMode = null; currentPlan = null; isDirty = false;
+}
+function closePanelSafe() {
+  if (isDirty) {
+    showConfirm({
+      title: 'Discard changes?',
+      body: 'You have unsaved changes. Leaving now will discard them.',
+      ok: 'Discard',
+      danger: true,
+      onConfirm: closePanel
+    });
+  } else {
+    closePanel();
+  }
+}
+function markDirty() { isDirty = true; }
+function highlightRow(id) {
+  if (selectedRow) selectedRow.classList.remove('selected');
+  selectedRow = document.getElementById('row-'+id);
+  if (selectedRow) selectedRow.classList.add('selected');
+}
+
+// ── Shared: build panel header with tabs ─────────────────
+function buildHeader(title, sub, tabs, activeIdx) {
+  const tabHtml = tabs.map((t,i) =>
+    `<button class="panel-tab${i===activeIdx?' active':''}" onclick="switchTab(this,${i})">${t}</button>`
+  ).join('');
+  return `
+    <div class="panel-title-area">
+      <div>
+        <div class="panel-title-text">${title}</div>
+        ${sub ? `<div class="panel-title-sub">${sub}</div>` : ''}
+      </div>
+      <button class="panel-close-btn" onclick="closePanelSafe()">✕</button>
+    </div>
+    <div class="panel-tabs">${tabHtml}</div>
+  `;
+}
+
+// ── Dirty tracking ───────────────────────────────────────
+// Called after the panel body is injected; listens for any
+// user change on inputs, textareas, and selects.
+function attachDirtyListeners() {
+  isDirty = false;
+  const body = document.getElementById('panelBody');
+  body.addEventListener('input',  markDirty, { once: false });
+  body.addEventListener('change', markDirty, { once: false });
+}
+
+// ── Tab switching ─────────────────────────────────────────
+function switchTab(el, idx) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const prefix = currentMode==='view' ? 'vtab' : currentMode==='edit' ? 'etab' : 'ctab';
+  document.querySelectorAll('[id^="'+prefix+'-"]').forEach(t => t.style.display='none');
+  const tab = document.getElementById(prefix+'-'+idx);
+  if (tab) tab.style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// VIEW / DETAILS panel
+// ═══════════════════════════════════════════════════════════
+function openView(id) {
+  currentPlan = plans.find(p => p.id===id);
+  currentMode = 'view';
+  highlightRow(id);
+  const p = currentPlan;
+  const badge = `<span class="badge badge-${p.status==='Active'?'active':'inactive'}" style="font-size:11px;padding:2px 8px;"><span class="bdot"></span>${p.status}</span>`;
+
+  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, badge, ['Plan Details','Pricing'], 0);
+  document.getElementById('panelBody').innerHTML = `
+    <div id="vtab-0">
+      <div class="panel-section">
+        <div class="panel-section-title">Package Info</div>
+        <div class="view-field">
+          <div class="view-label">Plan Name</div>
+          <div class="view-value">${p.name}</div>
+        </div>
+        <div class="view-field">
+          <div class="view-label">Description</div>
+          <div class="view-value ${p.desc?'':'empty'}">${p.desc||'No description added'}</div>
+        </div>
+        <div class="view-field">
+          <div class="view-label">Status</div>
+          <div class="view-value">${badge}</div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Purchase Model</div>
+        <div class="view-row">
+          <div class="view-field">
+            <div class="view-label">Model</div>
+            <div class="view-value"><span class="model-pill">${p.model}</span></div>
+          </div>
+          <div class="view-field">
+            <div class="view-label">Quantity</div>
+            <div class="view-value">${p.qty} ${p.model==='Hours'?'hours':'occurrences'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Expiry</div>
+        <div class="view-field">
+          <div class="view-label">Expires After</div>
+          <div class="view-value ${p.expiry==='None'?'empty':''}">
+            ${p.expiry==='None'?'No expiry — active until balance depleted':p.expiry+' from purchase date'}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="vtab-1" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-title">Pricing Model</div>
+        <div class="view-field">
+          <div class="view-label">Model</div>
+          <div class="view-value">${p.pricingModel==='Flat'?'Flat Price — one fixed price for the bundle':'Per Unit — price × '+p.model.toLowerCase()}</div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Price Points</div>
+        <div class="view-row">
+          <div class="view-field">
+            <div class="view-label">Standard Price</div>
+            <div class="view-value">${p.stdPrice}</div>
+          </div>
+          <div class="view-field">
+            <div class="view-label">Member Price</div>
+            <div class="view-value">${p.memPrice}</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Auto-Renew</div>
+        <div class="view-field">
+          <div class="view-label">Auto-Renew</div>
+          <div class="view-value">${p.autoRenew?'Enabled — clients may opt in at purchase':'Disabled'}</div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('panelFooter').innerHTML = `
+    <div class="footer-left">
+      <button class="panel-btn panel-btn-destructive" onclick="archivePlan()">Archive Plan</button>
+    </div>
+    <div class="footer-right">
+      <button class="panel-btn panel-btn-secondary" onclick="closePanel()">Close</button>
+      <button class="panel-btn panel-btn-primary" onclick="openEdit(${p.id})">Edit Plan</button>
+    </div>
+  `;
+  openPanel();
+}
+
+// ═══════════════════════════════════════════════════════════
+// EDIT panel
+// ═══════════════════════════════════════════════════════════
+function openEdit(id) {
+  currentPlan = plans.find(p => p.id===id);
+  currentMode = 'edit';
+  highlightRow(id);
+  const p = currentPlan;
+
+  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, 'Editing rental plan', ['Plan Details','Pricing'], 0);
+  document.getElementById('panelBody').innerHTML = `
+    <div id="etab-0">
+      <div class="panel-section">
+        <div class="panel-section-title">Plan Info</div>
+        <div class="form-field">
+          <label class="field-label">Plan Name<span class="req">*</span></label>
+          <input class="form-input" type="text" value="${p.name}">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Description<span class="opt"> (optional)</span></label>
+          <textarea class="form-textarea">${p.desc}</textarea>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Status</label>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">${p.status==='Active'?'Active':'Inactive'}</span>
+              <span class="toggle-label-hint">${p.status==='Active'?'Available for sale':'Not available for sale'}</span>
+            </div>
+            <div class="toggle ${p.status==='Active'?'':'off'}" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Purchase Model</div>
+        <div class="form-field">
+          <label class="field-label">Model<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option ${p.model==='Hours'?'selected':''} disabled">
+              <div class="radio-option-label">Hours</div>
+              <div class="radio-option-desc">Deducted by rental duration</div>
+            </div>
+            <div class="radio-option ${p.model==='Occurrences'?'selected':''} disabled">
+              <div class="radio-option-label">Occurrences</div>
+              <div class="radio-option-desc">1 deducted per booking</div>
+            </div>
+          </div>
+          <div class="field-warning">⚠ Purchase model cannot be changed after the plan is created.</div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Quantity<span class="req">*</span></label>
+          <div class="inline-row">
+            <input class="form-input" type="number" value="${p.qty}" style="width:100px;">
+            <span class="inline-label">${p.model==='Hours'?'hours':'occurrences'} included</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Expiry</div>
+        <div class="form-field">
+          <div class="toggle-row" style="margin-bottom:12px;">
+            <div class="toggle-info">
+              <span class="toggle-label">Enable expiry</span>
+              <span class="toggle-label-hint">Plan expires after a set period from purchase</span>
+            </div>
+            <div class="toggle ${p.expiry!=='None'?'':'off'}" id="expiryToggle" onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+          <div id="expiryFields" style="${p.expiry!=='None'?'':'display:none;'}">
+            <div class="inline-row" style="margin-bottom:8px;">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}">
+              <select class="form-select" style="width:110px;">
+                <option>Days</option><option>Months</option><option>Years</option>
+              </select>
+              <span class="inline-label">from purchase</span>
+            </div>
+          </div>
+          <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
+        </div>
+      </div>
+    </div>
+    <div id="etab-1" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-title">Pricing Model</div>
+        <div class="form-field">
+          <label class="field-label">Pricing Model<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option ${p.pricingModel==='Flat'?'selected':''}" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Flat Price</div>
+              <div class="radio-option-desc">One fixed price for the bundle</div>
+            </div>
+            <div class="radio-option ${p.pricingModel==='Per Unit'?'selected':''}" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Unit</div>
+              <div class="radio-option-desc">Price × ${p.model.toLowerCase()}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Price Points</div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">Standard Price<span class="req">*</span></label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}">
+            </div>
+            <div class="field-hint">Non-member price</div>
+          </div>
+          <div class="form-field">
+            <label class="field-label">Member Price<span class="req">*</span></label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}">
+            </div>
+            <div class="field-hint">Discounted member price</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Auto-Renew</div>
+        <div class="form-field">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Allow auto-renew</span>
+              <span class="toggle-label-hint">Clients can opt in at purchase time</span>
+            </div>
+            <div class="toggle ${p.autoRenew?'':'off'}" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('panelFooter').innerHTML = `
+    <div class="footer-left">
+      <button class="panel-btn panel-btn-cancel" onclick="closePanelSafe()">Cancel</button>
+    </div>
+    <div class="footer-right">
+      <button class="panel-btn panel-btn-primary">Save Changes</button>
+    </div>
+  `;
+  attachDirtyListeners();
+  openPanel();
+}
+
+// ═══════════════════════════════════════════════════════════
+// CREATE panel
+// ═══════════════════════════════════════════════════════════
+function openCreate() {
+  currentPlan = null;
+  currentMode = 'create';
+  if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
+
+  document.getElementById('panelHeader').innerHTML = buildHeader('Create Rental Plan', null, ['Plan Details','Pricing'], 0);
+  document.getElementById('panelBody').innerHTML = `
+    <div id="ctab-0">
+      <div class="panel-section">
+        <div class="panel-section-title">Plan Info</div>
+        <div class="form-field">
+          <label class="field-label">Plan Name<span class="req">*</span></label>
+          <input class="form-input" type="text" placeholder="e.g. Court Time Bundle — 10hrs">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Description<span class="opt"> (optional)</span></label>
+          <textarea class="form-textarea" placeholder="Brief description visible to staff when selling…"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Status</label>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Active</span>
+              <span class="toggle-label-hint">Available for sale</span>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Purchase Model</div>
+        <div class="form-field">
+          <label class="field-label">What does this plan sell?<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Hours</div>
+              <div class="radio-option-desc">Deducted by rental duration</div>
+            </div>
+            <div class="radio-option" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Occurrences</div>
+              <div class="radio-option-desc">1 deducted per booking</div>
+            </div>
+          </div>
+          <div class="field-warning">⚠ This cannot be changed after the plan is saved.</div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Quantity<span class="req">*</span></label>
+          <div class="inline-row">
+            <input class="form-input" type="number" placeholder="e.g. 10" style="width:100px;">
+            <span class="inline-label">hours or occurrences included</span>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Expiry</div>
+        <div class="form-field">
+          <div class="toggle-row" style="margin-bottom:12px;">
+            <div class="toggle-info">
+              <span class="toggle-label">Enable expiry</span>
+              <span class="toggle-label-hint">Plan expires after a set period from purchase</span>
+            </div>
+            <div class="toggle off" id="expiryToggle" onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+          <div id="expiryFields" style="display:none;">
+            <div class="inline-row" style="margin-bottom:8px;">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;">
+              <select class="form-select" style="width:110px;">
+                <option>Days</option><option>Months</option><option>Years</option>
+              </select>
+              <span class="inline-label">from purchase</span>
+            </div>
+          </div>
+          <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
+        </div>
+      </div>
+    </div>
+    <div id="ctab-1" style="display:none;">
+      <div class="panel-section">
+        <div class="panel-section-title">Pricing Model</div>
+        <div class="form-field">
+          <label class="field-label">Pricing Model<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Flat Price</div>
+              <div class="radio-option-desc">One fixed price for the bundle</div>
+            </div>
+            <div class="radio-option" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Unit</div>
+              <div class="radio-option-desc">Price × hours or occurrences</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Price Points</div>
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label">Standard Price<span class="req">*</span></label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input class="form-input" type="number" placeholder="0.00">
+            </div>
+            <div class="field-hint">Non-member price</div>
+          </div>
+          <div class="form-field">
+            <label class="field-label">Member Price<span class="req">*</span></label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input class="form-input" type="number" placeholder="0.00">
+            </div>
+            <div class="field-hint">Discounted member price</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Auto-Renew</div>
+        <div class="form-field">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Allow auto-renew</span>
+              <span class="toggle-label-hint">Clients can opt in at purchase time</span>
+            </div>
+            <div class="toggle off" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('panelFooter').innerHTML = `
+    <div class="footer-left">
+      <button class="panel-btn panel-btn-cancel" onclick="closePanel()">Cancel</button>
+    </div>
+    <div class="footer-right">
+      <button class="panel-btn panel-btn-primary">Save Plan</button>
+    </div>
+  `;
+  attachDirtyListeners();
+  openPanel();
+}
+
+// ── Helpers ───────────────────────────────────────────────
+function selectRadio(el) {
+  el.closest('.radio-group').querySelectorAll('.radio-option').forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleExpiry() {
+  const t = document.getElementById('expiryToggle');
+  if (!t) return;
+  t.classList.toggle('off');
+  const f = document.getElementById('expiryFields');
+  if (f) f.style.display = t.classList.contains('off') ? 'none' : 'block';
+}
+function archivePlan() {
+  if (!currentPlan) return;
+  showConfirm({
+    title: `Archive "${currentPlan.name}"?`,
+    body: 'This plan will no longer be available for sale. You can restore it later from the Archived tab.',
+    ok: 'Archive',
+    danger: false,
+    onConfirm: () => archivePlanById(currentPlan.id)
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────
+// Close any open row menu when clicking anywhere else on the page
+document.addEventListener('click', function(e) {
+  if (openMenuId !== null
+      && !e.target.closest('.row-menu-wrap')
+      && !e.target.closest('#row-dropdown-portal')) {
+    closeAllMenus();
+  }
+});
+
+updateTabCounts();
+renderTable();
+</script>
+</body>
+</html>
