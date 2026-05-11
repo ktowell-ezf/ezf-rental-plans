@@ -397,39 +397,90 @@ body {
   color: #fff;
 }
 
-/* ── Bulk actions bar ── */
-.bulk-bar {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  font-size: 13px;
-  color: var(--color-text-secondary);
+/* ── Bulk actions (inline in toolbar) ── */
+.bulk-bar-count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  white-space: nowrap;
 }
-.bulk-bar.visible { display: flex; }
-.bulk-bar-count { font-weight: 700; color: var(--color-text); }
+.bulk-bar-count.has-sel {
+  font-weight: 700;
+  color: var(--color-text);
+}
 .bulk-action-btn {
   height: 30px;
   padding: 0 12px;
   border-radius: 4px;
   border: 1px solid var(--color-input-border);
   background: var(--color-surface);
-  color: var(--color-text);
+  color: var(--color-text-secondary);
   font-size: 13px;
   font-family: var(--font);
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  display: inline-flex; align-items: center; gap: 5px;
 }
-.bulk-action-btn:hover { background: var(--color-surface-raised); border-color: var(--color-text-secondary); }
-.bulk-action-btn.danger { color: var(--color-red); border-color: var(--color-red); }
-.bulk-action-btn.danger:hover { background: var(--color-red-subtle); }
+.bulk-action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.bulk-action-btn.has-selection {
+  color: var(--color-green);
+  border-color: var(--color-green);
+}
+.bulk-action-btn.has-selection:hover { background: rgba(0,194,138,0.06); }
+/* Pulse when selection first appears */
+@keyframes bulk-pulse {
+  0%   { background: var(--color-green); color:#fff; border-color: var(--color-green); box-shadow: 0 0 0 0 rgba(0,194,138,0.55); }
+  60%  { background: var(--color-green); color:#fff; border-color: var(--color-green); box-shadow: 0 0 0 7px rgba(0,194,138,0); }
+  100% { background: var(--color-green); color:#fff; border-color: var(--color-green); box-shadow: 0 0 0 0 rgba(0,194,138,0); }
+}
+.bulk-action-btn.pulsing {
+  animation: bulk-pulse 0.55s ease 3;
+  background: var(--color-green); color: #fff; border-color: var(--color-green);
+}
+.bulk-action-btn.pulsing:hover { background: var(--color-green-dark); }
+[data-wireframe="true"] .bulk-action-btn.has-selection { color:#555; border-color:#555; }
+[data-wireframe="true"] .bulk-action-btn.pulsing,
+[data-wireframe="true"] .bulk-action-btn.pulsing:hover { background:#555; border-color:#555; color:#fff; }
+/* Bulk action dropdown */
+.bulk-dd-wrap { position: relative; }
+.bulk-dd-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 200;
+  min-width: 140px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  overflow: hidden;
+  transition: background 0.2s;
+}
+.bulk-dd-menu.open { display: block; }
+.bulk-dd-item {
+  display: block; width: 100%;
+  padding: 9px 14px;
+  font-size: 13px; font-weight: 700;
+  font-family: var(--font);
+  color: var(--color-text);
+  background: none; border: none;
+  text-align: left; cursor: pointer;
+  transition: background 0.1s;
+  white-space: nowrap;
+}
+.bulk-dd-item:hover { background: var(--color-surface-raised); }
+.bulk-dd-item.danger { color: var(--color-red); }
+.bulk-dd-item.danger:hover { background: var(--color-red-subtle, rgba(239,68,68,0.06)); }
 .bulk-deselect {
   margin-left: auto;
   background: none;
   border: none;
-  font-size: 13px;
+  font-size: 12px;
   color: var(--color-text-muted);
   cursor: pointer;
   padding: 0 4px;
@@ -593,7 +644,7 @@ body {
   display: none;
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
+  right: 0;
   z-index: 150;
   min-width: 272px;
   background: var(--color-surface);
@@ -823,6 +874,7 @@ tbody tr:hover { background: var(--color-row-hover); }
 tbody tr.selected { background: var(--color-row-selected); }
 tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertical-align: middle; transition: color 0.2s; }
 .td-name { font-weight: 700; }
+.td-muted { color: var(--color-text-muted); font-style: italic; }
 
 /* Badges */
 .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; }
@@ -924,11 +976,25 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .rate-search-wrap.has-value .rate-search-input { padding-right: 28px; }
 /* re-use .search-clear for the rate search X button */
 
+/* Rate-picker filter popover — fixed so it escapes the panel's overflow:auto scroll container */
+.rate-filter-popover {
+  display: none;
+  position: fixed;
+  z-index: 350;
+  min-width: 220px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 10px 0 8px;
+  transition: background 0.2s, border-color 0.2s;
+}
+.rate-filter-popover.open { display: block; }
+[data-wireframe="true"] .rate-filter-popover { border-radius: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
 .rate-filter-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-bottom: 8px;
 }
 .rate-filter-chip {
   height: 24px;
@@ -1020,17 +1086,23 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   line-height: 1.4;
   transition: color 0.2s;
 }
-.rate-category-tag {
+.rate-type-tag {
   display: inline-block;
   padding: 1px 7px;
   border-radius: 8px;
   font-size: 11px;
   font-weight: 700;
-  background: var(--color-surface-raised);
-  color: var(--color-text-secondary);
   white-space: nowrap;
   flex-shrink: 0;
   transition: background 0.2s, color 0.2s;
+}
+.rate-type-tag.special-rate {
+  background: rgba(43,123,228,0.10);
+  color: #1D5EB8;
+}
+.rate-type-tag.discount {
+  background: rgba(0,194,138,0.12);
+  color: var(--primitive-green-dark, #00A876);
 }
 .rate-rules-toggle {
   flex-shrink: 0;
@@ -1058,6 +1130,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   transition: background 0.2s;
 }
 .rate-item.expanded .rate-rules-body { display: block; }
+.view-rate-item.expanded .rate-rules-body { display: block; }
 .rate-rule-line {
   font-size: 12px;
   color: var(--color-text-secondary);
@@ -1069,6 +1142,24 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   transition: color 0.2s;
 }
 .rate-rule-line::before { content: '•'; color: var(--color-text-muted); flex-shrink: 0; }
+/* Named pricing rule rows — suppress bullet, use block layout */
+.rate-rule-line.named { display: block; padding: 5px 0 3px; }
+.rate-rule-line.named::before { display: none; }
+.rate-rule-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 1px;
+}
+.rate-rule-desc {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  padding-left: 2px;
+  line-height: 1.4;
+}
 
 .rate-no-results {
   padding: 16px;
@@ -1080,17 +1171,23 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 }
 
 /* ── View panel: selected rental rates (read-only) ── */
+.view-rate-list { display: flex; flex-direction: column; gap: 8px; }
 .view-rate-item {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--color-border-light);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
-.view-rate-item:first-child { padding-top: 0; }
-.view-rate-item:last-child { border-bottom: none; padding-bottom: 0; }
+.view-rate-item-header {
+  padding: 10px 12px 8px;
+  background: var(--color-surface);
+  transition: background 0.2s;
+}
 .view-rate-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 .view-rate-name {
   font-size: 13px;
@@ -1102,7 +1199,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .view-rate-price {
   font-size: 12px;
   color: var(--color-text-secondary);
-  margin: 3px 0 5px;
+  margin: 2px 0 0;
   transition: color 0.2s;
 }
 .view-rate-price strong {
@@ -2323,6 +2420,65 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   border-top: 1px solid rgba(255,255,255,0.12);
 }
 
+/* ── History tab ── */
+.history-list { display: flex; flex-direction: column; padding: 4px 0; }
+.history-entry { display: flex; gap: 12px; padding: 14px 0; }
+.history-entry + .history-entry { border-top: 1px solid var(--color-border-light); }
+.history-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--color-green); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+  transition: background 0.2s;
+}
+.history-entry.entry-created .history-avatar { background: var(--color-text-muted); }
+.history-content { flex: 1; }
+.history-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.history-user { font-size: 12px; font-weight: 700; color: var(--color-text); }
+.history-time { font-size: 11px; color: var(--color-text-muted); }
+.history-changes { display: flex; flex-direction: column; gap: 4px; }
+.history-field-row { display: flex; align-items: center; gap: 5px; font-size: 12px; flex-wrap: wrap; }
+.history-field-name { color: var(--color-text-muted); min-width: 96px; flex-shrink: 0; }
+.history-val { color: var(--color-text); }
+.history-val.old { text-decoration: line-through; color: var(--color-text-muted); opacity: 0.75; }
+.history-arrow { color: var(--color-text-muted); font-size: 10px; }
+.history-created-label { font-size: 12px; color: var(--color-text-muted); font-style: italic; }
+.history-empty { font-size: 13px; color: var(--color-text-muted); font-style: italic; padding: 28px 0; text-align: center; }
+
+/* ── Revert Changes — inline confirm ── */
+.panel-btn-revert {
+  background: none; color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  height: 36px; padding: 0 14px;
+  font-size: 13px; font-weight: 700;
+  border-radius: 4px; cursor: pointer;
+  display: inline-flex; align-items: center;
+  transition: all 0.15s;
+}
+.panel-btn-revert:hover { border-color: var(--color-text); color: var(--color-text); }
+.revert-confirm-inline {
+  display: flex; align-items: center; gap: 8px;
+  animation: fadeInLeft 0.15s ease;
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.revert-confirm-text { font-size: 12px; color: var(--color-text); font-weight: 600; white-space: nowrap; }
+.panel-btn-revert-confirm {
+  background: var(--color-red); color: #fff; border: none;
+  height: 28px; padding: 0 12px; font-size: 12px; font-weight: 700;
+  border-radius: 4px; cursor: pointer; transition: background 0.15s;
+}
+.panel-btn-revert-confirm:hover { background: #c94040; }
+.panel-btn-revert-dismiss {
+  background: none; border: none; color: var(--color-text-secondary);
+  font-size: 12px; font-weight: 700; cursor: pointer; padding: 0 4px;
+  transition: color 0.15s;
+}
+.panel-btn-revert-dismiss:hover { color: var(--color-text); }
+
 /* Ann login error */
 .ann-login-error {
   font-size: 12px;
@@ -2388,18 +2544,16 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       </button>
     </div>
 
-    <!-- Bulk actions bar — visible only when rows are checked -->
-    <div class="bulk-bar" id="bulkBar">
-      <span class="bulk-bar-count" id="bulkCount">0</span>&nbsp;selected
-      <div id="bulkActions"></div>
-      <button class="bulk-deselect" onclick="clearSelection()" title="Clear selection">✕ Deselect all</button>
-    </div>
-
     <div class="toolbar">
-      <!-- Bulk actions (left) — rendered by JS, hidden when nothing selected -->
-      <div id="toolbarBulkActions" style="display:none; align-items:center; gap:6px;"></div>
+      <!-- Left: bulk actions + count + deselect -->
+      <div id="bulkActionWrap"></div>
+      <span class="bulk-bar-count" id="bulkCount"></span>
+      <button class="bulk-deselect" id="bulkDeselect" onclick="clearSelection()" style="display:none;" title="Clear selection">✕ Deselect all</button>
 
-      <!-- Search -->
+      <!-- Spacer -->
+      <div style="flex:1;"></div>
+
+      <!-- Right: search + filters -->
       <div class="search-wrap" id="searchWrap">
         <span class="search-icon">⌕</span>
         <input class="search-input" id="searchInput" type="text" placeholder="Search plans…" oninput="onSearch(this.value)">
@@ -2501,7 +2655,6 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
         </div>
       </div>
 
-      <div class="count-label" id="countLabel">6 plans</div>
     </div>
 
     <div class="table-wrap">
@@ -2514,6 +2667,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
             <th>Purchase Model</th>
             <th class="sortable">Standard Price <span class="sarr">↕</span></th>
             <th>Member Price</th>
+            <th>Expiration</th>
             <th>Pricing Rules</th>
             <th style="width:80px;text-align:right;padding-right:18px;">Actions</th>
           </tr>
@@ -2672,43 +2826,85 @@ const plans = [
 ];
 
 // Rental Rates — sourced from the Rental Rates admin page.
-// Each rate carries its own rules; rules are automatically applied and cannot be
-// individually selected. Users pick a rate and its rules come with it.
+// Each rate carries its own rate rules. Rules have an optional ruleType ('Special Rate' or
+// 'Discount') that indicates how the rule affects pricing. Rules without a ruleType are
+// applicability/condition lines. Users pick a rate and all its rules come with it.
 const ALL_RENTAL_RATES = [
   {
     name: 'Weekday Peak Rate',
-    category: 'Peak',
-    desc: 'Premium pricing during high-demand weekday hours',
+    purchaseModel: 'Hours',
+    desc: 'Standard weekday pricing with peak-hour and member rules applied',
     stdRate: 18, memRate: 14, unit: 'hr',
-    rules: ['Time-of-day multiplier: 1.25×', 'Applies Mon–Fri, 6am–8pm']
+    rules: [
+      { name: 'Peak Hour Rate',      ruleType: 'Special Rate', desc: 'Replaces base rate entirely during the peak window' },
+      { name: "Senior Discount",     ruleType: 'Discount',     desc: '10% off for clients aged 65+' },
+      { text: 'Applies Mon–Fri, 6am–8pm' }
+    ]
   },
   {
     name: 'Winter Evening Rate',
-    category: 'Off-peak',
-    desc: 'Discounted pricing for winter evening bookings',
+    purchaseModel: 'Hours',
+    desc: 'Evening bookings in winter months with discount rule applied',
     stdRate: 11, memRate: 9, unit: 'hr',
-    rules: ['Seasonal discount: 15% off base rate', 'Applies Oct–Mar, after 6pm']
+    rules: [
+      { name: 'Winter Evening Discount', ruleType: 'Discount', desc: '15% off the base rate for qualifying bookings' },
+      { text: 'Applies Oct–Mar, after 6pm' }
+    ]
   },
   {
     name: 'Weekend Morning Rate',
-    category: 'Peak',
-    desc: 'Surcharge for high-demand weekend morning slots',
+    purchaseModel: 'Hours',
+    desc: 'Weekend morning pricing with surcharge and loyalty rules applied',
     stdRate: 16, memRate: 13, unit: 'hr',
-    rules: ['Weekend morning surcharge: 1.10×', 'Applies Sat–Sun, 7am–12pm']
+    rules: [
+      { name: 'Weekend Morning Rate',  ruleType: 'Special Rate', desc: 'Replaces base rate during weekend morning window' },
+      { name: 'Loyalty Member Rate',   ruleType: 'Special Rate', desc: 'Further reduced rate for members with 2+ years tenure' },
+      { name: "Veteran's Discount",    ruleType: 'Discount',     desc: '15% off for verified veterans and active service members' },
+      { text: 'Applies Sat–Sun, 7am–12pm' }
+    ]
   },
   {
     name: 'Summer Block Rate',
-    category: 'Seasonal',
-    desc: 'Premium block pricing during peak summer months',
+    purchaseModel: 'Hours',
+    desc: 'Peak summer season pricing with elevated rate rule',
     stdRate: 20, memRate: 16, unit: 'hr',
-    rules: ['Peak season surcharge: 20%', 'Applies Jun–Aug, all hours']
+    rules: [
+      { name: 'Summer Premium Rate', ruleType: 'Special Rate', desc: 'Replaces base rate for the entire summer season' },
+      { text: 'Applies Jun–Aug, all hours' }
+    ]
+  },
+  {
+    name: 'Member Loyalty Discount',
+    purchaseModel: 'Hours',
+    desc: 'Multiple loyalty discount rules for qualifying members',
+    stdRate: null, memRate: null, unit: 'hr',
+    rules: [
+      { name: "Veteran's Discount",  ruleType: 'Discount', desc: '20% off for verified veterans' },
+      { name: 'Senior Discount',     ruleType: 'Discount', desc: '15% off for clients aged 65+' },
+      { name: 'Staff Rate',          ruleType: 'Special Rate', desc: 'Fixed reduced rate for facility staff members' },
+      { text: 'Requires active membership in good standing' }
+    ]
   },
   {
     name: 'Holiday Premium Rate',
-    category: 'Holiday',
-    desc: 'Elevated pricing on public holidays',
+    purchaseModel: 'Hours',
+    desc: 'Public holiday pricing with elevated rate rule applied',
     stdRate: 25, memRate: 20, unit: 'hr',
-    rules: ['Holiday rate multiplier: 1.50×', 'Applies all recognized public holidays']
+    rules: [
+      { name: 'Holiday Rate', ruleType: 'Special Rate', desc: 'Replaces all other rates on recognized public holidays' },
+      { text: 'Applies all recognized public holidays' }
+    ]
+  },
+  {
+    name: 'Drop-In Visit Rate',
+    purchaseModel: 'Occurrences',
+    desc: 'Per-visit pricing with occurrence and discount rules applied',
+    stdRate: 15, memRate: 12, unit: 'visit',
+    rules: [
+      { name: 'Drop-In Occurrence Rule', ruleType: 'Special Rate', desc: '1 occurrence deducted per booking regardless of duration' },
+      { name: 'Off-Peak Discount',       ruleType: 'Discount',     desc: '20% off drop-in visits booked during off-peak hours' },
+      { text: 'Valid for any available court or field type' }
+    ]
   },
 ];
 
@@ -3144,30 +3340,80 @@ function clearSelection() {
   updateBulkBar();
 }
 
+let _prevSelCount = 0;
+
 function updateBulkBar() {
   const n = selectedIds.size;
+  const visible = plans.filter(planMatchesFilters);
+  const total = visible.length;
 
-  // Floating selection bar (count + deselect)
-  const bar = document.getElementById('bulkBar');
-  document.getElementById('bulkCount').textContent = n;
-  bar.classList.toggle('visible', n > 0);
-  // Keep floating bar's own actions slot empty — actions live in toolbar now
-  document.getElementById('bulkActions').innerHTML = '';
-
-  // Toolbar inline bulk actions slot
-  const slot = document.getElementById('toolbarBulkActions');
+  // Count label: "X plans" normally, "X selected" when rows checked
+  const countEl = document.getElementById('bulkCount');
   if (n === 0) {
-    slot.style.display = 'none';
-    slot.innerHTML = '';
-    return;
+    countEl.textContent = total + ' plan' + (total !== 1 ? 's' : '');
+    countEl.classList.remove('has-sel');
+  } else {
+    countEl.textContent = n + ' selected';
+    countEl.classList.add('has-sel');
   }
-  slot.style.display = 'flex';
-  const actionsBtns = currentTab === 'active'
-    ? `<button class="bulk-action-btn" onclick="bulkArchive()">Archive</button>`
-    : `<button class="bulk-action-btn" onclick="bulkRestore()">Restore</button>
-       <button class="bulk-action-btn danger" onclick="bulkDelete()">Delete</button>`;
-  slot.innerHTML = actionsBtns;
+
+  // Deselect button
+  const deselectBtn = document.getElementById('bulkDeselect');
+  if (deselectBtn) deselectBtn.style.display = n > 0 ? '' : 'none';
+
+  // Action wrap
+  const wrap = document.getElementById('bulkActionWrap');
+  if (!wrap) return;
+
+  if (currentTab === 'active') {
+    // Single action — plain button
+    wrap.innerHTML = `<button class="bulk-action-btn" id="bulkArchiveBtn" ${n === 0 ? 'disabled' : ''} onclick="bulkArchive()">Archive</button>`;
+    const btn = document.getElementById('bulkArchiveBtn');
+    if (n > 0) {
+      btn.classList.add('has-selection');
+      if (_prevSelCount === 0) triggerBulkPulse(btn);
+    }
+  } else {
+    // Multiple actions — dropdown
+    wrap.innerHTML = `
+      <div class="bulk-dd-wrap">
+        <button class="bulk-action-btn bulk-dd-trigger" id="bulkDDBtn" ${n === 0 ? 'disabled' : ''} onclick="toggleBulkDropdown(event)">
+          Actions ▾
+        </button>
+        <div class="bulk-dd-menu" id="bulkDDMenu">
+          <button class="bulk-dd-item" onclick="closeBulkDropdown();bulkRestore()">Restore</button>
+          <button class="bulk-dd-item danger" onclick="closeBulkDropdown();bulkDelete()">Delete</button>
+        </div>
+      </div>`;
+    const btn = document.getElementById('bulkDDBtn');
+    if (n > 0) {
+      btn.classList.add('has-selection');
+      if (_prevSelCount === 0) triggerBulkPulse(btn);
+    }
+  }
+
+  _prevSelCount = n;
 }
+
+function triggerBulkPulse(btn) {
+  btn.classList.remove('pulsing');
+  void btn.offsetWidth; // force reflow
+  btn.classList.add('pulsing');
+  btn.addEventListener('animationend', () => btn.classList.remove('pulsing'), { once: true });
+}
+
+function toggleBulkDropdown(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('bulkDDMenu');
+  if (menu) menu.classList.toggle('open');
+}
+
+function closeBulkDropdown() {
+  const menu = document.getElementById('bulkDDMenu');
+  if (menu) menu.classList.remove('open');
+}
+
+document.addEventListener('click', () => closeBulkDropdown());
 
 function bulkArchive() {
   const ids = [...selectedIds];
@@ -3230,11 +3476,9 @@ function clearMainSearch() {
 // ── Render table ──────────────────────────────────────────
 function renderTable() {
   const visible = plans.filter(planMatchesFilters);
-  const countLabel = document.getElementById('countLabel');
-  if (countLabel) countLabel.textContent = visible.length + ' plan' + (visible.length !== 1 ? 's' : '');
 
   document.getElementById('tableBody').innerHTML = visible.length === 0
-    ? `<tr><td colspan="8" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
+    ? `<tr><td colspan="9" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
         ${currentTab === 'active' ? 'No active rental plans.' : 'No archived rental plans.'}
        </td></tr>`
     : visible.map(p => `
@@ -3247,9 +3491,10 @@ function renderTable() {
       <td><span class="model-pill">${p.model}</span></td>
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
+      <td class="${p.expiry === 'None' ? 'td-muted' : ''}">${p.expiry === 'None' ? 'No expiration' : p.expiry}</td>
       <td class="td-pricing-rules${p.pricingRules && p.pricingRules.length ? '' : ' empty'}"
           title="${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : ''}">
-        ${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : '—'}
+        ${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : 'Custom Rule'}
       </td>
       <td style="text-align:right;padding-right:14px;">
         <div class="row-menu-wrap">
@@ -3274,6 +3519,7 @@ function closePanel() {
   document.getElementById('sidePanel').classList.remove('open');
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
   currentMode = null; currentPlan = null; isDirty = false;
+  closeAllRateFilterPopovers();
   // Panel-layer annotation bubbles must be hidden when panel closes
   if (typeof renderAnnBubbles === 'function') renderAnnBubbles();
 }
@@ -3290,7 +3536,95 @@ function closePanelSafe() {
     closePanel();
   }
 }
-function markDirty() { isDirty = true; }
+function markDirty() {
+  isDirty = true;
+  const revertArea = document.getElementById('revertArea');
+  if (revertArea) revertArea.style.display = '';
+}
+
+// ── History tab content ───────────────────────────────────
+function buildHistoryHTML(plan) {
+  // Wireframe mock data — realistic placeholder audit entries
+  const entries = [
+    {
+      initials: 'KT', user: 'K. Towell', time: 'May 9, 2026 · 3:42 PM',
+      changes: [
+        { field: 'Status',     oldVal: 'Inactive', newVal: 'Active' },
+        { field: 'Auto-Renew', oldVal: 'Disabled', newVal: 'Enabled' },
+      ]
+    },
+    {
+      initials: 'MR', user: 'M. Rodriguez', time: 'Apr 22, 2026 · 10:15 AM',
+      changes: [
+        { field: 'Std. Price', oldVal: '$14 / hr', newVal: '$18 / hr' },
+        { field: 'Mbr. Price', oldVal: '$10 / hr', newVal: '$14 / hr' },
+      ]
+    },
+    {
+      initials: 'KT', user: 'K. Towell', time: 'Mar 5, 2026 · 9:00 AM',
+      changes: [
+        { field: 'Expiration', oldVal: '90 days',  newVal: 'None' },
+      ]
+    },
+    {
+      initials: 'KT', user: 'K. Towell', time: 'Jan 14, 2026 · 2:30 PM',
+      created: true
+    }
+  ];
+
+  const rows = entries.map(e => {
+    if (e.created) {
+      return `<div class="history-entry entry-created">
+        <div class="history-avatar" style="background:var(--color-text-muted);">${e.initials}</div>
+        <div class="history-content">
+          <div class="history-meta">
+            <span class="history-user">${e.user}</span>
+            <span class="history-time">${e.time}</span>
+          </div>
+          <span class="history-created-label">Plan created</span>
+        </div>
+      </div>`;
+    }
+    const changeRows = e.changes.map(c =>
+      `<div class="history-field-row">
+        <span class="history-field-name">${c.field}</span>
+        <span class="history-val old">${c.oldVal}</span>
+        <span class="history-arrow">→</span>
+        <span class="history-val">${c.newVal}</span>
+      </div>`
+    ).join('');
+    return `<div class="history-entry">
+      <div class="history-avatar">${e.initials}</div>
+      <div class="history-content">
+        <div class="history-meta">
+          <span class="history-user">${e.user}</span>
+          <span class="history-time">${e.time}</span>
+        </div>
+        <div class="history-changes">${changeRows}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="panel-section">
+    <div class="panel-section-title">Change History</div>
+    <div class="history-list">${rows}</div>
+  </div>`;
+}
+
+// ── Revert Changes ────────────────────────────────────────
+function showRevertConfirm() {
+  document.getElementById('revertBtn').style.display = 'none';
+  document.getElementById('revertConfirm').style.display = 'flex';
+}
+function cancelRevert() {
+  document.getElementById('revertConfirm').style.display = 'none';
+  document.getElementById('revertBtn').style.display = '';
+}
+function confirmRevert() {
+  // Re-render the edit panel from the unchanged plan data
+  const id = currentPlan.id;
+  openEdit(id);
+}
 function highlightRow(id) {
   if (selectedRow) selectedRow.classList.remove('selected');
   selectedRow = document.getElementById('row-'+id);
@@ -3433,7 +3767,7 @@ function openEdit(id) {
   highlightRow(id);
   const p = currentPlan;
 
-  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, 'Editing rental plan', ['Plan Details','Pricing'], 0);
+  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, 'Editing rental plan', ['Plan Details','Pricing','History'], 0);
   document.getElementById('panelBody').innerHTML = `
     <div id="etab-0">
       <div class="panel-section">
@@ -3562,10 +3896,21 @@ function openEdit(id) {
         </div>
       </div>
     </div>
+    <div id="etab-2" style="display:none;">
+      ${buildHistoryHTML(p)}
+    </div>
   `;
   document.getElementById('panelFooter').innerHTML = `
     <div class="footer-left">
       <button class="panel-btn panel-btn-cancel" onclick="closePanelSafe()">Cancel</button>
+      <div id="revertArea" style="display:none;">
+        <button class="panel-btn panel-btn-revert" id="revertBtn" onclick="showRevertConfirm()">Revert Changes</button>
+        <div id="revertConfirm" class="revert-confirm-inline" style="display:none;">
+          <span class="revert-confirm-text">Revert all changes?</span>
+          <button class="panel-btn-revert-confirm" onclick="confirmRevert()">Revert</button>
+          <button class="panel-btn-revert-dismiss" onclick="cancelRevert()">Cancel</button>
+        </div>
+      </div>
     </div>
     <div class="footer-right">
       <button class="panel-btn panel-btn-primary" onclick="validateAndSave('edit')">Save Changes</button>
@@ -3583,7 +3928,7 @@ function openCreate() {
   currentMode = 'create';
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
 
-  document.getElementById('panelHeader').innerHTML = buildHeader('Create Rental Plan', null, ['Plan Details','Pricing'], 0);
+  document.getElementById('panelHeader').innerHTML = buildHeader('Add Rental Plan', null, ['Plan Details','Pricing'], 0);
   document.getElementById('panelBody').innerHTML = `
     <div id="ctab-0">
       <div class="panel-section">
@@ -3766,46 +4111,75 @@ function buildViewRateList(pricingRules) {
   if (!pricingRules || !pricingRules.length) {
     return `<div class="view-value empty">No rental rates assigned</div>`;
   }
-  return pricingRules.map(ruleName => {
+  const items = pricingRules.map(ruleName => {
     const rate = ALL_RENTAL_RATES.find(r => r.name === ruleName);
-    if (!rate) return `<div class="view-rate-item"><div class="view-rate-header"><div class="view-rate-name">${ruleName}</div></div></div>`;
-    const rulesHtml = rate.rules.map(r => `<div class="rate-rule-line">${r}</div>`).join('');
+    if (!rate) return `<div class="view-rate-item"><div class="view-rate-item-header"><div class="view-rate-header"><div class="view-rate-name">${ruleName}</div></div></div></div>`;
+
+    const namedRules = rate.rules.filter(rule => rule.ruleType);
+    const allRulesHtml = namedRules.map(rule => {
+      const rtClass = rule.ruleType === 'Discount' ? 'discount' : 'special-rate';
+      return `<div class="rate-rule-line named">
+        <div class="rate-rule-name">${rule.name}<span class="rate-type-tag ${rtClass}">${rule.ruleType}</span></div>
+        <div class="rate-rule-desc">${rule.desc}</div>
+      </div>`;
+    }).join('');
+
+    const count = namedRules.length;
+    const toggleBtn = count
+      ? `<button class="rate-rules-toggle" onclick="toggleRateExpand(this)" data-count="${count}">▸ ${count} rule${count !== 1 ? 's' : ''}</button>`
+      : '';
+
     const priceHtml = (rate.stdRate || rate.memRate)
       ? `<div class="view-rate-price"><strong>$${rate.stdRate} / ${rate.unit}</strong> standard &nbsp;·&nbsp; <strong>$${rate.memRate} / ${rate.unit}</strong> members</div>`
       : '';
+
     return `
       <div class="view-rate-item">
-        <div class="view-rate-header">
-          <div class="view-rate-name">${rate.name}</div>
-          <span class="rate-category-tag">${rate.category}</span>
+        <div class="view-rate-item-header">
+          <div class="view-rate-header">
+            <div class="view-rate-name">${rate.name}</div>
+            ${toggleBtn}
+          </div>
+          ${priceHtml}
         </div>
-        ${priceHtml}
-        <div class="view-rate-rules">${rulesHtml}</div>
+        <div class="rate-rules-body" style="padding:6px 12px 10px;">${allRulesHtml}</div>
       </div>`;
-  }).join('');
+  });
+  return `<div class="view-rate-list">${items.join('')}</div>`;
 }
 
-// Build the search + filter chips + selectable rate list for edit/create panels.
+// Build the search + filter button + selectable rate list for edit/create panels.
 // context: 'edit' | 'create'
 function buildRateListHTML(selectedRules, context) {
-  const categories = ['All', 'Peak', 'Off-peak', 'Seasonal', 'Holiday'];
-  const chipsHtml = categories.map(c =>
-    `<button class="rate-filter-chip${c === 'All' ? ' active' : ''}"
-             onclick="setRateFilter(this,'${context}')"
-             data-cat="${c.toLowerCase()}">${c}</button>`
-  ).join('');
-
   const itemsHtml = ALL_RENTAL_RATES.map(r => {
     const checked = (selectedRules || []).includes(r.name);
-    const rulesHtml = r.rules.map(rule => `<div class="rate-rule-line">${rule}</div>`).join('');
-    const count = r.rules.length;
+    const namedRules = r.rules.filter(rule => rule.ruleType);
+    const rulesHtml = namedRules.map(rule => {
+      const rtClass = rule.ruleType === 'Discount' ? 'discount' : 'special-rate';
+      return `<div class="rate-rule-line named">
+        <div class="rate-rule-name">${rule.name}<span class="rate-type-tag ${rtClass}">${rule.ruleType}</span></div>
+        <div class="rate-rule-desc">${rule.desc}</div>
+      </div>`;
+    }).join('');
+    const count = namedRules.length;
+    const modelLabel = r.purchaseModel === 'Occurrences' ? 'Per Occurrence' : 'Hourly';
+    // Collect the unique rule types present in this rate's rules for filtering
+    const ruleTypeKeys = [...new Set(r.rules.filter(rule => rule.ruleType).map(rule =>
+      rule.ruleType.toLowerCase().replace(' ', '-')
+    ))].join(' ');
     return `
-      <div class="rate-item" data-name="${r.name.toLowerCase()}" data-desc="${r.desc.toLowerCase()}" data-cat="${r.category.toLowerCase()}">
+      <div class="rate-item"
+           data-name="${r.name.toLowerCase()}"
+           data-desc="${r.desc.toLowerCase()}"
+           data-ruletype="${ruleTypeKeys}"
+           data-model="${(r.purchaseModel || 'hours').toLowerCase()}">
         <div class="rate-item-header">
           <label class="rate-check-label">
             <input type="checkbox" class="rate-cb" ${checked ? 'checked' : ''} onchange="markDirty()">
             <div class="rate-item-info">
-              <div class="rate-item-name">${r.name} <span class="rate-category-tag">${r.category}</span></div>
+              <div class="rate-item-name">${r.name}
+                <span class="rate-type-tag" style="background:var(--color-surface-raised);color:var(--color-text-secondary);">${modelLabel}</span>
+              </div>
               ${(r.stdRate || r.memRate) ? `
               <div class="rate-item-price">
                 <span>$${r.stdRate} / ${r.unit}</span>
@@ -3830,8 +4204,14 @@ function buildRateListHTML(selectedRules, context) {
                oninput="onRateSearch(this,'${context}')">
         <button class="search-clear" onclick="clearRateSearch('${context}')" title="Clear">✕</button>
       </div>
+      <div class="filter-wrap">
+        <button class="filter-btn" id="${context}-rate-filter-btn"
+                onclick="toggleRateFilterPopover(this,'${context}')">
+          <span>⊞</span> Filter
+          <span class="filter-badge" id="${context}-rate-filter-badge" style="display:none;"></span>
+        </button>
+      </div>
     </div>
-    <div class="rate-filter-chips" id="${context}-rate-filters">${chipsHtml}</div>
     <div class="rate-select-actions">
       <button class="rate-select-btn" onclick="selectAllRates('${context}', true)">Select All</button>
       <button class="rate-select-btn" onclick="selectAllRates('${context}', false)">Deselect All</button>
@@ -3842,26 +4222,100 @@ function buildRateListHTML(selectedRules, context) {
     </div>`;
 }
 
-// Filter visible rate items by search query + active category chip.
+// Filter visible rate items by search query + popover checkboxes.
 function filterRentalRates(context) {
   const input = document.getElementById(context + '-rate-search');
   const query = input ? input.value.toLowerCase().trim() : '';
-  const activeChip = document.querySelector('#' + context + '-rate-filters .rate-filter-chip.active');
-  const category = activeChip ? activeChip.dataset.cat : 'all';
+
+  // Collect checked values from the filter popover
+  const pop = document.getElementById(context + '-rate-filter-popover');
+  const checkedRuleTypes = new Set();
+  const checkedModels    = new Set();
+  if (pop) {
+    pop.querySelectorAll('input[data-filter="ruletype"]:checked').forEach(cb => checkedRuleTypes.add(cb.value));
+    pop.querySelectorAll('input[data-filter="model"]:checked').forEach(cb   => checkedModels.add(cb.value));
+  }
 
   const list = document.getElementById(context + '-rate-list');
   if (!list) return;
 
   let visible = 0;
   list.querySelectorAll('.rate-item').forEach(item => {
-    const matchSearch = !query || item.dataset.name.includes(query) || item.dataset.desc.includes(query);
-    const matchCat    = category === 'all' || item.dataset.cat === category;
-    item.style.display = (matchSearch && matchCat) ? '' : 'none';
-    if (matchSearch && matchCat) visible++;
+    const matchSearch   = !query || item.dataset.name.includes(query) || item.dataset.desc.includes(query);
+    const itemRuleTypes = new Set((item.dataset.ruletype || '').split(' ').filter(Boolean));
+    const matchRuleType = checkedRuleTypes.size === 0 || [...checkedRuleTypes].some(t => itemRuleTypes.has(t));
+    const matchModel    = checkedModels.size    === 0 || checkedModels.has(item.dataset.model);
+    item.style.display = (matchSearch && matchRuleType && matchModel) ? '' : 'none';
+    if (matchSearch && matchRuleType && matchModel) visible++;
   });
 
   const noRes = document.getElementById(context + '-rate-no-results');
   if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+
+  // Sync filter button badge
+  const activeCount = pop ? pop.querySelectorAll('input:checked').length : 0;
+  const btn   = document.getElementById(context + '-rate-filter-btn');
+  const badge = document.getElementById(context + '-rate-filter-badge');
+  if (btn)   btn.classList.toggle('active', activeCount > 0);
+  if (badge) { badge.style.display = activeCount > 0 ? 'inline-flex' : 'none'; badge.textContent = activeCount; }
+}
+
+// ── Rate filter popover ───────────────────────────────────
+// The popover is appended to <body> (not inside the side panel) so that
+// the panel's CSS transform doesn't break position:fixed coordinate space.
+function ensureRateFilterPopover(context) {
+  let pop = document.getElementById(context + '-rate-filter-popover');
+  if (pop) return pop;
+  pop = document.createElement('div');
+  pop.id        = context + '-rate-filter-popover';
+  pop.className = 'rate-filter-popover';
+  pop.innerHTML = `
+    <div class="filter-popover-section">
+      <div class="filter-popover-label">Rule Type</div>
+      <div class="filter-popover-options">
+        <label class="filter-option"><input type="checkbox" data-filter="ruletype" value="special-rate" onchange="filterRentalRates('${context}')"> Special Rate</label>
+        <label class="filter-option"><input type="checkbox" data-filter="ruletype" value="discount"     onchange="filterRentalRates('${context}')"> Discount</label>
+      </div>
+    </div>
+    <hr class="filter-popover-divider">
+    <div class="filter-popover-section">
+      <div class="filter-popover-label">Purchase Model</div>
+      <div class="filter-popover-options">
+        <label class="filter-option"><input type="checkbox" data-filter="model" value="hours"       onchange="filterRentalRates('${context}')"> Hours</label>
+        <label class="filter-option"><input type="checkbox" data-filter="model" value="occurrences" onchange="filterRentalRates('${context}')"> Occurrences</label>
+      </div>
+    </div>
+    <hr class="filter-popover-divider">
+    <div class="filter-popover-footer">
+      <button class="filter-clear-btn" onclick="clearRateFilters('${context}')">Clear filters</button>
+    </div>`;
+  document.body.appendChild(pop);
+  return pop;
+}
+function toggleRateFilterPopover(btn, context) {
+  const pop    = ensureRateFilterPopover(context);
+  const isOpen = pop.classList.contains('open');
+  closeAllRateFilterPopovers();
+  if (!isOpen) {
+    const rect     = btn.getBoundingClientRect();
+    const popWidth = 224;
+    pop.style.top  = (rect.bottom + 6) + 'px';
+    pop.style.left = Math.max(8, rect.right - popWidth) + 'px';
+    pop.classList.add('open');
+    btn.classList.add('active');
+  }
+}
+function closeAllRateFilterPopovers() {
+  document.querySelectorAll('.rate-filter-popover.open').forEach(p => {
+    p.classList.remove('open');
+    const b = document.getElementById(p.id.replace('-rate-filter-popover', '-rate-filter-btn'));
+    if (b) b.classList.remove('active');
+  });
+}
+function clearRateFilters(context) {
+  const pop = document.getElementById(context + '-rate-filter-popover');
+  if (pop) pop.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  filterRentalRates(context);
 }
 
 function setRateFilter(btn, context) {
@@ -4102,7 +4556,7 @@ document.addEventListener('keydown', e => {
 
 // Expand/collapse the rules list on a rate item.
 function toggleRateExpand(btn) {
-  const item = btn.closest('.rate-item');
+  const item = btn.closest('.rate-item, .view-rate-item');
   item.classList.toggle('expanded');
   const count = btn.dataset.count;
   const label = count + ' rule' + (count !== '1' ? 's' : '');
@@ -4611,6 +5065,12 @@ function onAnnDragEnd(e) {
 }
 
 // ── Global event wiring ───────────────────────────────────
+// Close rate filter popovers on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.rate-filter-popover') && !e.target.closest('[id$="-rate-filter-btn"]')) {
+    closeAllRateFilterPopovers();
+  }
+});
 // Close detail popover on outside click
 document.addEventListener('click', e => {
   const pop = document.getElementById('annDetailPopover');

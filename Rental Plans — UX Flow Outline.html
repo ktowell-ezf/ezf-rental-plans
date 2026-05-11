@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rental Plans — UX Flow Outline</title>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Fira Sans', sans-serif;
+    background: #F0F6F8;
+    color: #182023;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  /* ── Page chrome ── */
+  .page-header {
+    background: #23373F;
+    color: #fff;
+    padding: 32px 48px 28px;
+    border-bottom: 3px solid #00C28A;
+  }
+  .page-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .page-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #00C28A;
+  }
+  .page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .page-header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    display: flex;
+    gap: 24px;
+  }
+  .page-header-sub span { display: flex; align-items: center; gap: 6px; }
+
+  /* ── Layout ── */
+  .page-body {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 36px 32px 60px;
+  }
+
+  /* ── Scope callout ── */
+  .scope-box {
+    background: #EBF3FD;
+    border: 1px solid #C3D9F8;
+    border-left: 4px solid #2B7BE4;
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    font-size: 13px;
+    color: #1D4E8F;
+  }
+  .scope-box strong { color: #1D5EB8; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 28px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .section-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #23373F;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-header h2 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #182023;
+    flex: 1;
+  }
+  .story-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    align-items: center;
+  }
+  .story-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .story-tag.covered   { background: rgba(0,194,138,0.12); color: #00875F; border: 1px solid rgba(0,194,138,0.3); }
+  .story-tag.partial   { background: rgba(255,171,0,0.12); color: #946800; border: 1px solid rgba(255,171,0,0.3); }
+  .story-tag.design    { background: rgba(43,123,228,0.10); color: #1D5EB8; border: 1px solid rgba(43,123,228,0.25); }
+
+  /* ── Card ── */
+  .card {
+    background: #fff;
+    border: 1px solid #D8E8EE;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .card-head {
+    padding: 11px 16px 10px;
+    background: #F7FAFB;
+    border-bottom: 1px solid #EAF0F3;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #597179;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+  }
+  .card-head:hover { background: #EFF5F8; }
+  .card-chevron { font-size: 10px; color: #A1BDC6; transition: transform 0.2s; }
+  .card.open .card-chevron { transform: rotate(90deg); }
+  .card-body {
+    display: none;
+    padding: 14px 16px 16px;
+  }
+  .card.open .card-body { display: block; }
+
+  /* ── Sub-sections within cards ── */
+  .subsection { margin-bottom: 14px; }
+  .subsection:last-child { margin-bottom: 0; }
+  .subsection-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #A1BDC6;
+    margin-bottom: 6px;
+  }
+
+  /* ── Field rows ── */
+  .field-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+  }
+  .field-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 0;
+    border-bottom: 1px solid #F0F6F8;
+    font-size: 13px;
+  }
+  .field-item:last-child { border-bottom: none; }
+  .field-name {
+    font-weight: 600;
+    color: #23373F;
+    min-width: 130px;
+    flex-shrink: 0;
+  }
+  .field-note {
+    color: #597179;
+    font-size: 12px;
+  }
+
+  /* ── Bullet list ── */
+  .item-list { list-style: none; }
+  .item-list li {
+    padding: 4px 0 4px 16px;
+    position: relative;
+    font-size: 13px;
+    color: #23373F;
+    border-bottom: 1px solid #F0F6F8;
+  }
+  .item-list li:last-child { border-bottom: none; }
+  .item-list li::before {
+    content: '•';
+    position: absolute;
+    left: 4px;
+    color: #A1BDC6;
+  }
+
+  /* ── Note/callout inline ── */
+  .note {
+    font-size: 12px;
+    color: #597179;
+    background: #F7FAFB;
+    border-left: 3px solid #D8E8EE;
+    border-radius: 0 4px 4px 0;
+    padding: 7px 11px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .note.warn {
+    background: #FFFBEB;
+    border-left-color: #F59E0B;
+    color: #78480F;
+  }
+  .note.design {
+    background: #EBF3FD;
+    border-left-color: #2B7BE4;
+    color: #1D4E8F;
+  }
+  .note strong { font-weight: 700; }
+
+  /* ── Tab row (for panels with tabs) ── */
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .tab-chip {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid #D8E8EE;
+    background: #fff;
+    color: #597179;
+  }
+  .tab-chip.active {
+    background: #23373F;
+    color: #fff;
+    border-color: #23373F;
+  }
+  .tab-chip.new {
+    background: rgba(0,194,138,0.10);
+    color: #00875F;
+    border-color: rgba(0,194,138,0.3);
+  }
+
+  /* ── Out of scope table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #597179;
+    padding: 7px 12px;
+    background: #F7FAFB;
+    border-bottom: 1px solid #EAF0F3;
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #F0F6F8;
+    color: #23373F;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  td:first-child { font-weight: 700; color: #597179; white-space: nowrap; }
+  .phase-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  .phase-badge.separate  { background: #F0F6F8; color: #597179; }
+  .phase-badge.postmvp   { background: rgba(255,171,0,0.12); color: #946800; }
+  .phase-badge.blocked   { background: rgba(224,82,82,0.10); color: #B93333; }
+
+  /* ── Open questions ── */
+  .oq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .oq-card {
+    background: #fff;
+    border: 1px solid #D8E8EE;
+    border-radius: 6px;
+    padding: 12px 14px;
+  }
+  .oq-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: #A1BDC6;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 4px;
+  }
+  .oq-q {
+    font-size: 13px;
+    font-weight: 600;
+    color: #23373F;
+    margin-bottom: 6px;
+  }
+  .oq-note {
+    font-size: 12px;
+    color: #597179;
+    line-height: 1.45;
+  }
+  .oq-card.needs-decision { border-left: 3px solid #F59E0B; }
+  .oq-card.addressed      { border-left: 3px solid #00C28A; }
+
+  /* ── Design decisions ── */
+  .decision-card {
+    background: #fff;
+    border: 1px solid #D8E8EE;
+    border-left: 4px solid #2B7BE4;
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .decision-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #2B7BE4;
+    margin-bottom: 5px;
+  }
+  .decision-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #182023;
+    margin-bottom: 5px;
+  }
+  .decision-body {
+    font-size: 13px;
+    color: #597179;
+    line-height: 1.5;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    margin-bottom: 28px;
+    align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.covered { background: #00C28A; }
+  .legend-dot.partial { background: #F59E0B; }
+  .legend-dot.design  { background: #2B7BE4; }
+
+  hr.divider { border: none; border-top: 1px solid #D8E8EE; margin: 8px 0 14px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-header-meta">
+    <span class="page-label">UX Flow Outline</span>
+  </div>
+  <h1>Rental Plans — Admin Configuration</h1>
+  <div class="page-header-sub">
+    <span>📄 PRD: Rental Packages — January 2026 Draft</span>
+    <span>✏️ Prepared by K. Towell</span>
+    <span>🗓 May 2026</span>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <div class="scope-box">
+    <strong>Wireframe scope:</strong> This wireframe covers the <strong>Admin Configuration</strong> experience — the standalone Rental Plans admin page where facility admins create, view, edit, and archive Rental Plans. Sales, schedule deduction, client profile, reporting, and Self Service flows are out of scope for this wireframe (see Section 5).
+  </div>
+
+  <div class="legend">
+    <span style="font-size:12px;font-weight:600;color:#597179;margin-right:4px;">Story coverage:</span>
+    <span class="legend-item"><span class="legend-dot covered"></span> Fully covered</span>
+    <span class="legend-item"><span class="legend-dot partial"></span> Partially covered</span>
+    <span class="legend-item"><span class="legend-dot design"></span> Design addition</span>
+  </div>
+
+  <!-- ── 1. List ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Rental Plans List</h2>
+      <div class="story-tags">
+        <span class="story-tag covered">Story 1 ✓</span>
+        <span class="story-tag partial">Story 10 partial</span>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Page Tabs <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li><strong>Active</strong> — shows all non-archived plans with count badge</li>
+          <li><strong>Archived</strong> — shows archived plans with count badge; switching tab resets filters and selection</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Toolbar <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Search field — matches against any visible plan detail (name, purchase model, pricing model, description, applied rate names)</li>
+          <li><strong>Filters</strong> button opens popover: Status · Purchase Model · Pricing Rules multiselect · Standard Price range · Member Price range · Clear filters</li>
+          <li>Results count ("X plans") — replaced by "X selected" when rows are checked</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Bulk Actions <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Always visible in toolbar; disabled until rows are selected</li>
+          <li><strong>Active tab:</strong> single <em>Archive</em> button — because there is only one available bulk action, no dropdown is needed; enabled on selection and pulses briefly to draw attention on first selection</li>
+          <li><strong>Archived tab:</strong> <em>Actions ▾</em> dropdown containing Restore and Delete — a dropdown is used here because there are two available bulk actions; this keeps the toolbar clean while making all options accessible</li>
+          <li>Deselect All button appears when rows are checked</li>
+        </ul>
+        <div class="note design"><strong>UX pattern:</strong> When there is only one bulk action available, it is shown as a direct button. When there are two or more, they are consolidated into a dropdown. This avoids cluttering the toolbar while keeping all actions reachable. <span style="display:inline-block;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px;letter-spacing:0.05em;vertical-align:middle;margin-left:6px;">OPTIONAL CHANGE</span> <span style="color:#946800;font-size:12px;font-weight:600;">Affects global grid component</span></div>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Grid Columns &amp; Actions <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Checkbox · Name · Status badge · Purchase Model · Standard Price · Member Price · Expiration · Pricing Rules</li>
+          <li>Pricing Rules cell shows applied rate names when rates are assigned; shows <em>Custom Rule</em> (italicized) when the plan uses ad hoc pricing with no applied rates</li>
+          <li>Row actions (⋯): View, Edit, Archive — or Restore / Delete on Archived tab</li>
+          <li>Add Rental Plan button in page header opens the Add Rental Plan side panel</li>
+        </ul>
+        <div class="note">Satisfies Story 1 list view requirements: columns, filter/search, archive. Story 10 entry points (View + Edit row actions) are present.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Create ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Add Rental Plan</h2>
+      <div class="story-tags">
+        <span class="story-tag covered">Story 1 ✓</span>
+        <span class="story-tag covered">Story 2 ✓</span>
+        <span class="story-tag covered">Story 11 ✓</span>
+        <span class="story-tag covered">Story 14 ✓</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div class="tab-row">
+        <span class="tab-chip active">Plan Details</span>
+        <span class="tab-chip">Pricing</span>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 1 — Plan Details <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-item"><span class="field-name">Plan Name</span><span class="field-note">Text input, required</span></div>
+          <div class="field-item"><span class="field-name">Description</span><span class="field-note">Textarea</span></div>
+          <div class="field-item"><span class="field-name">Status</span><span class="field-note">Active / Inactive toggle</span></div>
+          <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Toggle on/off; duration input when enabled — Story 11 ✓</span></div>
+          <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Toggle on/off — Story 14 ✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 2 — Pricing <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <div class="subsection">
+          <div class="subsection-label">Pricing configuration fields</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Hours or Occurrences — one per plan</span></div>
+            <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Numeric input</span></div>
+            <div class="field-item"><span class="field-name">Pricing Model</span><span class="field-note">Flat Price or Per Unit</span></div>
+            <div class="field-item"><span class="field-name">Standard Price</span><span class="field-note">Currency input</span></div>
+            <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Separate price point — Story 2 ✓</span></div>
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="subsection">
+          <div class="subsection-label">Applied Rates mode</div>
+          <ul class="item-list">
+            <li>Search field to filter the rates list</li>
+            <li>Filter button opens popover: Rule Type (Special Rate / Discount) · Purchase Model</li>
+            <li>Selectable list sourced from Rental Rates admin page</li>
+            <li>Each rate shows: name · purchase model tag · std and member price · description</li>
+            <li>▸ N rules toggle reveals named pricing rules — each shows rule name, rule type badge, and description</li>
+            <li>Select All / Deselect All controls</li>
+          </ul>
+        </div>
+        <hr class="divider">
+        <div class="subsection">
+          <div class="subsection-label">Custom Pricing mode</div>
+          <ul class="item-list">
+            <li>Manual standard and member price inputs (flat or per-unit per Pricing Model selection)</li>
+          </ul>
+          <div class="note design"><strong>How custom rates are tracked:</strong> When a plan is saved with custom pricing unique to that rental plan, the rate is created and displayed as a read-only entry in the Rental Rates grid — it does not appear as a selectable option when searching applied rates on the Add or Edit Rental Plan panels. In the Rental Rates grid, the Rental Type value for these rows will be <strong>Rental Plan: [plan name]</strong>. Rather than Edit/Delete actions, these rows will show a button that navigates directly to the associated rental plan. A design update to the rental rates grid can be provided if approved.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Panel Footer <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li><strong>Save</strong> (primary) · <strong>Cancel</strong> (secondary)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. View ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>View Rental Plan</h2>
+      <div class="story-tags">
+        <span class="story-tag covered">Story 1 ✓</span>
+        <span class="story-tag covered">Story 2 ✓</span>
+        <span class="story-tag covered">Story 11 ✓</span>
+        <span class="story-tag covered">Story 14 ✓</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div class="tab-row">
+        <span class="tab-chip active">Plan Summary</span>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Plan Summary (read-only) <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <div class="field-grid">
+          <div class="field-item"><span class="field-name">Name</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Status</span><span class="field-note">Active / Inactive badge</span></div>
+          <div class="field-item"><span class="field-name">Description</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Pricing Model</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Standard Price</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Duration from purchase date, or "No expiration" — read-only</span></div>
+          <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Enabled / Disabled — read-only</span></div>
+        </div>
+        <hr class="divider">
+        <div class="subsection-label">Applied Rates</div>
+        <ul class="item-list">
+          <li>Read-only card list — each card shows rate name and price</li>
+          <li>▸ N rules toggle (collapsed by default) — expands to show named pricing rules with rule type badges</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. Edit ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Edit Rental Plan</h2>
+      <div class="story-tags">
+        <span class="story-tag covered">Story 10 ✓</span>
+        <span class="story-tag covered">Story 11 ✓</span>
+        <span class="story-tag covered">Story 14 ✓</span>
+        <span class="story-tag design">Q2 — Audit Trail</span>
+      </div>
+    </div>
+
+    <div style="margin-bottom:10px;">
+      <div class="tab-row">
+        <span class="tab-chip active">Plan Details</span>
+        <span class="tab-chip">Pricing</span>
+        <span class="tab-chip new">History ✦ new</span>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 1 — Plan Details <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Same fields as Add Rental Plan — Plan Details tab, pre-populated with saved values — all fields editable</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 2 — Pricing <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Same rate picker as Create, pre-populated with saved selections</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 3 — History <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>Read-only chronological audit log — addresses PRD Open Question Q2</li>
+          <li>Each entry: user avatar/initials · display name · timestamp</li>
+          <li>Fields changed shown as: old value → new value</li>
+          <li>Creation entry at bottom ("Plan created by…")</li>
+        </ul>
+        <div class="note design"><strong>Design addition:</strong> The History tab was added proactively to address Q2 (audit trail). Confirm whether this satisfies the requirement or whether a more robust solution is needed.</div>
+      </div>
+    </div>
+
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Panel Footer <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li><strong>Save</strong> (primary) · <strong>Cancel</strong> (secondary)</li>
+          <li><strong>Revert Changes</strong> — appears only after a field has been edited; shows inline "Revert all changes? [Revert] [Cancel]" before reverting to last saved state</li>
+        </ul>
+        <div class="note warn"><strong>Design decision — review required:</strong> Story 10 specifies a confirmation prompt before saving changes. The wireframe implements a Revert Changes button instead. Confirm preferred pattern before handoff.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Out of Scope ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Out of Scope for This Wireframe</h2>
+    </div>
+    <div class="card open">
+      <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Stories requiring separate design work <span class="card-chevron">▶</span></div>
+      <div class="card-body">
+        <table>
+          <thead>
+            <tr>
+              <th>Story</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Story 3</td><td>Staff sells a Rental Plan to a client</td><td><span class="phase-badge separate">Separate sales flow</span></td></tr>
+            <tr><td>Story 4</td><td>Client Profile — view purchased plans and balance history</td><td><span class="phase-badge separate">Client Profile tab</span></td></tr>
+            <tr><td>Story 5</td><td>Schedule — automatic deduction at booking time</td><td><span class="phase-badge separate">Schedule integration</span></td></tr>
+            <tr><td>Story 6</td><td>Schedule — insufficient balance handling at booking</td><td><span class="phase-badge separate">Depends on Story 5</span></td></tr>
+            <tr><td>Story 7</td><td>Schedule — restore balance when rental is deleted</td><td><span class="phase-badge separate">Open questions remain</span></td></tr>
+            <tr><td>Story 8</td><td>Reporting — Rental Plan sales summary</td><td><span class="phase-badge separate">Separate reports page</span></td></tr>
+            <tr><td>Story 9</td><td>Self Service — client view of purchased plans</td><td><span class="phase-badge postmvp">Post-MVP</span></td></tr>
+            <tr><td>Story 12</td><td>Auto-refund to package on rental cancellation</td><td><span class="phase-badge blocked">Blocked on Story 5</span></td></tr>
+            <tr><td>Story 13</td><td>Admin — manual refund of unused rentals</td><td><span class="phase-badge separate">Client Profile action</span></td></tr>
+            <tr><td>Story 15</td><td>Client — family package sharing</td><td><span class="phase-badge separate">Client Profile flow</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. Open Questions ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Open Questions — Design Impact</h2>
+    </div>
+    <div class="oq-grid">
+      <div class="oq-card addressed">
+        <div class="oq-num">Q2 · Addressed in wireframe</div>
+        <div class="oq-q">What level of audit logging is required?</div>
+        <div class="oq-note">History tab added to Edit panel with chronological change log. Scope and retention policy TBD with Engineering.</div>
+      </div>
+      <div class="oq-card needs-decision">
+        <div class="oq-num">Q1 · Needs answer</div>
+        <div class="oq-q">What permission levels are needed for selling vs. configuring?</div>
+        <div class="oq-note">No permission-gating shown in this wireframe. Will need to be layered in once permission model is defined.</div>
+      </div>
+      <div class="oq-card needs-decision">
+        <div class="oq-num">Q3 · Needs business decision</div>
+        <div class="oq-q">Can an active (sold) plan configuration be edited?</div>
+        <div class="oq-note">Wireframe allows editing all fields. The recommended approach is that edits to a sold plan take effect only at the next renewal — not retroactively. This means the client must be notified of the upcoming change and given the opportunity to cancel renewal before it applies. This should be confirmed as a business rule before engineering estimates Story 10.</div>
+      </div>
+      <div class="oq-card needs-decision">
+        <div class="oq-num">Q4 · Needs answer</div>
+        <div class="oq-q">Balance restoration on delete — automatic or prompted?</div>
+        <div class="oq-note">Not addressed in this wireframe (Schedule flow). Behavior decision needed before Story 7 design begins.</div>
+      </div>
+      <div class="oq-card needs-decision">
+        <div class="oq-num">Q5 · Needs answer</div>
+        <div class="oq-q">Reporting — new report or update existing?</div>
+        <div class="oq-note">Not addressed in this wireframe. Options A, B, C from PRD remain open.</div>
+      </div>
+      <div class="oq-card addressed">
+        <div class="oq-num">Q6 · Resolved</div>
+        <div class="oq-q">Terminology differences from Package Plans?</div>
+        <div class="oq-note">"Rental Packages" has been decided across departments to be referred to as <strong>Rental Plans</strong>. This is reflected throughout the wireframe. Remaining term decisions (Check-In vs. Attended, etc.) apply to Schedule and Client Profile flows and remain open for those workstreams.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. Design Decisions ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Design Decisions for Product Owner Review</h2>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 1 · Story 10</div>
+      <div class="decision-title">Revert Changes vs. Save Confirmation</div>
+      <div class="decision-body">The PRD specifies a confirmation prompt before saving changes. The wireframe implements a <strong>Revert Changes</strong> button instead — it appears in the footer once any field has been edited, and shows an inline confirmation before reverting to last saved state. This avoids interrupting the save flow. <strong>Confirm preferred pattern before handoff.</strong></div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 2 · Q2</div>
+      <div class="decision-title">History Tab as Audit Trail</div>
+      <div class="decision-body">A History tab was added to the Edit panel proactively to address Q2. It shows a read-only chronological log of field changes with user, timestamp, and old → new values. Confirm whether this satisfies the audit trail requirement or whether a more robust solution (exportable log, separate page) is needed.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 3 · Story 1</div>
+      <div class="decision-title">Applied Rates vs. Custom Pricing</div>
+      <div class="decision-body">The Pricing tab offers both Applied Rates (sourced from the Rental Rates admin page) and Custom Pricing modes via a segmented control. The PRD does not explicitly define this as a UI pattern. Confirm this aligns with product intent.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 4 · Story 1</div>
+      <div class="decision-title">Rate Rules Display in Plan Summary</div>
+      <div class="decision-body">Pricing rules attached to each Applied Rate are shown collapsed by default behind an expandable ▸ N rules toggle in the Plan Summary view, consistent with the Edit/Create panels. Confirm this is the right level of detail for the read-only summary.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // All cards start open; clicking head toggles them
+  document.querySelectorAll('.card-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.parentElement.classList.toggle('open');
+    });
+  });
+</script>
+</body>
+</html>
