@@ -506,7 +506,7 @@ body {
   transition: background 0.2s, border-color 0.2s;
 }
 .search-wrap { position: relative; }
-.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 13px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); font-size: 13px; pointer-events: none; }
 .search-input {
   height: 32px;
   width: 240px;
@@ -518,10 +518,40 @@ body {
   color: var(--color-input-text);
   background: var(--color-input-bg);
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, padding-right 0.1s;
 }
 .search-input:focus { border-color: var(--color-green); }
 .search-input::placeholder { color: var(--color-input-placeholder); }
+.search-wrap.has-value .search-input { padding-right: 28px; }
+
+/* ── Search clear button (shared by main search + ms-search) ── */
+.search-clear {
+  display: none;
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  color: var(--color-surface);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.1s;
+  font-family: var(--font);
+}
+.search-clear:hover { background: var(--color-text); }
+.search-wrap.has-value     .search-clear,
+.ms-search-wrap.has-value  .search-clear { display: flex; }
+.ms-search-wrap.has-value  .ms-search    { padding-right: 28px; }
 .count-label { margin-left: auto; color: var(--color-text-muted); font-size: 13px; }
 
 /* ── Filters button ── */
@@ -565,15 +595,161 @@ body {
   top: calc(100% + 6px);
   left: 0;
   z-index: 150;
-  min-width: 220px;
+  min-width: 272px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 6px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  padding: 12px 0 8px;
+  padding: 10px 0 8px;
 }
 .filter-popover.open { display: block; }
 [data-wireframe="true"] .filter-popover { border-radius: 2px; box-shadow: 0 2px 6px rgba(0,0,0,0.18); }
+
+/* ── Multiselect-with-search component ── */
+.ms-trigger {
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+.ms-trigger:hover { border-color: var(--color-text-secondary); }
+.ms-trigger.open,
+.ms-trigger.has-selection { border-color: var(--color-green); }
+.ms-trigger.has-selection .ms-trigger-label { color: var(--color-green); }
+.ms-trigger-left { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ms-trigger-label { font-size: 13px; white-space: nowrap; }
+.ms-sel-badge {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-green);
+  color: #fff;
+  flex-shrink: 0;
+}
+[data-wireframe="true"] .ms-sel-badge { background: #555; }
+.ms-chevron {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: transform 0.15s;
+  margin-left: 4px;
+}
+.ms-trigger.open .ms-chevron { transform: rotate(180deg); }
+
+.ms-body {
+  display: none;
+  margin-top: 4px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.ms-body.open { display: block; }
+.ms-search-wrap {
+  position: relative;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-surface-raised);
+}
+.ms-search {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 3px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.ms-search::placeholder { color: var(--color-input-placeholder); }
+.ms-search:focus { border-color: var(--color-green); }
+.ms-options {
+  max-height: 148px;
+  overflow-y: auto;
+  padding: 4px 0;
+}
+.ms-options::-webkit-scrollbar { width: 4px; }
+.ms-options::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+.ms-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.ms-option:hover { background: var(--color-surface-raised); }
+.ms-option input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--color-green); cursor: pointer; flex-shrink: 0; }
+[data-wireframe="true"] .ms-option input[type="checkbox"] { accent-color: #555; }
+.ms-no-results { padding: 8px 10px; font-size: 12px; color: var(--color-text-muted); font-style: italic; display: none; }
+
+/* Price range row */
+.filter-price-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+.filter-price-range-sep {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.filter-price-wrap {
+  position: relative;
+  flex: 1;
+}
+.filter-price-wrap .currency {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+.filter-price-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 6px 0 18px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.filter-price-input::-webkit-inner-spin-button,
+.filter-price-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.filter-price-input:focus { border-color: var(--color-green); }
+.filter-price-input::placeholder { color: var(--color-input-placeholder); }
 .filter-popover-section { padding: 0 14px 10px; }
 .filter-popover-label {
   font-size: 11px;
@@ -655,8 +831,402 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .bdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .model-pill { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 12px; font-weight: 700; background: var(--color-pill-bg); color: var(--color-pill-text); }
 
+/* Pricing rules cell */
+.td-pricing-rules {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+.td-pricing-rules.empty { color: var(--color-text-muted); font-style: italic; }
+
+/* Pricing rules checkbox list (panel) */
+.pricing-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  padding: 6px 4px;
+  background: var(--color-input-bg);
+  max-height: 180px;
+  overflow-y: auto;
+  transition: border-color 0.15s, background 0.2s;
+}
+.pricing-rules-list::-webkit-scrollbar { width: 4px; }
+.pricing-rules-list::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+.pricing-rule-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.1s;
+}
+.pricing-rule-option:hover { background: var(--color-surface-raised); }
+.pricing-rule-option input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--color-green); cursor: pointer; flex-shrink: 0; }
+[data-wireframe="true"] .pricing-rule-option input[type="checkbox"] { accent-color: #555; }
+
+/* Pricing rules tags (view mode) */
+.pricing-rules-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.pricing-rule-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--color-pill-bg);
+  color: var(--color-pill-text);
+}
+
+/* ── Rental Rate list — search + filter + selectable items (edit/create) ── */
+.rate-search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.rate-search-wrap {
+  position: relative;
+  flex: 1;
+}
+.rate-search-icon {
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  pointer-events: none;
+}
+.rate-search-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 28px 0 28px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s, background 0.2s;
+}
+.rate-search-input:focus { border-color: var(--color-green); }
+.rate-search-input::placeholder { color: var(--color-input-placeholder); }
+.rate-search-wrap.has-value .rate-search-input { padding-right: 28px; }
+/* re-use .search-clear for the rate search X button */
+
+.rate-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.rate-filter-chip {
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 12px;
+  background: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.rate-filter-chip:hover { border-color: var(--color-text-secondary); color: var(--color-text); }
+.rate-filter-chip.active { background: var(--color-green); color: var(--primitive-white); border-color: var(--color-green); }
+[data-wireframe="true"] .rate-filter-chip.active { background: #555; border-color: #555; }
+
+.rate-list-wrap {
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  overflow: hidden;
+  max-height: 248px;
+  overflow-y: auto;
+  background: var(--color-input-bg);
+  transition: border-color 0.15s, background 0.2s;
+}
+.rate-list-wrap::-webkit-scrollbar { width: 4px; }
+.rate-list-wrap::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+
+.rate-item { border-bottom: 1px solid var(--color-border-light); transition: background 0.1s; }
+.rate-item:last-of-type { border-bottom: none; }
+.rate-item-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+}
+.rate-check-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+.rate-check-label input[type="checkbox"] {
+  width: 14px; height: 14px;
+  margin-top: 2px;
+  accent-color: var(--color-green);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+[data-wireframe="true"] .rate-check-label input[type="checkbox"] { accent-color: #555; }
+.rate-item-info { flex: 1; min-width: 0; }
+.rate-item-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  line-height: 1.3;
+  transition: color 0.2s;
+}
+.rate-item-price {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 3px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+  transition: color 0.2s;
+}
+.rate-item-price-sep {
+  width: 1px;
+  height: 10px;
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+.rate-item-price-mem { color: var(--color-text-secondary); font-weight: 400; }
+.rate-item-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 0;
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+.rate-category-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-surface-raised);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.rate-rules-toggle {
+  flex-shrink: 0;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  background: none;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+  margin-top: 1px;
+  transition: all 0.1s;
+}
+.rate-rules-toggle:hover { border-color: var(--color-text-secondary); color: var(--color-text); }
+.rate-item.expanded .rate-rules-toggle { border-color: var(--color-green); color: var(--color-green); }
+
+.rate-rules-body {
+  display: none;
+  padding: 6px 12px 10px 34px;
+  background: var(--color-surface-raised);
+  transition: background 0.2s;
+}
+.rate-item.expanded .rate-rules-body { display: block; }
+.rate-rule-line {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  padding: 2px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  line-height: 1.45;
+  transition: color 0.2s;
+}
+.rate-rule-line::before { content: '•'; color: var(--color-text-muted); flex-shrink: 0; }
+
+.rate-no-results {
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  display: none;
+}
+
+/* ── View panel: selected rental rates (read-only) ── */
+.view-rate-item {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.view-rate-item:first-child { padding-top: 0; }
+.view-rate-item:last-child { border-bottom: none; padding-bottom: 0; }
+.view-rate-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+.view-rate-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  flex: 1;
+  transition: color 0.2s;
+}
+.view-rate-price {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 3px 0 5px;
+  transition: color 0.2s;
+}
+.view-rate-price strong {
+  color: var(--color-text);
+  font-weight: 700;
+}
+.view-rate-rules {
+  padding-left: 4px;
+}
+
+/* ── Pricing type selector (Rental Rates vs Custom Pricing) ── */
+.pricing-type-selector {
+  margin-bottom: 16px;
+}
+.pricing-type-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  transition: color 0.2s;
+}
+.pricing-mode-seg {
+  display: flex;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-input-bg);
+}
+.pricing-mode-btn {
+  flex: 1;
+  height: 38px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.2;
+  transition: background 0.15s, color 0.15s;
+}
+.pricing-mode-btn + .pricing-mode-btn { border-left: 1px solid var(--color-input-border); }
+.pricing-mode-btn.active { background: var(--color-green); color: var(--primitive-white); }
+.pricing-mode-btn:hover:not(.active) { background: var(--color-surface-raised); color: var(--color-text); }
+[data-wireframe="true"] .pricing-mode-btn.active { background: #555; }
+
+/* ── Pricing validation error banner ── */
+.pricing-error {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-red);
+  background: var(--primitive-red-subtle);
+  font-size: 13px;
+  color: var(--color-red);
+  line-height: 1.4;
+}
+.pricing-error.visible { display: flex; }
+
+/* ── Rate list: select / deselect all row ── */
+.rate-select-actions {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.rate-select-btn {
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 3px;
+  background: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.rate-select-btn:hover { border-color: var(--color-green); color: var(--color-green); }
+
 /* Row actions */
 .row-actions { display: flex; gap: 4px; }
+
+/* ── Row description tooltip ── */
+#row-tooltip {
+  display: none;
+  position: fixed;
+  z-index: 400;
+  max-width: 300px;
+  background: var(--primitive-blue-black);
+  border-radius: 6px;
+  padding: 10px 13px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.28);
+  pointer-events: none;
+  animation: tooltip-in 0.1s ease;
+}
+#row-tooltip.visible { display: block; }
+@keyframes tooltip-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.row-tooltip-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primitive-white);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+.row-tooltip-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.68);
+  line-height: 1.5;
+}
 .action-btn {
   width: 28px; height: 28px;
   border-radius: 4px;
@@ -1249,6 +1819,94 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   background: var(--color-surface);
 }
 
+/* ── Rate suggestion modal ── */
+.modal-wide { max-width: 520px; }
+.rate-suggest-intro {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+.rate-suggest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+.rate-suggest-list::-webkit-scrollbar { width: 4px; }
+.rate-suggest-list::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 2px; }
+.rate-suggest-card {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 12px 12px 10px;
+  background: var(--color-surface);
+  transition: border-color 0.12s, background 0.2s;
+}
+.rate-suggest-card:hover { border-color: var(--color-green); }
+.rate-suggest-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.rate-suggest-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  flex: 1;
+  transition: color 0.2s;
+}
+.rate-suggest-card-desc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  line-height: 1.4;
+  transition: color 0.2s;
+}
+.rate-suggest-card-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+.rate-suggest-use-btn {
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--color-green);
+  border-radius: 4px;
+  background: none;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-green);
+  cursor: pointer;
+  transition: all 0.12s;
+  display: block;
+  margin-left: auto;
+}
+.rate-suggest-use-btn:hover {
+  background: var(--color-green);
+  color: var(--primitive-white);
+}
+[data-wireframe="true"] .rate-suggest-use-btn { border-color: #555; color: #555; }
+[data-wireframe="true"] .rate-suggest-use-btn:hover { background: #555; color: var(--primitive-white); }
+.rate-suggest-match-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-green);
+  background: rgba(0,194,138,0.10);
+  border-radius: 8px;
+  padding: 2px 8px;
+  flex-shrink: 0;
+}
+[data-wireframe="true"] .rate-suggest-match-label { color: #555; background: rgba(85,85,85,0.10); }
+
 /* ── Wireframe mode indicator banner ──
    Persistent, non-intrusive stamp in the bottom-left corner.
    Dismissible, but defaults to visible. ── */
@@ -1279,6 +1937,398 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 [data-wireframe="true"] .theme-toggle-btn {
   opacity: 0.35;
   pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ANNOTATION SYSTEM
+   ═══════════════════════════════════════════════════════════ */
+
+/* wf-badge is now an interactive control panel */
+.wf-badge {
+  pointer-events: auto !important;
+  cursor: default;
+  padding: 10px 12px 11px;
+  min-width: 178px;
+  opacity: 1 !important;
+}
+.wf-badge-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 2px;
+}
+.wf-badge-sub {
+  font-size: 9px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.wf-badge-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.18);
+  margin: 9px 0 7px;
+}
+.wf-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 5px;
+}
+.wf-badge-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.65);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+/* pill toggle inside the badge */
+.wf-pill-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 18px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.3);
+  overflow: hidden;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.wf-pill-toggle span {
+  padding: 0 7px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  height: 100%;
+  display: flex; align-items: center;
+  transition: background 0.15s, color 0.15s;
+}
+.wf-pill-toggle span.active {
+  background: rgba(255,255,255,0.22);
+  color: rgba(255,255,255,0.95);
+}
+.wf-auth-link {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-family: var(--font);
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+.wf-auth-link:hover { color: rgba(255,255,255,0.85); }
+.wf-author-label {
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.3px;
+}
+
+/* ── Annotation sidebar ── */
+.ann-sidebar {
+  width: 0;
+  min-width: 0;
+  flex-shrink: 0;
+  background: #EBF3FD;
+  border-left: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.25s ease, border-color 0.25s, min-width 0.25s;
+  position: relative;
+  z-index: 10;
+}
+.ann-sidebar.open {
+  width: 264px;
+  min-width: 264px;
+  border-left-color: #2B7BE4;
+}
+.ann-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px 12px;
+  border-bottom: 1px solid rgba(43,123,228,0.25);
+  flex-shrink: 0;
+  background: #D6E9FA;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ann-sidebar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #2B7BE4;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+.ann-sidebar-close {
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  border: 1px solid rgba(43,123,228,0.3);
+  background: none;
+  color: #2B7BE4;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.1s;
+}
+.ann-sidebar-close:hover { border-color: #2B7BE4; background: rgba(43,123,228,0.1); }
+.ann-sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+.ann-sidebar-body::-webkit-scrollbar { width: 4px; }
+.ann-sidebar-body::-webkit-scrollbar-thumb { background: rgba(43,123,228,0.25); border-radius: 2px; }
+.ann-sidebar-hint {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: 4px 6px 8px;
+  line-height: 1.5;
+  transition: color 0.2s;
+}
+.ann-sidebar-empty {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: 12px 6px;
+  transition: color 0.2s;
+}
+.ann-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.ann-list-item:hover { background: rgba(43,123,228,0.1); }
+.ann-list-item.active { background: rgba(43,123,228,0.18); border-left: 2px solid #2B7BE4; padding-left: 6px; }
+.ann-list-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #2B7BE4;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.ann-list-text {
+  font-size: 12px;
+  color: var(--color-text);
+  line-height: 1.5;
+  flex: 1;
+  transition: color 0.2s;
+}
+
+/* ── Annotation layer (inside #main) ── */
+#annLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 55;
+  overflow: hidden;
+}
+/* Crosshair capture overlay — shown only in add mode */
+#annCapture {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  cursor: crosshair;
+  display: none;
+  background: rgba(43,123,228,0.04);
+}
+#annCapture::after {
+  content: '+ Click anywhere to place annotation';
+  position: fixed;
+  bottom: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #2B7BE4;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 20px;
+  pointer-events: none;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 10px rgba(43,123,228,0.4);
+}
+[data-ann-add="true"] #annCapture { display: block; }
+
+/* Annotation bubbles */
+.ann-bubble {
+  position: absolute;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: #DBEAFE;
+  color: #1D5EB8;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(43,123,228,0.3), 0 0 0 2px #2B7BE4;
+  transition: transform 0.12s, box-shadow 0.12s;
+  user-select: none;
+  z-index: 56;
+}
+.ann-bubble:hover { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 3px 12px rgba(43,123,228,0.4), 0 0 0 2px #2B7BE4; background: #C3D9F8; }
+.ann-bubble.flash {
+  animation: ann-flash 0.9s ease;
+}
+@keyframes ann-flash {
+  0%   { box-shadow: 0 0 0 0 rgba(43,123,228,0.7), 0 0 0 2px #2B7BE4; }
+  50%  { box-shadow: 0 0 0 12px rgba(43,123,228,0), 0 0 0 2px #2B7BE4; }
+  100% { box-shadow: 0 2px 8px rgba(43,123,228,0.3), 0 0 0 2px #2B7BE4; }
+}
+
+/* Annotation detail popover */
+.ann-detail-popover {
+  position: fixed;
+  z-index: 400;
+  background: var(--color-surface);
+  border: 1px solid rgba(43,123,228,0.25);
+  border-top: 3px solid #2B7BE4;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(43,123,228,0.15);
+  width: 256px;
+  padding: 12px 14px;
+  font-family: var(--font);
+  display: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ann-detail-popover.visible { display: block; }
+.ann-detail-num {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2B7BE4;
+  margin-bottom: 6px;
+  transition: color 0.2s;
+}
+.ann-detail-text {
+  font-size: 13px;
+  color: var(--color-text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  transition: color 0.2s;
+}
+.ann-detail-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(43,123,228,0.15);
+}
+
+/* Annotation input form (fixed near click point) */
+.ann-input-form {
+  position: fixed;
+  z-index: 410;
+  background: var(--color-surface);
+  border: 1px solid rgba(43,123,228,0.25);
+  border-top: 3px solid #2B7BE4;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(43,123,228,0.18);
+  width: 288px;
+  padding: 12px;
+  font-family: var(--font);
+  display: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ann-input-form.visible { display: block; }
+.ann-input-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #2B7BE4;
+  margin-bottom: 7px;
+  transition: color 0.2s;
+}
+.ann-input-textarea {
+  width: 100%;
+  height: 82px;
+  resize: none;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  padding: 8px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  box-sizing: border-box;
+  line-height: 1.5;
+  transition: border-color 0.15s, background 0.2s, color 0.2s;
+}
+.ann-input-textarea:focus { border-color: #2B7BE4; }
+.ann-input-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* Layer badge in sidebar list */
+.ann-layer-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-text-muted);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  margin-top: 3px;
+  transition: all 0.2s;
+}
+.ann-layer-tag.panel-closed {
+  color: var(--color-orange, #E07A00);
+  border-color: var(--color-orange, #E07A00);
+  background: rgba(224,122,0,0.08);
+}
+/* Editing bubble — shows grab cursor and highlight ring */
+.ann-bubble.ann-bubble-editing {
+  cursor: grab !important;
+  box-shadow: 0 0 0 4px #2B7BE4, 0 2px 10px rgba(43,123,228,0.4);
+  z-index: 10001;
+}
+.ann-bubble.ann-bubble-editing:active {
+  cursor: grabbing !important;
+}
+.wf-badge-shortcut {
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.3px;
+  margin-top: 5px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.12);
+}
+
+/* Ann login error */
+.ann-login-error {
+  font-size: 12px;
+  color: var(--color-red);
+  margin-top: 8px;
+  min-height: 14px;
 }
 
 </style>
@@ -1350,9 +2400,10 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       <div id="toolbarBulkActions" style="display:none; align-items:center; gap:6px;"></div>
 
       <!-- Search -->
-      <div class="search-wrap">
+      <div class="search-wrap" id="searchWrap">
         <span class="search-icon">⌕</span>
         <input class="search-input" id="searchInput" type="text" placeholder="Search plans…" oninput="onSearch(this.value)">
+        <button class="search-clear" onclick="clearMainSearch()" title="Clear search">✕</button>
       </div>
 
       <!-- Filters button + popover -->
@@ -1361,21 +2412,88 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
           <span>⊞</span> Filters <span class="filter-badge" id="filterBadge" style="display:none"></span>
         </button>
         <div class="filter-popover" id="filterPopover">
+
+          <!-- Status (2 options — inline checkboxes) -->
           <div class="filter-popover-section">
             <div class="filter-popover-label">Status</div>
             <div class="filter-popover-options">
-              <label class="filter-option"><input type="checkbox" id="fStatus-Active" onchange="onFilterChange()"> Active</label>
+              <label class="filter-option"><input type="checkbox" id="fStatus-Active"   onchange="onFilterChange()"> Active</label>
               <label class="filter-option"><input type="checkbox" id="fStatus-Inactive" onchange="onFilterChange()"> Inactive</label>
             </div>
           </div>
+
           <hr class="filter-popover-divider">
+
+          <!-- Purchase Model (2 options — inline checkboxes) -->
           <div class="filter-popover-section">
             <div class="filter-popover-label">Purchase Model</div>
             <div class="filter-popover-options">
-              <label class="filter-option"><input type="checkbox" id="fModel-Hours" onchange="onFilterChange()"> Hours</label>
-              <label class="filter-option"><input type="checkbox" id="fModel-Occurrences" onchange="onFilterChange()"> Occurrences</label>
+              <label class="filter-option"><input type="checkbox" id="fModel-Hours"        onchange="onFilterChange()"> Hours</label>
+              <label class="filter-option"><input type="checkbox" id="fModel-Occurrences"  onchange="onFilterChange()"> Occurrences</label>
             </div>
           </div>
+
+          <hr class="filter-popover-divider">
+
+          <!-- Pricing Rules multiselect (populated by JS) -->
+          <div class="filter-popover-section">
+            <div class="ms-wrap">
+              <button class="ms-trigger" id="ms-trigger-pricing" onclick="toggleMs('pricing', event)">
+                <span class="ms-trigger-left">
+                  <span class="ms-trigger-label">Pricing Rules</span>
+                  <span class="ms-sel-badge" id="ms-badge-pricing"></span>
+                </span>
+                <span class="ms-chevron">▾</span>
+              </button>
+              <div class="ms-body" id="ms-body-pricing">
+                <div class="ms-search-wrap" id="ms-search-wrap-pricing">
+                  <input class="ms-search" type="text" placeholder="Search rules…" id="ms-search-pricing" oninput="filterMsOptions('pricing', this.value)">
+                  <button class="search-clear" onclick="clearMsSearch('pricing')" title="Clear search">✕</button>
+                </div>
+                <div class="ms-options" id="ms-options-pricing">
+                  <!-- Populated by JS -->
+                  <div class="ms-no-results">No results</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="filter-popover-divider">
+
+          <!-- Standard Price range -->
+          <div class="filter-popover-section">
+            <div class="filter-popover-label">Standard Price</div>
+            <div class="filter-price-range">
+              <div class="filter-price-wrap">
+                <span class="currency">$</span>
+                <input class="filter-price-input" type="number" id="fStdMin" placeholder="Min" min="0" oninput="onFilterChange()">
+              </div>
+              <span class="filter-price-range-sep">—</span>
+              <div class="filter-price-wrap">
+                <span class="currency">$</span>
+                <input class="filter-price-input" type="number" id="fStdMax" placeholder="Max" min="0" oninput="onFilterChange()">
+              </div>
+            </div>
+          </div>
+
+          <hr class="filter-popover-divider">
+
+          <!-- Member Price range -->
+          <div class="filter-popover-section">
+            <div class="filter-popover-label">Member Price</div>
+            <div class="filter-price-range">
+              <div class="filter-price-wrap">
+                <span class="currency">$</span>
+                <input class="filter-price-input" type="number" id="fMemMin" placeholder="Min" min="0" oninput="onFilterChange()">
+              </div>
+              <span class="filter-price-range-sep">—</span>
+              <div class="filter-price-wrap">
+                <span class="currency">$</span>
+                <input class="filter-price-input" type="number" id="fMemMax" placeholder="Max" min="0" oninput="onFilterChange()">
+              </div>
+            </div>
+          </div>
+
           <hr class="filter-popover-divider">
           <div class="filter-popover-footer">
             <button class="filter-clear-btn" onclick="clearFilters()">Clear filters</button>
@@ -1396,6 +2514,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
             <th>Purchase Model</th>
             <th class="sortable">Standard Price <span class="sarr">↕</span></th>
             <th>Member Price</th>
+            <th>Pricing Rules</th>
             <th style="width:80px;text-align:right;padding-right:18px;">Actions</th>
           </tr>
         </thead>
@@ -1419,6 +2538,28 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
          so it's never clipped by overflow:auto on .table-wrap -->
     <div id="row-dropdown-portal"></div>
 
+    <!-- Row description tooltip portal -->
+    <div id="row-tooltip" role="tooltip">
+      <div class="row-tooltip-name" id="row-tooltip-name"></div>
+      <div class="row-tooltip-desc" id="row-tooltip-desc"></div>
+    </div>
+
+    <!-- Rate suggestion modal — shown when custom pricing matches existing rates -->
+    <div class="modal-backdrop" id="rateSuggestBackdrop">
+      <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="rateSuggestTitle">
+        <div class="modal-header">
+          <div class="modal-title" id="rateSuggestTitle">Matching rates found</div>
+        </div>
+        <div class="modal-body">
+          <p class="rate-suggest-intro" id="rateSuggestIntro"></p>
+          <div class="rate-suggest-list" id="rateSuggestList"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="panel-btn panel-btn-secondary" id="rateSuggestKeep">Keep custom pricing</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Confirmation modal — replaces native confirm() -->
     <div class="modal-backdrop" id="confirmBackdrop">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
@@ -1433,8 +2574,32 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       </div>
     </div>
 
-    <!-- Wireframe mode badge — visible only when data-wireframe="true" -->
-    <div class="wf-badge">Lo-Fi Wireframe · Not a design spec</div>
+    <!-- Wireframe mode badge — interactive control panel (visible when data-wireframe="true") -->
+    <div class="wf-badge" id="wfBadge">
+      <div class="wf-badge-title">Lo-Fi Wireframe</div>
+      <div class="wf-badge-sub">Not a design spec</div>
+      <div class="wf-badge-divider"></div>
+      <div class="wf-badge-row">
+        <span class="wf-badge-label">Annotations</span>
+        <div class="wf-pill-toggle" onclick="toggleAnnotationsVisible()" id="wfAnnToggle" title="Show/hide annotations">
+          <span id="wfAnnOn">On</span><span id="wfAnnOff" class="active">Off</span>
+        </div>
+      </div>
+      <div class="wf-badge-row" id="wfAddRow" style="display:none;">
+        <span class="wf-badge-label">Add mode</span>
+        <div class="wf-pill-toggle" onclick="toggleAnnAddMode()" id="wfAddToggle" title="Click anywhere to add an annotation">
+          <span id="wfAddOn">On</span><span id="wfAddOff" class="active">Off</span>
+        </div>
+      </div>
+      <div class="wf-badge-row" id="wfAuthRow">
+        <button class="wf-auth-link" onclick="showAnnLogin()">Sign in to annotate</button>
+      </div>
+    </div>
+
+    <!-- Annotation capture overlay (crosshair click-to-place, only active in add mode) -->
+    <div id="annCapture" onclick="onAnnCapture(event)"></div>
+    <!-- Annotation bubble layer (always on top of content, below modals) -->
+    <div id="annLayer"></div>
 
     <!-- ════════════════════════════════════════════
          SIDE PANEL — EZFacility structure
@@ -1449,18 +2614,102 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       <div class="panel-footer" id="panelFooter"></div>
     </div>
 
+  </div><!-- /#main -->
+
+  <!-- Annotation sidebar — flex sibling of #main, pushes layout responsively -->
+  <div class="ann-sidebar" id="annSidebar">
+    <div class="ann-sidebar-header">
+      <span class="ann-sidebar-title">Annotations</span>
+      <button class="ann-sidebar-close" onclick="closeAnnSidebar()" title="Close">✕</button>
+    </div>
+    <div class="ann-sidebar-body" id="annSidebarBody">
+      <div class="ann-sidebar-empty" id="annSidebarEmpty">No annotations yet.</div>
+    </div>
+  </div>
+
+</div><!-- /.layout -->
+
+<!-- Annotation detail popover (rendered by JS, positioned fixed) -->
+<div class="ann-detail-popover" id="annDetailPopover"></div>
+
+<!-- Annotation input form (rendered by JS, positioned fixed near click) -->
+<div class="ann-input-form" id="annInputForm">
+  <div class="ann-input-label" id="annInputLabel">New annotation</div>
+  <textarea class="ann-input-textarea" id="annInputTextarea" placeholder="Describe this element, interaction, or decision…" autocomplete="off"></textarea>
+  <div class="ann-input-actions">
+    <button class="panel-btn panel-btn-secondary" onclick="cancelAnnInput()">Cancel</button>
+    <button class="panel-btn panel-btn-primary"   onclick="saveAnnInput()">Save</button>
+  </div>
+</div>
+
+<!-- Annotation login modal -->
+<div class="modal-backdrop" id="annLoginBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="annLoginTitle">
+    <div class="modal-header">
+      <div class="modal-title" id="annLoginTitle">Annotator sign-in</div>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 14px;font-size:14px;color:var(--color-text-secondary);line-height:1.55;">Enter your password to add, edit, or delete annotations. Developers can view annotations without signing in.</p>
+      <input class="form-input" type="password" id="annLoginInput" placeholder="Password" autocomplete="off">
+      <div class="ann-login-error" id="annLoginError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="panel-btn panel-btn-secondary" onclick="hideAnnLogin()">Cancel</button>
+      <button class="panel-btn panel-btn-primary"   onclick="submitAnnLogin()">Sign in</button>
+    </div>
   </div>
 </div>
 
 <script>
 // ── Data ──────────────────────────────────────────────────
 const plans = [
-  { id:1, name:'Court Time Bundle — 10hrs',    status:'Active',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
-  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Active',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, desc:'5 drop-in visits, valid any time.', archived:false },
-  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Active',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  desc:'Flexible hourly pickleball court access.', archived:false },
-  { id:4, name:'Field Rental Block — 8hrs',    status:'Active',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, desc:'', archived:false },
-  { id:5, name:'Room Booking Pack — 10 visits',status:'Inactive', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, desc:'Meeting room access pack.', archived:false },
-  { id:6, name:'Annual Court Pass — 100hrs',   status:'Active',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  desc:'Best value for regular court users.', archived:false },
+  { id:1, name:'Court Time Bundle — 10hrs',    status:'Active',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, pricingType:'rates',  pricingRules:['Weekday Peak Rate','Weekend Morning Rate'],                                             desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
+  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Active',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Winter Evening Rate'],                                                                  desc:'5 drop-in visits, valid any time.', archived:false },
+  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Active',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  pricingType:'rates',  pricingRules:['Summer Block Rate'],                                                                    desc:'Flexible hourly pickleball court access.', archived:false },
+  { id:4, name:'Field Rental Block — 8hrs',    status:'Active',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Weekend Morning Rate','Summer Block Rate'],                                             desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
+  { id:5, name:'Room Booking Pack — 10 visits',status:'Inactive', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, pricingType:'custom', pricingRules:[],                                                                                       desc:'Meeting room access pack.', archived:false },
+  { id:6, name:'Annual Court Pass — 100hrs',   status:'Active',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  pricingType:'rates',  pricingRules:['Weekday Peak Rate','Winter Evening Rate','Weekend Morning Rate','Holiday Premium Rate'], desc:'Best value for regular court users.', archived:false },
+];
+
+// Rental Rates — sourced from the Rental Rates admin page.
+// Each rate carries its own rules; rules are automatically applied and cannot be
+// individually selected. Users pick a rate and its rules come with it.
+const ALL_RENTAL_RATES = [
+  {
+    name: 'Weekday Peak Rate',
+    category: 'Peak',
+    desc: 'Premium pricing during high-demand weekday hours',
+    stdRate: 18, memRate: 14, unit: 'hr',
+    rules: ['Time-of-day multiplier: 1.25×', 'Applies Mon–Fri, 6am–8pm']
+  },
+  {
+    name: 'Winter Evening Rate',
+    category: 'Off-peak',
+    desc: 'Discounted pricing for winter evening bookings',
+    stdRate: 11, memRate: 9, unit: 'hr',
+    rules: ['Seasonal discount: 15% off base rate', 'Applies Oct–Mar, after 6pm']
+  },
+  {
+    name: 'Weekend Morning Rate',
+    category: 'Peak',
+    desc: 'Surcharge for high-demand weekend morning slots',
+    stdRate: 16, memRate: 13, unit: 'hr',
+    rules: ['Weekend morning surcharge: 1.10×', 'Applies Sat–Sun, 7am–12pm']
+  },
+  {
+    name: 'Summer Block Rate',
+    category: 'Seasonal',
+    desc: 'Premium block pricing during peak summer months',
+    stdRate: 20, memRate: 16, unit: 'hr',
+    rules: ['Peak season surcharge: 20%', 'Applies Jun–Aug, all hours']
+  },
+  {
+    name: 'Holiday Premium Rate',
+    category: 'Holiday',
+    desc: 'Elevated pricing on public holidays',
+    stdRate: 25, memRate: 20, unit: 'hr',
+    rules: ['Holiday rate multiplier: 1.50×', 'Applies all recognized public holidays']
+  },
 ];
 
 let currentMode = null;
@@ -1469,9 +2718,13 @@ let selectedRow = null;
 let searchQuery  = '';
 let isDirty = false; // true only after the user has changed a field
 let selectedIds  = new Set(); // ids of checked rows
-// filterStatus / filterModel: Sets of selected values; empty = "all"
-let filterStatus = new Set();
-let filterModel  = new Set();
+// filterStatus / filterModel / filterPricingRules: Sets of selected values; empty = "all"
+let filterStatus       = new Set();
+let filterModel        = new Set();
+let filterPricingRules = new Set();
+// Price range filters — null means "no bound set"
+let filterStdMin = null, filterStdMax = null;
+let filterMemMin = null, filterMemMax = null;
 let currentTab = 'active'; // 'active' | 'archived'
 let openMenuId = null;     // id of the plan whose row menu is open
 
@@ -1549,7 +2802,7 @@ function switchPageTab(tab) {
   selectedIds.clear();
   clearFilters(true); // skip re-render; switchPageTab calls renderTable itself
   const si = document.getElementById('searchInput');
-  if (si) si.value = '';
+  if (si) { si.value = ''; document.getElementById('searchWrap')?.classList.remove('has-value'); }
   document.getElementById('tabActive').classList.toggle('active', tab === 'active');
   document.getElementById('tabArchived').classList.toggle('active', tab === 'archived');
   renderTable();
@@ -1641,18 +2894,85 @@ function deletePermanently(id) {
   });
 }
 
+// ── Multiselect-with-search ───────────────────────────────
+let openMsKey = null;
+
+function toggleMs(key, event) {
+  event.stopPropagation();
+  const isOpen = openMsKey === key;
+  closeAllMs();
+  if (!isOpen) {
+    openMsKey = key;
+    document.getElementById('ms-trigger-' + key)?.classList.add('open');
+    document.getElementById('ms-body-' + key)?.classList.add('open');
+    // Auto-focus search
+    setTimeout(() => document.getElementById('ms-search-' + key)?.focus(), 0);
+  }
+}
+
+function closeAllMs() {
+  if (openMsKey) {
+    document.getElementById('ms-trigger-' + openMsKey)?.classList.remove('open');
+    document.getElementById('ms-body-' + openMsKey)?.classList.remove('open');
+    // Reset search + clear X button
+    const si = document.getElementById('ms-search-' + openMsKey);
+    if (si) { si.value = ''; }
+    filterMsOptions(openMsKey, '');
+    openMsKey = null;
+  }
+}
+
+function filterMsOptions(key, query) {
+  const q = query.toLowerCase().trim();
+  document.getElementById('ms-search-wrap-' + key)?.classList.toggle('has-value', query.length > 0);
+  const container = document.getElementById('ms-options-' + key);
+  if (!container) return;
+  let visible = 0;
+  container.querySelectorAll('.ms-option').forEach(opt => {
+    const text = opt.textContent.trim().toLowerCase();
+    const show = !q || text.includes(q);
+    opt.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const noRes = container.querySelector('.ms-no-results');
+  if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+function clearMsSearch(key) {
+  const si = document.getElementById('ms-search-' + key);
+  if (si) si.value = '';
+  filterMsOptions(key, '');
+  si?.focus();
+}
+
+function updateMsBadge(key, count) {
+  const badge   = document.getElementById('ms-badge-' + key);
+  const trigger = document.getElementById('ms-trigger-' + key);
+  if (!badge || !trigger) return;
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+    trigger.classList.add('has-selection');
+  } else {
+    badge.style.display = 'none';
+    trigger.classList.remove('has-selection');
+  }
+}
+
 // ── Filter popover ────────────────────────────────────────
 function toggleFilterPopover(e) {
   e.stopPropagation();
-  document.getElementById('filterPopover').classList.toggle('open');
-  syncFilterBtnState();
+  const pop = document.getElementById('filterPopover');
+  const isOpen = pop.classList.contains('open');
+  if (isOpen) { closeFilterPopover(); } else { pop.classList.add('open'); syncFilterBtnState(); }
 }
 function closeFilterPopover() {
+  closeAllMs();
   document.getElementById('filterPopover').classList.remove('open');
   syncFilterBtnState();
 }
 function syncFilterBtnState() {
-  const total = filterStatus.size + filterModel.size;
+  const priceActive = filterStdMin !== null || filterStdMax !== null || filterMemMin !== null || filterMemMax !== null;
+  const total = filterStatus.size + filterModel.size + filterPricingRules.size + (priceActive ? 1 : 0);
   const btn   = document.getElementById('filterBtn');
   const badge = document.getElementById('filterBadge');
   btn.classList.toggle('active', total > 0);
@@ -1662,23 +2982,86 @@ function syncFilterBtnState() {
 function onFilterChange() {
   filterStatus.clear();
   filterModel.clear();
+  filterPricingRules.clear();
+  // ≤3 options: read by individual IDs
   ['Active','Inactive'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
   ['Hours','Occurrences'].forEach(v => { if (document.getElementById('fModel-'+v)?.checked) filterModel.add(v); });
+  // >3 options: read from multiselect dropdown
+  document.querySelectorAll('#ms-options-pricing input:checked').forEach(cb => filterPricingRules.add(cb.value));
+  updateMsBadge('pricing', filterPricingRules.size);
+  const toNum = id => { const v = document.getElementById(id)?.value; return (v !== '' && v != null) ? parseFloat(v) : null; };
+  filterStdMin = toNum('fStdMin'); filterStdMax = toNum('fStdMax');
+  filterMemMin = toNum('fMemMin'); filterMemMax = toNum('fMemMax');
   syncFilterBtnState();
   renderTable();
 }
 function clearFilters(skipRender) {
-  filterStatus.clear(); filterModel.clear();
+  filterStatus.clear(); filterModel.clear(); filterPricingRules.clear();
+  filterStdMin = null; filterStdMax = null; filterMemMin = null; filterMemMax = null;
+  // ≤3 options
   ['fStatus-Active','fStatus-Inactive','fModel-Hours','fModel-Occurrences'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
+  });
+  // >3 options (multiselect dropdown)
+  document.querySelectorAll('#ms-options-pricing input[type="checkbox"]').forEach(cb => cb.checked = false);
+  updateMsBadge('pricing', 0);
+  ['fStdMin','fStdMax','fMemMin','fMemMax'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
   });
   syncFilterBtnState();
   if (!skipRender) renderTable();
 }
-// Close popover when clicking outside
+// Close popover + any open multiselect when clicking outside
 document.addEventListener('click', e => {
   if (!document.getElementById('filterWrap')?.contains(e.target)) closeFilterPopover();
 });
+
+// ── Row description tooltip ───────────────────────────────
+function showRowTooltip(event, id) {
+  const p = plans.find(pl => pl.id === id);
+  if (!p || !p.desc) return;
+
+  const tooltip = document.getElementById('row-tooltip');
+  document.getElementById('row-tooltip-name').textContent = p.name;
+  document.getElementById('row-tooltip-desc').textContent = p.desc;
+
+  // Render off-screen first to get real dimensions, then position
+  tooltip.style.top  = '-9999px';
+  tooltip.style.left = '-9999px';
+  tooltip.classList.add('visible');
+
+  const row    = event.currentTarget;
+  const rowR   = row.getBoundingClientRect();
+  const ttR    = tooltip.getBoundingClientRect();
+  const gap    = 6;
+  const margin = 10;
+
+  let top  = rowR.bottom + gap;
+  let left = rowR.left + 56; // clear the checkbox column
+
+  // Flip above if it would overflow the bottom of the viewport
+  if (top + ttR.height > window.innerHeight - margin) {
+    top = rowR.top - ttR.height - gap;
+  }
+  // Clamp to the right edge
+  if (left + ttR.width > window.innerWidth - margin) {
+    left = window.innerWidth - ttR.width - margin;
+  }
+
+  tooltip.style.top  = top  + 'px';
+  tooltip.style.left = left + 'px';
+}
+function hideRowTooltip() {
+  document.getElementById('row-tooltip')?.classList.remove('visible');
+}
+
+// ── Helpers ───────────────────────────────────────────────
+// Extract numeric dollar value from strings like "$100.00", "$12.00/hr"
+function parsePrice(str) {
+  if (!str) return null;
+  const m = String(str).match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : null;
+}
 
 // ── Shared filter predicate ───────────────────────────────
 function planMatchesFilters(p) {
@@ -1691,12 +3074,26 @@ function planMatchesFilters(p) {
     p.model.toLowerCase().includes(q) ||
     p.pricingModel.toLowerCase().includes(q) ||
     String(p.stdPrice).includes(q) ||
-    (p.desc || '').toLowerCase().includes(q)
+    (p.desc || '').toLowerCase().includes(q) ||
+    (p.pricingRules || []).some(r => r.toLowerCase().includes(q))
   )) return false;
   // Status filter
   if (filterStatus.size > 0 && !filterStatus.has(p.status)) return false;
   // Model filter (p.model is e.g. "Hours" or "Occurrences")
   if (filterModel.size > 0 && !filterModel.has(p.model)) return false;
+  // Pricing rules filter — plan must have at least one of the selected rules
+  if (filterPricingRules.size > 0) {
+    const planRules = p.pricingRules || [];
+    if (!planRules.some(r => filterPricingRules.has(r))) return false;
+  }
+  // Standard price range
+  const stdVal = parsePrice(p.stdPrice);
+  if (filterStdMin !== null && (stdVal === null || stdVal < filterStdMin)) return false;
+  if (filterStdMax !== null && (stdVal === null || stdVal > filterStdMax)) return false;
+  // Member price range
+  const memVal = parsePrice(p.memPrice);
+  if (filterMemMin !== null && (memVal === null || memVal < filterMemMin)) return false;
+  if (filterMemMax !== null && (memVal === null || memVal > filterMemMax)) return false;
   return true;
 }
 
@@ -1820,7 +3217,14 @@ function bulkDelete() {
 // ── Search ────────────────────────────────────────────────
 function onSearch(val) {
   searchQuery = val.trim().toLowerCase();
+  document.getElementById('searchWrap')?.classList.toggle('has-value', val.length > 0);
   renderTable();
+}
+function clearMainSearch() {
+  const si = document.getElementById('searchInput');
+  if (si) si.value = '';
+  onSearch('');
+  si?.focus();
 }
 
 // ── Render table ──────────────────────────────────────────
@@ -1830,11 +3234,11 @@ function renderTable() {
   if (countLabel) countLabel.textContent = visible.length + ' plan' + (visible.length !== 1 ? 's' : '');
 
   document.getElementById('tableBody').innerHTML = visible.length === 0
-    ? `<tr><td colspan="7" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
+    ? `<tr><td colspan="8" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
         ${currentTab === 'active' ? 'No active rental plans.' : 'No archived rental plans.'}
        </td></tr>`
     : visible.map(p => `
-    <tr id="row-${p.id}" onclick="handleRowClick(event,${p.id})" style="${currentTab==='archived'?'cursor:default;':''}">
+    <tr id="row-${p.id}" onclick="handleRowClick(event,${p.id})" onmouseenter="showRowTooltip(event,${p.id})" onmouseleave="hideRowTooltip()" style="${currentTab==='archived'?'cursor:default;':''}">
       <td class="cb-col" onclick="event.stopPropagation()">
         <input type="checkbox" class="row-cb" id="cb-${p.id}" ${selectedIds.has(p.id)?'checked':''} onchange="toggleRowCheck(${p.id},this)">
       </td>
@@ -1843,6 +3247,10 @@ function renderTable() {
       <td><span class="model-pill">${p.model}</span></td>
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
+      <td class="td-pricing-rules${p.pricingRules && p.pricingRules.length ? '' : ' empty'}"
+          title="${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : ''}">
+        ${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : '—'}
+      </td>
       <td style="text-align:right;padding-right:14px;">
         <div class="row-menu-wrap">
           <button class="menu-btn" id="menu-btn-${p.id}" title="Actions" onclick="toggleMenu(${p.id},event)">&#8942;</button>
@@ -1858,12 +3266,16 @@ function renderTable() {
 function openPanel() {
   document.getElementById('overlay').classList.add('open');
   document.getElementById('sidePanel').classList.add('open');
+  // Panel-layer annotation bubbles become visible when panel opens
+  if (typeof renderAnnBubbles === 'function') renderAnnBubbles();
 }
 function closePanel() {
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('sidePanel').classList.remove('open');
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
   currentMode = null; currentPlan = null; isDirty = false;
+  // Panel-layer annotation bubbles must be hidden when panel closes
+  if (typeof renderAnnBubbles === 'function') renderAnnBubbles();
 }
 function closePanelSafe() {
   if (isDirty) {
@@ -1903,13 +3315,24 @@ function buildHeader(title, sub, tabs, activeIdx) {
 }
 
 // ── Dirty tracking ───────────────────────────────────────
-// Called after the panel body is injected; listens for any
-// user change on inputs, textareas, and selects.
+// Called after the panel body is injected. We wait a short
+// tick before attaching so that any browser autofill events
+// that fire immediately after DOM injection are ignored —
+// otherwise simply opening the panel (or switching to a tab
+// that reveals an input) can falsely mark the form dirty.
 function attachDirtyListeners() {
   isDirty = false;
   const body = document.getElementById('panelBody');
-  body.addEventListener('input',  markDirty, { once: false });
-  body.addEventListener('change', markDirty, { once: false });
+  // Remove any stale listeners before re-attaching
+  body.removeEventListener('input',  markDirty);
+  body.removeEventListener('change', markDirty);
+  setTimeout(() => {
+    // Only attach if the panel is still open in an edit/create context
+    if (currentMode === 'edit' || currentMode === 'create') {
+      body.addEventListener('input',  markDirty);
+      body.addEventListener('change', markDirty);
+    }
+  }, 250);
 }
 
 // ── Tab switching ─────────────────────────────────────────
@@ -1932,29 +3355,21 @@ function openView(id) {
   const p = currentPlan;
   const badge = `<span class="badge badge-${p.status==='Active'?'active':'inactive'}" style="font-size:11px;padding:2px 8px;"><span class="bdot"></span>${p.status}</span>`;
 
-  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, badge, ['Plan Details','Pricing'], 0);
+  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, badge, ['Plan Summary'], 0);
   document.getElementById('panelBody').innerHTML = `
     <div id="vtab-0">
       <div class="panel-section">
-        <div class="panel-section-title">Package Info</div>
-        <div class="view-field">
-          <div class="view-label">Plan Name</div>
-          <div class="view-value">${p.name}</div>
-        </div>
+        <div class="panel-section-title">Overview</div>
         <div class="view-field">
           <div class="view-label">Description</div>
           <div class="view-value ${p.desc?'':'empty'}">${p.desc||'No description added'}</div>
         </div>
-        <div class="view-field">
-          <div class="view-label">Status</div>
-          <div class="view-value">${badge}</div>
-        </div>
       </div>
       <div class="panel-section">
-        <div class="panel-section-title">Purchase Model</div>
+        <div class="panel-section-title">Package Details</div>
         <div class="view-row">
           <div class="view-field">
-            <div class="view-label">Model</div>
+            <div class="view-label">Purchase Model</div>
             <div class="view-value"><span class="model-pill">${p.model}</span></div>
           </div>
           <div class="view-field">
@@ -1962,44 +3377,38 @@ function openView(id) {
             <div class="view-value">${p.qty} ${p.model==='Hours'?'hours':'occurrences'}</div>
           </div>
         </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Expiry</div>
         <div class="view-field">
-          <div class="view-label">Expires After</div>
+          <div class="view-label">Expiration</div>
           <div class="view-value ${p.expiry==='None'?'empty':''}">
-            ${p.expiry==='None'?'No expiry — active until balance depleted':p.expiry+' from purchase date'}
+            ${p.expiry==='None'?'No expiration — active until balance depleted':p.expiry+' from purchase date'}
           </div>
         </div>
-      </div>
-    </div>
-    <div id="vtab-1" style="display:none;">
-      <div class="panel-section">
-        <div class="panel-section-title">Pricing Model</div>
-        <div class="view-field">
-          <div class="view-label">Model</div>
-          <div class="view-value">${p.pricingModel==='Flat'?'Flat Price — one fixed price for the bundle':'Per Unit — price × '+p.model.toLowerCase()}</div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Price Points</div>
-        <div class="view-row">
-          <div class="view-field">
-            <div class="view-label">Standard Price</div>
-            <div class="view-value">${p.stdPrice}</div>
-          </div>
-          <div class="view-field">
-            <div class="view-label">Member Price</div>
-            <div class="view-value">${p.memPrice}</div>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Auto-Renew</div>
-        <div class="view-field">
+        <div class="view-field" style="margin-bottom:0;">
           <div class="view-label">Auto-Renew</div>
-          <div class="view-value">${p.autoRenew?'Enabled — clients may opt in at purchase':'Disabled'}</div>
+          <div class="view-value">${p.autoRenew?'Yes':'No'}</div>
         </div>
+      </div>
+      <div class="panel-section" style="margin-bottom:0;">
+        <div class="panel-section-title">Pricing</div>
+        ${p.pricingType === 'rates' ? `
+          <div class="view-field" style="margin-bottom:0;">
+            <div class="view-label">Applied Rates</div>
+            <div style="margin-top:6px;">${buildViewRateList(p.pricingRules)}</div>
+          </div>` : `
+          <div class="view-field" style="margin-bottom:8px;">
+            <div class="view-label">Custom Rates</div>
+            <div class="view-value" style="margin-top:4px;">${p.pricingModel==='Flat'?'Flat Price':'Per Unit'}</div>
+          </div>
+          <div class="view-row" style="margin-bottom:0;">
+            <div class="view-field" style="margin-bottom:0;">
+              <div class="view-label">Standard</div>
+              <div class="view-value">${p.stdPrice}</div>
+            </div>
+            <div class="view-field" style="margin-bottom:0;">
+              <div class="view-label">Member</div>
+              <div class="view-value">${p.memPrice}</div>
+            </div>
+          </div>`}
       </div>
     </div>
   `;
@@ -2031,11 +3440,11 @@ function openEdit(id) {
         <div class="panel-section-title">Plan Info</div>
         <div class="form-field">
           <label class="field-label">Plan Name<span class="req">*</span></label>
-          <input class="form-input" type="text" value="${p.name}">
+          <input class="form-input" type="text" value="${p.name}" autocomplete="off">
         </div>
         <div class="form-field">
-          <label class="field-label">Description<span class="opt"> (optional)</span></label>
-          <textarea class="form-textarea">${p.desc}</textarea>
+          <label class="field-label">Description<span class="req">*</span></label>
+          <textarea class="form-textarea" autocomplete="off">${p.desc}</textarea>
         </div>
         <div class="form-field">
           <label class="field-label">Status</label>
@@ -2044,47 +3453,29 @@ function openEdit(id) {
               <span class="toggle-label">${p.status==='Active'?'Active':'Inactive'}</span>
               <span class="toggle-label-hint">${p.status==='Active'?'Available for sale':'Not available for sale'}</span>
             </div>
-            <div class="toggle ${p.status==='Active'?'':'off'}" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle ${p.status==='Active'?'':'off'}"
+                 data-on-label='Active'    data-off-label='Inactive'
+                 data-on-hint='Available for sale' data-off-hint='Not available for sale'
+                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
         </div>
       </div>
       <div class="panel-section">
-        <div class="panel-section-title">Purchase Model</div>
-        <div class="form-field">
-          <label class="field-label">Model<span class="req">*</span></label>
-          <div class="radio-group">
-            <div class="radio-option ${p.model==='Hours'?'selected':''} disabled">
-              <div class="radio-option-label">Hours</div>
-              <div class="radio-option-desc">Deducted by rental duration</div>
-            </div>
-            <div class="radio-option ${p.model==='Occurrences'?'selected':''} disabled">
-              <div class="radio-option-label">Occurrences</div>
-              <div class="radio-option-desc">1 deducted per booking</div>
-            </div>
-          </div>
-          <div class="field-warning">⚠ Purchase model cannot be changed after the plan is created.</div>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Quantity<span class="req">*</span></label>
-          <div class="inline-row">
-            <input class="form-input" type="number" value="${p.qty}" style="width:100px;">
-            <span class="inline-label">${p.model==='Hours'?'hours':'occurrences'} included</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Expiry</div>
+        <div class="panel-section-title">Expiration</div>
         <div class="form-field">
           <div class="toggle-row" style="margin-bottom:12px;">
             <div class="toggle-info">
-              <span class="toggle-label">Enable expiry</span>
-              <span class="toggle-label-hint">Plan expires after a set period from purchase</span>
+              <span class="toggle-label">${p.expiry!=='None'?'Enabled':'No expiration'}</span>
+              <span class="toggle-label-hint">${p.expiry!=='None'?'Plan expires after a set period from purchase':'Plan stays active until the balance is fully depleted'}</span>
             </div>
-            <div class="toggle ${p.expiry!=='None'?'':'off'}" id="expiryToggle" onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle ${p.expiry!=='None'?'':'off'}" id="expiryToggle"
+                 data-on-label='Enabled'   data-off-label='No expiration'
+                 data-on-hint='Plan expires after a set period from purchase' data-off-hint='Plan stays active until the balance is fully depleted'
+                 onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
           </div>
           <div id="expiryFields" style="${p.expiry!=='None'?'':'display:none;'}">
             <div class="inline-row" style="margin-bottom:8px;">
-              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}">
               <select class="form-select" style="width:110px;">
                 <option>Days</option><option>Months</option><option>Years</option>
               </select>
@@ -2094,54 +3485,79 @@ function openEdit(id) {
           <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
         </div>
       </div>
-    </div>
-    <div id="etab-1" style="display:none;">
-      <div class="panel-section">
-        <div class="panel-section-title">Pricing Model</div>
-        <div class="form-field">
-          <label class="field-label">Pricing Model<span class="req">*</span></label>
-          <div class="radio-group">
-            <div class="radio-option ${p.pricingModel==='Flat'?'selected':''}" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Flat Price</div>
-              <div class="radio-option-desc">One fixed price for the bundle</div>
-            </div>
-            <div class="radio-option ${p.pricingModel==='Per Unit'?'selected':''}" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Per Unit</div>
-              <div class="radio-option-desc">Price × ${p.model.toLowerCase()}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Price Points</div>
-        <div class="form-row">
-          <div class="form-field">
-            <label class="field-label">Standard Price<span class="req">*</span></label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">$</span>
-              <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}">
-            </div>
-            <div class="field-hint">Non-member price</div>
-          </div>
-          <div class="form-field">
-            <label class="field-label">Member Price<span class="req">*</span></label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">$</span>
-              <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}">
-            </div>
-            <div class="field-hint">Discounted member price</div>
-          </div>
-        </div>
-      </div>
       <div class="panel-section">
         <div class="panel-section-title">Auto-Renew</div>
         <div class="form-field">
           <div class="toggle-row">
             <div class="toggle-info">
-              <span class="toggle-label">Allow auto-renew</span>
-              <span class="toggle-label-hint">Clients can opt in at purchase time</span>
+              <span class="toggle-label">${p.autoRenew?'Enabled':'Disabled'}</span>
+              <span class="toggle-label-hint">${p.autoRenew?'Clients can opt in at purchase time':'Clients cannot opt in at purchase time'}</span>
             </div>
-            <div class="toggle ${p.autoRenew?'':'off'}" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle ${p.autoRenew?'':'off'}"
+                 data-on-label='Enabled'  data-off-label='Disabled'
+                 data-on-hint='Clients can opt in at purchase time' data-off-hint='Clients cannot opt in at purchase time'
+                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="etab-1" style="display:none;">
+      <div class="pricing-error" id="edit-pricing-error"></div>
+      <div class="pricing-type-selector">
+        <div class="pricing-type-label">Pricing type</div>
+        <div class="pricing-mode-seg">
+          <button class="pricing-mode-btn ${p.pricingType==='rates'?'active':''}"
+                  onclick="setPricingType('rates',this,'edit')">Rental Rates</button>
+          <button class="pricing-mode-btn ${p.pricingType==='custom'?'active':''}"
+                  onclick="setPricingType('custom',this,'edit')">Custom Pricing</button>
+        </div>
+      </div>
+      <div id="edit-pricing-rates" style="${p.pricingType==='custom'?'display:none;':''}">
+        <div class="panel-section">
+          <div class="panel-section-title">Rental Rates</div>
+          <div class="form-field">
+            <label class="field-label">Applied Rates<span class="opt"> (optional)</span></label>
+            ${buildRateListHTML(p.pricingType==='rates'?p.pricingRules:[], 'edit')}
+            <div class="field-hint" style="margin-top:8px;">Rates are defined on the <a href="#" style="color:var(--color-green);text-decoration:none;font-weight:700;">Rental Rates</a> page. Each rate's rules are automatically applied based on client criteria — you cannot select rules individually.</div>
+          </div>
+        </div>
+      </div>
+      <div id="edit-pricing-custom" style="${p.pricingType==='rates'?'display:none;':''}">
+        <div class="panel-section">
+          <div class="panel-section-title">Custom Pricing</div>
+          <div class="form-field">
+            <label class="field-label">Pricing Model<span class="req">*</span></label>
+            <div class="radio-group">
+              <div class="radio-option ${p.pricingModel==='Flat'?'selected':''}" onclick="selectRadio(this);markDirty()">
+                <div class="radio-option-label">Flat Price</div>
+                <div class="radio-option-desc">One fixed price for the bundle</div>
+              </div>
+              <div class="radio-option ${p.pricingModel==='Per Unit'?'selected':''}" onclick="selectRadio(this);markDirty()">
+                <div class="radio-option-label">Per Unit</div>
+                <div class="radio-option-desc">Price × ${p.model.toLowerCase()}</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="field-label">Rental Rates<span class="req">*</span></label>
+            <div class="form-row">
+              <div class="form-field" style="margin-bottom:0;">
+                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Standard</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
+                </div>
+                <div class="field-hint">Non-member price</div>
+              </div>
+              <div class="form-field" style="margin-bottom:0;">
+                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
+                </div>
+                <div class="field-hint">Discounted member price</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2152,7 +3568,7 @@ function openEdit(id) {
       <button class="panel-btn panel-btn-cancel" onclick="closePanelSafe()">Cancel</button>
     </div>
     <div class="footer-right">
-      <button class="panel-btn panel-btn-primary">Save Changes</button>
+      <button class="panel-btn panel-btn-primary" onclick="validateAndSave('edit')">Save Changes</button>
     </div>
   `;
   attachDirtyListeners();
@@ -2174,11 +3590,11 @@ function openCreate() {
         <div class="panel-section-title">Plan Info</div>
         <div class="form-field">
           <label class="field-label">Plan Name<span class="req">*</span></label>
-          <input class="form-input" type="text" placeholder="e.g. Court Time Bundle — 10hrs">
+          <input class="form-input" type="text" placeholder="e.g. Court Time Bundle — 10hrs" autocomplete="off">
         </div>
         <div class="form-field">
-          <label class="field-label">Description<span class="opt"> (optional)</span></label>
-          <textarea class="form-textarea" placeholder="Brief description visible to staff when selling…"></textarea>
+          <label class="field-label">Description<span class="req">*</span></label>
+          <textarea class="form-textarea" placeholder="Brief description visible to staff when selling…" autocomplete="off"></textarea>
         </div>
         <div class="form-field">
           <label class="field-label">Status</label>
@@ -2187,47 +3603,29 @@ function openCreate() {
               <span class="toggle-label">Active</span>
               <span class="toggle-label-hint">Available for sale</span>
             </div>
-            <div class="toggle" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle"
+                 data-on-label='Active'   data-off-label='Inactive'
+                 data-on-hint='Available for sale' data-off-hint='Not available for sale'
+                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
         </div>
       </div>
       <div class="panel-section">
-        <div class="panel-section-title">Purchase Model</div>
-        <div class="form-field">
-          <label class="field-label">What does this plan sell?<span class="req">*</span></label>
-          <div class="radio-group">
-            <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Hours</div>
-              <div class="radio-option-desc">Deducted by rental duration</div>
-            </div>
-            <div class="radio-option" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Occurrences</div>
-              <div class="radio-option-desc">1 deducted per booking</div>
-            </div>
-          </div>
-          <div class="field-warning">⚠ This cannot be changed after the plan is saved.</div>
-        </div>
-        <div class="form-field">
-          <label class="field-label">Quantity<span class="req">*</span></label>
-          <div class="inline-row">
-            <input class="form-input" type="number" placeholder="e.g. 10" style="width:100px;">
-            <span class="inline-label">hours or occurrences included</span>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Expiry</div>
+        <div class="panel-section-title">Expiration</div>
         <div class="form-field">
           <div class="toggle-row" style="margin-bottom:12px;">
             <div class="toggle-info">
-              <span class="toggle-label">Enable expiry</span>
-              <span class="toggle-label-hint">Plan expires after a set period from purchase</span>
+              <span class="toggle-label">No expiration</span>
+              <span class="toggle-label-hint">Plan stays active until the balance is fully depleted</span>
             </div>
-            <div class="toggle off" id="expiryToggle" onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle off" id="expiryToggle"
+                 data-on-label='Enabled'   data-off-label='No expiration'
+                 data-on-hint='Plan expires after a set period from purchase' data-off-hint='Plan stays active until the balance is fully depleted'
+                 onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
           </div>
           <div id="expiryFields" style="display:none;">
             <div class="inline-row" style="margin-bottom:8px;">
-              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off">
               <select class="form-select" style="width:110px;">
                 <option>Days</option><option>Months</option><option>Years</option>
               </select>
@@ -2237,54 +3635,79 @@ function openCreate() {
           <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
         </div>
       </div>
-    </div>
-    <div id="ctab-1" style="display:none;">
-      <div class="panel-section">
-        <div class="panel-section-title">Pricing Model</div>
-        <div class="form-field">
-          <label class="field-label">Pricing Model<span class="req">*</span></label>
-          <div class="radio-group">
-            <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Flat Price</div>
-              <div class="radio-option-desc">One fixed price for the bundle</div>
-            </div>
-            <div class="radio-option" onclick="selectRadio(this);markDirty()">
-              <div class="radio-option-label">Per Unit</div>
-              <div class="radio-option-desc">Price × hours or occurrences</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Price Points</div>
-        <div class="form-row">
-          <div class="form-field">
-            <label class="field-label">Standard Price<span class="req">*</span></label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">$</span>
-              <input class="form-input" type="number" placeholder="0.00">
-            </div>
-            <div class="field-hint">Non-member price</div>
-          </div>
-          <div class="form-field">
-            <label class="field-label">Member Price<span class="req">*</span></label>
-            <div class="input-with-prefix">
-              <span class="input-prefix">$</span>
-              <input class="form-input" type="number" placeholder="0.00">
-            </div>
-            <div class="field-hint">Discounted member price</div>
-          </div>
-        </div>
-      </div>
       <div class="panel-section">
         <div class="panel-section-title">Auto-Renew</div>
         <div class="form-field">
           <div class="toggle-row">
             <div class="toggle-info">
-              <span class="toggle-label">Allow auto-renew</span>
-              <span class="toggle-label-hint">Clients can opt in at purchase time</span>
+              <span class="toggle-label">Disabled</span>
+              <span class="toggle-label-hint">Clients cannot opt in at purchase time</span>
             </div>
-            <div class="toggle off" onclick="this.classList.toggle('off');markDirty()"><div class="toggle-knob"></div></div>
+            <div class="toggle off"
+                 data-on-label='Enabled'  data-off-label='Disabled'
+                 data-on-hint='Clients can opt in at purchase time' data-off-hint='Clients cannot opt in at purchase time'
+                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="ctab-1" style="display:none;">
+      <div class="pricing-error" id="create-pricing-error"></div>
+      <div class="pricing-type-selector">
+        <div class="pricing-type-label">Pricing type</div>
+        <div class="pricing-mode-seg">
+          <button class="pricing-mode-btn active"
+                  onclick="setPricingType('rates',this,'create')">Rental Rates</button>
+          <button class="pricing-mode-btn"
+                  onclick="setPricingType('custom',this,'create')">Custom Pricing</button>
+        </div>
+      </div>
+      <div id="create-pricing-rates">
+        <div class="panel-section">
+          <div class="panel-section-title">Rental Rates</div>
+          <div class="form-field">
+            <label class="field-label">Applied Rates<span class="opt"> (optional)</span></label>
+            ${buildRateListHTML([], 'create')}
+            <div class="field-hint" style="margin-top:8px;">Rates are defined on the <a href="#" style="color:var(--color-green);text-decoration:none;font-weight:700;">Rental Rates</a> page. Each rate's rules are automatically applied based on client criteria — you cannot select rules individually.</div>
+          </div>
+        </div>
+      </div>
+      <div id="create-pricing-custom" style="display:none;">
+        <div class="panel-section">
+          <div class="panel-section-title">Custom Pricing</div>
+          <div class="form-field">
+            <label class="field-label">Pricing Model<span class="req">*</span></label>
+            <div class="radio-group">
+              <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
+                <div class="radio-option-label">Flat Price</div>
+                <div class="radio-option-desc">One fixed price for the bundle</div>
+              </div>
+              <div class="radio-option" onclick="selectRadio(this);markDirty()">
+                <div class="radio-option-label">Per Unit</div>
+                <div class="radio-option-desc">Price × hours or occurrences</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-field">
+            <label class="field-label">Rental Rates<span class="req">*</span></label>
+            <div class="form-row">
+              <div class="form-field" style="margin-bottom:0;">
+                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Standard</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
+                </div>
+                <div class="field-hint">Non-member price</div>
+              </div>
+              <div class="form-field" style="margin-bottom:0;">
+                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
+                <div class="input-with-prefix">
+                  <span class="input-prefix">$</span>
+                  <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
+                </div>
+                <div class="field-hint">Discounted member price</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2295,7 +3718,7 @@ function openCreate() {
       <button class="panel-btn panel-btn-cancel" onclick="closePanel()">Cancel</button>
     </div>
     <div class="footer-right">
-      <button class="panel-btn panel-btn-primary">Save Plan</button>
+      <button class="panel-btn panel-btn-primary" onclick="validateAndSave('create')">Save Plan</button>
     </div>
   `;
   attachDirtyListeners();
@@ -2307,13 +3730,385 @@ function selectRadio(el) {
   el.closest('.radio-group').querySelectorAll('.radio-option').forEach(r => r.classList.remove('selected'));
   el.classList.add('selected');
 }
+// Updates a toggle's label + hint text from its data-on-*/data-off-* attributes.
+// Call after classList.toggle('off') so the new state is already reflected.
+function updateToggle(el) {
+  const isOn = !el.classList.contains('off');
+  const info = el.closest('.toggle-row')?.querySelector('.toggle-info');
+  if (!info) return;
+  const label = info.querySelector('.toggle-label');
+  const hint  = info.querySelector('.toggle-label-hint');
+  if (label) label.textContent = isOn ? (el.dataset.onLabel || '') : (el.dataset.offLabel || '');
+  if (hint)  hint.textContent  = isOn ? (el.dataset.onHint  || '') : (el.dataset.offHint  || '');
+}
 function toggleExpiry() {
   const t = document.getElementById('expiryToggle');
   if (!t) return;
   t.classList.toggle('off');
   const f = document.getElementById('expiryFields');
   if (f) f.style.display = t.classList.contains('off') ? 'none' : 'block';
+  updateToggle(t);
 }
+// ── Pricing type switcher (Rental Rates vs Custom Pricing) ───────────────
+// context: 'edit' | 'create'
+function setPricingType(mode, btn, context) {
+  btn.closest('.pricing-mode-seg').querySelectorAll('.pricing-mode-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(context + '-pricing-rates').style.display  = mode === 'rates'  ? '' : 'none';
+  document.getElementById(context + '-pricing-custom').style.display = mode === 'custom' ? '' : 'none';
+  markDirty();
+}
+
+// ── Rental Rate list helpers ──────────────────────────────
+
+// Build the HTML for a view-mode (read-only) list of selected rates.
+function buildViewRateList(pricingRules) {
+  if (!pricingRules || !pricingRules.length) {
+    return `<div class="view-value empty">No rental rates assigned</div>`;
+  }
+  return pricingRules.map(ruleName => {
+    const rate = ALL_RENTAL_RATES.find(r => r.name === ruleName);
+    if (!rate) return `<div class="view-rate-item"><div class="view-rate-header"><div class="view-rate-name">${ruleName}</div></div></div>`;
+    const rulesHtml = rate.rules.map(r => `<div class="rate-rule-line">${r}</div>`).join('');
+    const priceHtml = (rate.stdRate || rate.memRate)
+      ? `<div class="view-rate-price"><strong>$${rate.stdRate} / ${rate.unit}</strong> standard &nbsp;·&nbsp; <strong>$${rate.memRate} / ${rate.unit}</strong> members</div>`
+      : '';
+    return `
+      <div class="view-rate-item">
+        <div class="view-rate-header">
+          <div class="view-rate-name">${rate.name}</div>
+          <span class="rate-category-tag">${rate.category}</span>
+        </div>
+        ${priceHtml}
+        <div class="view-rate-rules">${rulesHtml}</div>
+      </div>`;
+  }).join('');
+}
+
+// Build the search + filter chips + selectable rate list for edit/create panels.
+// context: 'edit' | 'create'
+function buildRateListHTML(selectedRules, context) {
+  const categories = ['All', 'Peak', 'Off-peak', 'Seasonal', 'Holiday'];
+  const chipsHtml = categories.map(c =>
+    `<button class="rate-filter-chip${c === 'All' ? ' active' : ''}"
+             onclick="setRateFilter(this,'${context}')"
+             data-cat="${c.toLowerCase()}">${c}</button>`
+  ).join('');
+
+  const itemsHtml = ALL_RENTAL_RATES.map(r => {
+    const checked = (selectedRules || []).includes(r.name);
+    const rulesHtml = r.rules.map(rule => `<div class="rate-rule-line">${rule}</div>`).join('');
+    const count = r.rules.length;
+    return `
+      <div class="rate-item" data-name="${r.name.toLowerCase()}" data-desc="${r.desc.toLowerCase()}" data-cat="${r.category.toLowerCase()}">
+        <div class="rate-item-header">
+          <label class="rate-check-label">
+            <input type="checkbox" class="rate-cb" ${checked ? 'checked' : ''} onchange="markDirty()">
+            <div class="rate-item-info">
+              <div class="rate-item-name">${r.name} <span class="rate-category-tag">${r.category}</span></div>
+              ${(r.stdRate || r.memRate) ? `
+              <div class="rate-item-price">
+                <span>$${r.stdRate} / ${r.unit}</span>
+                <span class="rate-item-price-sep"></span>
+                <span class="rate-item-price-mem">$${r.memRate} / ${r.unit} members</span>
+              </div>` : ''}
+              <div class="rate-item-desc">${r.desc}</div>
+            </div>
+          </label>
+          <button class="rate-rules-toggle" onclick="toggleRateExpand(this)" data-count="${count}">▸ ${count} rule${count !== 1 ? 's' : ''}</button>
+        </div>
+        <div class="rate-rules-body">${rulesHtml}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="rate-search-row">
+      <div class="rate-search-wrap" id="${context}-rate-search-wrap">
+        <span class="rate-search-icon">⌕</span>
+        <input class="rate-search-input" type="text" id="${context}-rate-search"
+               placeholder="Search rates…" autocomplete="off"
+               oninput="onRateSearch(this,'${context}')">
+        <button class="search-clear" onclick="clearRateSearch('${context}')" title="Clear">✕</button>
+      </div>
+    </div>
+    <div class="rate-filter-chips" id="${context}-rate-filters">${chipsHtml}</div>
+    <div class="rate-select-actions">
+      <button class="rate-select-btn" onclick="selectAllRates('${context}', true)">Select All</button>
+      <button class="rate-select-btn" onclick="selectAllRates('${context}', false)">Deselect All</button>
+    </div>
+    <div class="rate-list-wrap">
+      <div id="${context}-rate-list">${itemsHtml}</div>
+      <div class="rate-no-results" id="${context}-rate-no-results">No rates match your search.</div>
+    </div>`;
+}
+
+// Filter visible rate items by search query + active category chip.
+function filterRentalRates(context) {
+  const input = document.getElementById(context + '-rate-search');
+  const query = input ? input.value.toLowerCase().trim() : '';
+  const activeChip = document.querySelector('#' + context + '-rate-filters .rate-filter-chip.active');
+  const category = activeChip ? activeChip.dataset.cat : 'all';
+
+  const list = document.getElementById(context + '-rate-list');
+  if (!list) return;
+
+  let visible = 0;
+  list.querySelectorAll('.rate-item').forEach(item => {
+    const matchSearch = !query || item.dataset.name.includes(query) || item.dataset.desc.includes(query);
+    const matchCat    = category === 'all' || item.dataset.cat === category;
+    item.style.display = (matchSearch && matchCat) ? '' : 'none';
+    if (matchSearch && matchCat) visible++;
+  });
+
+  const noRes = document.getElementById(context + '-rate-no-results');
+  if (noRes) noRes.style.display = visible === 0 ? 'block' : 'none';
+}
+
+function setRateFilter(btn, context) {
+  btn.closest('.rate-filter-chips').querySelectorAll('.rate-filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  filterRentalRates(context);
+}
+
+function onRateSearch(input, context) {
+  const wrap = document.getElementById(context + '-rate-search-wrap');
+  if (wrap) wrap.classList.toggle('has-value', input.value.length > 0);
+  filterRentalRates(context);
+}
+
+function clearRateSearch(context) {
+  const input = document.getElementById(context + '-rate-search');
+  if (input) { input.value = ''; input.focus(); }
+  const wrap = document.getElementById(context + '-rate-search-wrap');
+  if (wrap) wrap.classList.remove('has-value');
+  filterRentalRates(context);
+}
+
+// Select or deselect all currently-visible rate checkboxes.
+function selectAllRates(context, selectAll) {
+  const list = document.getElementById(context + '-rate-list');
+  if (!list) return;
+  list.querySelectorAll('.rate-item').forEach(item => {
+    if (item.style.display === 'none') return; // respect active filter
+    const cb = item.querySelector('.rate-cb');
+    if (cb) cb.checked = selectAll;
+  });
+  markDirty();
+}
+
+// Validate that pricing has been configured before saving.
+// If invalid: switches to Pricing tab and shows inline error.
+// If custom pricing is valid but matches existing rates: shows suggestion modal.
+// context: 'edit' | 'create'
+function validateAndSave(context) {
+  const prefix    = context === 'edit' ? 'e' : 'c';
+  const ratesEl   = document.getElementById(context + '-pricing-rates');
+  const customEl  = document.getElementById(context + '-pricing-custom');
+  const errorEl   = document.getElementById(context + '-pricing-error');
+
+  const isRatesMode  = ratesEl  && ratesEl.style.display  !== 'none';
+  const isCustomMode = customEl && customEl.style.display !== 'none';
+
+  let errorMsg = '';
+
+  if (isRatesMode) {
+    const anyChecked = ratesEl.querySelectorAll('.rate-cb:checked').length > 0;
+    if (!anyChecked) {
+      errorMsg = 'Select at least one rental rate before saving, or switch to Custom Pricing.';
+    }
+  } else if (isCustomMode) {
+    const inputs = customEl.querySelectorAll('input[type="number"]');
+    const anyFilled = [...inputs].some(i => i.value.trim() !== '' && parseFloat(i.value) > 0);
+    if (!anyFilled) {
+      errorMsg = 'Enter at least one price (Standard or Member) before saving, or switch to Rental Rates.';
+    }
+  } else {
+    errorMsg = 'Choose a pricing type and add pricing before saving.';
+  }
+
+  if (errorMsg) {
+    // Switch to Pricing tab if not already there
+    const pricingTab = document.getElementById(prefix + 'tab-1');
+    if (pricingTab && pricingTab.style.display === 'none') {
+      const tabs = document.querySelectorAll('.panel-tab');
+      if (tabs[1]) switchTab(tabs[1], 1);
+    }
+    // Show error banner (scroll it into view)
+    if (errorEl) {
+      errorEl.textContent = '⚠ ' + errorMsg;
+      errorEl.classList.add('visible');
+      errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return;
+  }
+
+  // Clear error
+  if (errorEl) errorEl.classList.remove('visible');
+
+  // If saving with custom pricing, check whether any existing rates match
+  if (isCustomMode) {
+    const inputs   = customEl.querySelectorAll('input[type="number"]');
+    const stdVal   = inputs[0] ? parseFloat(inputs[0].value) || 0 : 0;
+    const memVal   = inputs[1] ? parseFloat(inputs[1].value) || 0 : 0;
+    const matches  = findMatchingRates(stdVal, memVal);
+    if (matches.length > 0) {
+      showRateSuggestions(matches, context, () => commitSave(context));
+      return; // wait for user's decision in the modal
+    }
+  }
+
+  commitSave(context);
+}
+
+// Persist the edit/create and close the panel.
+function commitSave(context) {
+  if (context === 'edit' && currentPlan) {
+    const nameInput = document.querySelector('#etab-0 .form-input');
+    if (nameInput && nameInput.value.trim()) currentPlan.name = nameInput.value.trim();
+    const statusToggle = document.querySelector('#etab-0 .toggle');
+    if (statusToggle) currentPlan.status = statusToggle.classList.contains('off') ? 'Inactive' : 'Active';
+  }
+  isDirty = false;
+  closePanel();
+  renderTable();
+}
+
+// ── Rate matching heuristic ──────────────────────────────
+// Returns ALL_RENTAL_RATES entries that plausibly match the
+// custom pricing the user entered. In production this would
+// be a server-side schedule comparison; here we use simple
+// price-ratio signals as a prototype stand-in.
+function findMatchingRates(stdVal, memVal) {
+  const results = [];
+  if (!stdVal && !memVal) return results;
+
+  const ratio = (stdVal > 0 && memVal > 0) ? memVal / stdVal : null;
+
+  // Meaningful member discount → suggest off-peak or seasonal rates
+  if (ratio !== null && ratio <= 0.88) {
+    ALL_RENTAL_RATES.forEach(r => {
+      if ((r.category === 'Off-peak' || r.category === 'Seasonal') && !results.includes(r))
+        results.push(r);
+    });
+  }
+
+  // Higher standard price → suggest peak rates (surcharge patterns)
+  if (stdVal > 50) {
+    ALL_RENTAL_RATES.forEach(r => {
+      if (r.category === 'Peak' && !results.includes(r))
+        results.push(r);
+    });
+  }
+
+  // Holiday marker: large multiplier implied (std significantly higher than member)
+  if (ratio !== null && ratio <= 0.70) {
+    ALL_RENTAL_RATES.forEach(r => {
+      if (r.category === 'Holiday' && !results.includes(r))
+        results.push(r);
+    });
+  }
+
+  // Always surface at least one suggestion so the feature is demonstrable
+  if (results.length === 0 && ALL_RENTAL_RATES.length > 0) {
+    results.push(ALL_RENTAL_RATES[0]);
+  }
+
+  return results.slice(0, 3); // cap to avoid overwhelming the modal
+}
+
+// ── Rate suggestion modal ────────────────────────────────
+let _rateSuggestKeepCallback = null;
+
+function showRateSuggestions(matches, context, onKeep) {
+  _rateSuggestKeepCallback = onKeep;
+
+  document.getElementById('rateSuggestIntro').textContent =
+    'The pricing you entered resembles ' +
+    (matches.length === 1 ? 'an existing rental rate' : 'existing rental rates') +
+    '. Using an established rate ensures pricing rules are applied consistently across all bookings.';
+
+  const list = document.getElementById('rateSuggestList');
+  list.innerHTML = matches.map(r => {
+    const rulesHtml = r.rules.map(rule =>
+      `<div class="rate-rule-line">${rule}</div>`
+    ).join('');
+    return `
+      <div class="rate-suggest-card">
+        <div class="rate-suggest-card-header">
+          <div class="rate-suggest-card-name">${r.name}</div>
+          <span class="rate-category-tag">${r.category}</span>
+          <span class="rate-suggest-match-label">Match</span>
+        </div>
+        <div class="rate-suggest-card-desc">${r.desc}</div>
+        ${(r.stdRate || r.memRate) ? `<div class="rate-suggest-card-desc" style="font-weight:700;color:var(--color-text);margin-top:-2px;margin-bottom:6px;">$${r.stdRate} / ${r.unit} <span style="font-weight:400;color:var(--color-text-secondary);">standard</span> &nbsp;·&nbsp; $${r.memRate} / ${r.unit} <span style="font-weight:400;color:var(--color-text-secondary);">members</span></div>` : ''}
+        <div class="rate-suggest-card-rules">${rulesHtml}</div>
+        <button class="rate-suggest-use-btn"
+                onclick="useRateSuggestion('${r.name}','${context}')">Use this rate</button>
+      </div>`;
+  }).join('');
+
+  document.getElementById('rateSuggestBackdrop').classList.add('open');
+}
+
+function hideRateSuggestions() {
+  document.getElementById('rateSuggestBackdrop').classList.remove('open');
+  _rateSuggestKeepCallback = null;
+}
+
+// User chose to switch to an existing rate instead of custom pricing.
+function useRateSuggestion(rateName, context) {
+  hideRateSuggestions();
+
+  // Switch pricing mode to Rental Rates
+  const prefix   = context === 'edit' ? 'e' : 'c';
+  const tabEl    = document.getElementById(prefix + 'tab-1');
+  const ratesBtn = tabEl?.querySelector('.pricing-mode-btn:first-child');
+  if (ratesBtn) setPricingType('rates', ratesBtn, context);
+
+  // Pre-check the matching rate checkbox
+  const list = document.getElementById(context + '-rate-list');
+  if (list) {
+    list.querySelectorAll('.rate-item').forEach(item => {
+      if (item.dataset.name === rateName.toLowerCase()) {
+        const cb = item.querySelector('.rate-cb');
+        if (cb) cb.checked = true;
+      }
+    });
+  }
+
+  // Show the Pricing tab so the user can review before saving again
+  const tabs = document.querySelectorAll('.panel-tab');
+  if (tabs[1]) switchTab(tabs[1], 1);
+
+  markDirty();
+}
+
+// Wire up the "Keep custom pricing" button — proceeds with the original save
+document.getElementById('rateSuggestKeep').addEventListener('click', () => {
+  const cb = _rateSuggestKeepCallback;
+  hideRateSuggestions();
+  if (cb) cb();
+});
+// Close on backdrop click
+document.getElementById('rateSuggestBackdrop').addEventListener('click', e => {
+  if (e.target === e.currentTarget) hideRateSuggestions();
+});
+// Close on Escape (appended to existing keydown listener context)
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('rateSuggestBackdrop').classList.contains('open')) {
+    hideRateSuggestions();
+  }
+});
+
+// Expand/collapse the rules list on a rate item.
+function toggleRateExpand(btn) {
+  const item = btn.closest('.rate-item');
+  item.classList.toggle('expanded');
+  const count = btn.dataset.count;
+  const label = count + ' rule' + (count !== '1' ? 's' : '');
+  btn.textContent = item.classList.contains('expanded') ? '▾ ' + label : '▸ ' + label;
+}
+
 function archivePlan() {
   if (!currentPlan) return;
   showConfirm({
@@ -2335,8 +4130,529 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// ── Populate Rental Rates filter multiselect (toolbar filter) ────────────
+(function() {
+  const container = document.getElementById('ms-options-pricing');
+  if (!container) return;
+  const noRes = container.querySelector('.ms-no-results');
+  ALL_RENTAL_RATES.forEach(r => {
+    const label = document.createElement('label');
+    label.className = 'ms-option';
+    label.innerHTML = `<input type="checkbox" value="${r.name}" onchange="onFilterChange()"> ${r.name}`;
+    container.insertBefore(label, noRes);
+  });
+})();
+
 updateTabCounts();
 renderTable();
+
+// ═══════════════════════════════════════════════════════════
+// ANNOTATION SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+const ANN_PASSWORD    = 'katy';
+const ANN_STORAGE_KEY = 'rfp_annotations_v1';
+
+// Each annotation: { id, layer, xPct, yPct, text, num }
+//   layer: 'main'  — coords are % of #main dimensions
+//   layer: 'panel' — coords are % of #sidePanel dimensions; only shown when panel open
+let annData        = [];
+let annNextNum     = 1;
+let annVisible     = false;
+let annAddMode     = false;
+let annAuthor      = false;
+let annPendingX    = 0;
+let annPendingY    = 0;
+let annPendingLayer = 'main';   // ← new: tracks which layer the pending click landed on
+let annEditingId   = null;
+let annActiveId    = null;
+// Drag state
+let annDragId        = null;
+let annDragStartX    = 0;
+let annDragStartY    = 0;
+let annDragBL        = 0;   // bubble starting left %
+let annDragBT        = 0;   // bubble starting top %
+let annDragMoved     = false;
+
+// ── Persistence ───────────────────────────────────────────
+function annLoad() {
+  try {
+    const raw = localStorage.getItem(ANN_STORAGE_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      annData    = d.annotations || [];
+      annNextNum = d.nextNum     || (annData.length + 1);
+    }
+  } catch(e) {}
+}
+function annSave() {
+  try {
+    localStorage.setItem(ANN_STORAGE_KEY, JSON.stringify({ annotations: annData, nextNum: annNextNum }));
+  } catch(e) {}
+}
+
+// ── Visibility toggle ─────────────────────────────────────
+function setAnnVisible(v) {
+  annVisible = v;
+  document.getElementById('wfAnnOn').classList.toggle('active',  v);
+  document.getElementById('wfAnnOff').classList.toggle('active', !v);
+  document.getElementById('annSidebar').classList.toggle('open', v);
+  document.getElementById('wfAddRow').style.display = (v && annAuthor) ? '' : 'none';
+  if (!v && annAddMode) setAnnAddMode(false);
+}
+function toggleAnnotationsVisible() {
+  setAnnVisible(!annVisible);
+  renderAnnBubbles();
+  renderAnnSidebar();
+}
+
+// ── Add mode ──────────────────────────────────────────────
+function toggleAnnAddMode() { setAnnAddMode(!annAddMode); }
+function setAnnAddMode(on) {
+  annAddMode = on;
+  document.getElementById('wfAddOn').classList.toggle('active',  on);
+  document.getElementById('wfAddOff').classList.toggle('active', !on);
+  document.getElementById('main').setAttribute('data-ann-add', on ? 'true' : 'false');
+  if (!on) cancelAnnInput();
+}
+
+// ── Layer-aware placement ─────────────────────────────────
+// Called by both the capture overlay (add mode) and ⌘+Click shortcut.
+function triggerAnnPlace(e) {
+  if (!annAuthor) return;
+  // Auto-enable annotations if not yet visible
+  if (!annVisible) { setAnnVisible(true); renderAnnBubbles(); renderAnnSidebar(); }
+
+  const mainEl   = document.getElementById('main');
+  const panelEl  = document.getElementById('sidePanel');
+  const mainRect = mainEl.getBoundingClientRect();
+  const panelOpen = panelEl.classList.contains('open');
+
+  if (panelOpen) {
+    const panelRect = panelEl.getBoundingClientRect();
+    const onPanel   = e.clientX >= panelRect.left && e.clientX <= panelRect.right
+                   && e.clientY >= panelRect.top  && e.clientY <= panelRect.bottom;
+    if (onPanel) {
+      annPendingLayer = 'panel';
+      annPendingX = (e.clientX - panelRect.left) / panelRect.width  * 100;
+      annPendingY = (e.clientY - panelRect.top)  / panelRect.height * 100;
+    } else {
+      annPendingLayer = 'main';
+      annPendingX = (e.clientX - mainRect.left) / mainRect.width  * 100;
+      annPendingY = (e.clientY - mainRect.top)  / mainRect.height * 100;
+    }
+  } else {
+    annPendingLayer = 'main';
+    annPendingX = (e.clientX - mainRect.left) / mainRect.width  * 100;
+    annPendingY = (e.clientY - mainRect.top)  / mainRect.height * 100;
+  }
+
+  annEditingId = null;
+  showAnnInputForm(e.clientX, e.clientY, '');
+}
+
+// Capture overlay click (add-mode toggle is ON)
+function onAnnCapture(e) {
+  if (!annAddMode || !annAuthor) return;
+  triggerAnnPlace(e);
+}
+
+// ── Input form ────────────────────────────────────────────
+function showAnnInputForm(clientX, clientY, text) {
+  const form = document.getElementById('annInputForm');
+  document.getElementById('annInputLabel').textContent    = annEditingId !== null ? 'Edit annotation' : 'New annotation';
+  document.getElementById('annInputTextarea').value       = text;
+  // Position near click, clamped to viewport
+  const W = 288, H = 160, M = 12;
+  let left = clientX + 14;
+  let top  = clientY - 16;
+  if (left + W > window.innerWidth  - M) left = clientX - W - 14;
+  if (top  + H > window.innerHeight - M) top  = window.innerHeight - H - M;
+  if (top < M) top = M;
+  form.style.left = left + 'px';
+  form.style.top  = top  + 'px';
+  form.classList.add('visible');
+  setTimeout(() => document.getElementById('annInputTextarea').focus(), 40);
+}
+function saveAnnInput() {
+  const text = document.getElementById('annInputTextarea').value.trim();
+  if (!text) { document.getElementById('annInputTextarea').focus(); return; }
+  if (annEditingId !== null) {
+    const ann = annData.find(a => a.id === annEditingId);
+    if (ann) ann.text = text;
+  } else {
+    // Store layer + layer-space coords
+    annData.push({
+      id: Date.now(),
+      layer: annPendingLayer,
+      xPct: annPendingX,
+      yPct: annPendingY,
+      text,
+      num: annNextNum++
+    });
+  }
+  annSave();
+  cancelAnnInput();
+  renderAnnBubbles();
+  renderAnnSidebar();
+}
+function cancelAnnInput() {
+  document.getElementById('annInputForm').classList.remove('visible');
+  annEditingId = null;
+  renderAnnBubbles(); // clear the editing class
+}
+
+// ── Bubble rendering — layer-aware ────────────────────────
+function renderAnnBubbles() {
+  const layerEl  = document.getElementById('annLayer');
+  if (!annVisible) { layerEl.innerHTML = ''; return; }
+
+  const mainEl    = document.getElementById('main');
+  const panelEl   = document.getElementById('sidePanel');
+  const mainRect  = mainEl.getBoundingClientRect();
+  const panelOpen = panelEl.classList.contains('open');
+  const panelRect = panelOpen ? panelEl.getBoundingClientRect() : null;
+
+  layerEl.innerHTML = annData.map(a => {
+    const aLayer = a.layer || 'main'; // backward compat: treat unlayered as main
+
+    let leftPct, topPct;
+
+    if (aLayer === 'panel') {
+      // Panel-layer: only render when the panel is actually open
+      if (!panelOpen) return '';
+      // Convert panel-space % to main-space % using live rects
+      const panelOffsetLeft = panelRect.left - mainRect.left;
+      const panelOffsetTop  = panelRect.top  - mainRect.top;
+      leftPct = (panelOffsetLeft + a.xPct / 100 * panelRect.width)  / mainRect.width  * 100;
+      topPct  = (panelOffsetTop  + a.yPct / 100 * panelRect.height) / mainRect.height * 100;
+    } else {
+      // Main-layer: coords are already % of #main — unchanged whether panel is open or not
+      leftPct = a.xPct;
+      topPct  = a.yPct;
+    }
+
+    const isEditing = annEditingId === a.id;
+    return `<div class="ann-bubble${isEditing ? ' ann-bubble-editing' : ''}" id="ann-b-${a.id}"
+                 style="left:${leftPct.toFixed(3)}%;top:${topPct.toFixed(3)}%"
+                 onmousedown="startAnnDrag(event,${a.id})"
+                 onclick="onAnnBubbleClick(event,${a.id},this)">${a.num}</div>`;
+  }).join('');
+}
+
+// ── Sidebar rendering ─────────────────────────────────────
+function renderAnnSidebar() {
+  const body = document.getElementById('annSidebarBody');
+  if (!annData.length) {
+    body.innerHTML = `<div class="ann-sidebar-empty" id="annSidebarEmpty">${
+      annAuthor
+        ? 'No annotations yet. ⌘+click (or Ctrl+click) anywhere on the wireframe to add one.'
+        : 'No annotations yet.'
+    }</div>`;
+    return;
+  }
+  const panelOpen = document.getElementById('sidePanel').classList.contains('open');
+  const hint = annAuthor
+    ? `<div class="ann-sidebar-hint">⌘+click anywhere to annotate. Enable Add mode for persistent placement.</div>` : '';
+
+  body.innerHTML = hint + annData.map(a => {
+    const aLayer = a.layer || 'main';
+    const panelClosed = aLayer === 'panel' && !panelOpen;
+    const layerTag = aLayer === 'panel'
+      ? `<span class="ann-layer-tag${panelClosed ? ' panel-closed' : ''}">panel${panelClosed ? ' · click to open' : ''}</span>` : '';
+    return `<div class="ann-list-item${annActiveId === a.id ? ' active' : ''}"
+                 id="ann-li-${a.id}" onclick="navigateToAnn(${a.id})">
+              <div class="ann-list-num">${a.num}</div>
+              <div class="ann-list-text">${escapeAnn(a.text)}${layerTag ? '<br>' + layerTag : ''}</div>
+            </div>`;
+  }).join('');
+}
+
+// ── Bubble click → detail popover ────────────────────────
+function clickAnnBubble(id, bubbleEl) {
+  closeAnnDetail();
+  if (annActiveId === id) { annActiveId = null; renderAnnSidebar(); return; }
+  annActiveId = id;
+  const ann = annData.find(a => a.id === id);
+  if (!ann) return;
+  const popover = document.getElementById('annDetailPopover');
+  const authorActions = annAuthor
+    ? `<div class="ann-detail-actions">
+         <button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="editAnn(${id})">Edit</button>
+         <button class="panel-btn panel-btn-destructive" style="height:26px;font-size:12px;padding:0 10px;" onclick="deleteAnn(${id})">Delete</button>
+       </div>` : '';
+  popover.innerHTML = `
+    <div class="ann-detail-num">Note ${ann.num}</div>
+    <div class="ann-detail-text">${escapeAnn(ann.text)}</div>
+    ${authorActions}`;
+  // Position relative to bubble
+  const bRect = bubbleEl.getBoundingClientRect();
+  positionAnnPopover(popover, bRect.right + 8, bRect.top - 4);
+  popover.classList.add('visible');
+  // Highlight matching sidebar item
+  renderAnnSidebar();
+}
+function positionAnnPopover(el, x, y) {
+  el.style.visibility = 'hidden';
+  el.style.display = 'block';
+  const W = el.offsetWidth || 256, H = el.offsetHeight || 100, M = 10;
+  el.style.display = '';
+  el.style.visibility = '';
+  let left = x, top = y;
+  if (left + W > window.innerWidth  - M) left = x - W - 44;
+  if (top  + H > window.innerHeight - M) top  = window.innerHeight - H - M;
+  if (top < M) top = M;
+  el.style.left = left + 'px';
+  el.style.top  = top  + 'px';
+}
+function closeAnnDetail() {
+  document.getElementById('annDetailPopover').classList.remove('visible');
+  annActiveId = null;
+}
+
+// ── Navigate from sidebar ─────────────────────────────────
+function navigateToAnn(id) {
+  annActiveId = id;
+  const ann = annData.find(a => a.id === id);
+  if (!ann) return;
+
+  const aLayer   = ann.layer || 'main';
+  const panelEl  = document.getElementById('sidePanel');
+  const panelOpen = panelEl.classList.contains('open');
+
+  function flashAndOpen() {
+    const bubble = document.getElementById('ann-b-' + id);
+    if (!bubble) return;
+    bubble.classList.remove('flash');
+    void bubble.offsetWidth;
+    bubble.classList.add('flash');
+    closeAnnDetail();
+    clickAnnBubble(id, bubble);
+    renderAnnSidebar();
+  }
+
+  if (aLayer === 'panel' && !panelOpen) {
+    // Open the wireframe side panel first, then navigate once it's rendered
+    openPanel();
+    renderAnnBubbles();
+    requestAnimationFrame(() => requestAnimationFrame(flashAndOpen));
+  } else {
+    renderAnnSidebar();
+    flashAndOpen();
+  }
+}
+
+// ── Edit / delete ─────────────────────────────────────────
+function editAnn(id) {
+  closeAnnDetail();
+  const ann = annData.find(a => a.id === id);
+  if (!ann) return;
+  annEditingId = id;
+  // Compute screen position based on layer
+  const aLayer = ann.layer || 'main';
+  let cx, cy;
+  if (aLayer === 'panel') {
+    const r = document.getElementById('sidePanel').getBoundingClientRect();
+    cx = r.left + ann.xPct / 100 * r.width;
+    cy = r.top  + ann.yPct / 100 * r.height;
+  } else {
+    const r = document.getElementById('main').getBoundingClientRect();
+    cx = r.left + ann.xPct / 100 * r.width;
+    cy = r.top  + ann.yPct / 100 * r.height;
+  }
+  renderAnnBubbles(); // re-render so the editing bubble gets its special class/cursor
+  showAnnInputForm(cx + 16, cy, ann.text);
+}
+function deleteAnn(id) {
+  closeAnnDetail();
+  annData = annData.filter(a => a.id !== id);
+  // Re-sequence numbers
+  annData.forEach((a, i) => { a.num = i + 1; });
+  annNextNum = annData.length + 1;
+  annSave();
+  renderAnnBubbles();
+  renderAnnSidebar();
+}
+
+// ── Close sidebar button ──────────────────────────────────
+function closeAnnSidebar() {
+  annVisible = false;
+  document.getElementById('wfAnnOn').classList.remove('active');
+  document.getElementById('wfAnnOff').classList.add('active');
+  document.getElementById('annSidebar').classList.remove('open');
+  document.getElementById('wfAddRow').style.display = 'none';
+  if (annAddMode) setAnnAddMode(false);
+  closeAnnDetail();
+  renderAnnBubbles();
+}
+
+// ── Login ─────────────────────────────────────────────────
+function showAnnLogin() {
+  document.getElementById('annLoginInput').value = '';
+  document.getElementById('annLoginError').textContent = '';
+  document.getElementById('annLoginBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('annLoginInput').focus(), 60);
+}
+function hideAnnLogin() {
+  document.getElementById('annLoginBackdrop').classList.remove('open');
+}
+function submitAnnLogin() {
+  if (document.getElementById('annLoginInput').value === ANN_PASSWORD) {
+    annAuthor = true;
+    hideAnnLogin();
+    document.getElementById('wfAuthRow').innerHTML =
+      `<span class="wf-author-label">Signed in as Katy</span>
+       <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
+    if (annVisible) document.getElementById('wfAddRow').style.display = '';
+    renderAnnBubbles();  // re-render to show edit/delete in popovers
+    renderAnnSidebar();
+  } else {
+    document.getElementById('annLoginError').textContent = 'Incorrect password.';
+    document.getElementById('annLoginInput').select();
+  }
+}
+function annLogout() {
+  annAuthor = false;
+  if (annAddMode) setAnnAddMode(false);
+  document.getElementById('wfAddRow').style.display = 'none';
+  document.getElementById('wfAuthRow').innerHTML =
+    `<button class="wf-auth-link" onclick="showAnnLogin()">Sign in to annotate</button>`;
+  closeAnnDetail();
+  renderAnnBubbles();
+  renderAnnSidebar();
+}
+
+// ── Utility ───────────────────────────────────────────────
+function escapeAnn(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/\n/g,'<br>');
+}
+
+// ── Bubble click wrapper (suppresses click after drag) ────
+function onAnnBubbleClick(e, id, el) {
+  if (annDragMoved) { annDragMoved = false; return; }
+  clickAnnBubble(id, el);
+}
+
+// ── Bubble drag (reposition when editing) ────────────────
+function startAnnDrag(e, id) {
+  // Only drag if this bubble is the one being edited
+  if (!annAuthor || annEditingId !== id) return;
+  e.preventDefault();
+  e.stopPropagation();
+  annDragId    = id;
+  annDragMoved = false;
+  annDragStartX = e.clientX;
+  annDragStartY = e.clientY;
+  const bubble  = document.getElementById('ann-b-' + id);
+  annDragBL     = parseFloat(bubble.style.left);
+  annDragBT     = parseFloat(bubble.style.top);
+  document.addEventListener('mousemove', onAnnDragMove);
+  document.addEventListener('mouseup',   onAnnDragEnd);
+}
+function onAnnDragMove(e) {
+  if (annDragId === null) return;
+  const bubble  = document.getElementById('ann-b-' + annDragId);
+  if (!bubble) return;
+  const mainRect = document.getElementById('main').getBoundingClientRect();
+  const dx = (e.clientX - annDragStartX) / mainRect.width  * 100;
+  const dy = (e.clientY - annDragStartY) / mainRect.height * 100;
+  const newLeft = Math.max(0, Math.min(99, annDragBL + dx));
+  const newTop  = Math.max(0, Math.min(99, annDragBT  + dy));
+  bubble.style.left = newLeft + '%';
+  bubble.style.top  = newTop  + '%';
+  annDragMoved = true;
+  // Keep input form roughly near the bubble
+  const inputForm = document.getElementById('annInputForm');
+  if (inputForm.classList.contains('visible')) {
+    const mainEl  = document.getElementById('main');
+    const mRect   = mainEl.getBoundingClientRect();
+    const bLeft   = mRect.left + newLeft / 100 * mRect.width;
+    const bTop    = mRect.top  + newTop  / 100 * mRect.height;
+    positionAnnPopover(inputForm, bLeft + 24, bTop - 4);
+  }
+}
+function onAnnDragEnd(e) {
+  document.removeEventListener('mousemove', onAnnDragMove);
+  document.removeEventListener('mouseup',   onAnnDragEnd);
+  if (!annDragMoved || annDragId === null) { annDragId = null; return; }
+
+  // Read where the bubble ended up (in main-space %)
+  const bubble   = document.getElementById('ann-b-' + annDragId);
+  const newLeftPct = bubble ? parseFloat(bubble.style.left) : annDragBL;
+  const newTopPct  = bubble ? parseFloat(bubble.style.top)  : annDragBT;
+
+  const ann      = annData.find(a => a.id === annDragId);
+  const mainEl   = document.getElementById('main');
+  const panelEl  = document.getElementById('sidePanel');
+
+  if (ann) {
+    const aLayer = ann.layer || 'main';
+    if (aLayer === 'panel' && panelEl.classList.contains('open')) {
+      // Convert main-space % back to panel-space %
+      const mRect = mainEl.getBoundingClientRect();
+      const pRect = panelEl.getBoundingClientRect();
+      const panelOffL = pRect.left - mRect.left;
+      const panelOffT = pRect.top  - mRect.top;
+      const absPxL = newLeftPct / 100 * mRect.width;
+      const absPxT = newTopPct  / 100 * mRect.height;
+      ann.xPct = Math.max(0, Math.min(100, (absPxL - panelOffL) / pRect.width  * 100));
+      ann.yPct = Math.max(0, Math.min(100, (absPxT - panelOffT) / pRect.height * 100));
+    } else {
+      ann.xPct = newLeftPct;
+      ann.yPct = newTopPct;
+    }
+    annSave();
+  }
+  annDragId = null;
+  renderAnnBubbles();
+}
+
+// ── Global event wiring ───────────────────────────────────
+// Close detail popover on outside click
+document.addEventListener('click', e => {
+  const pop = document.getElementById('annDetailPopover');
+  if (pop.classList.contains('visible')
+      && !pop.contains(e.target)
+      && !e.target.closest('.ann-bubble')
+      && !e.target.closest('#annInputForm')) {
+    closeAnnDetail();
+    renderAnnSidebar();
+  }
+});
+// Escape → cancel input form or close popover
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('annInputForm').classList.contains('visible')) { cancelAnnInput(); return; }
+    if (document.getElementById('annDetailPopover').classList.contains('visible')) { closeAnnDetail(); renderAnnSidebar(); }
+    if (document.getElementById('annLoginBackdrop').classList.contains('open')) hideAnnLogin();
+  }
+});
+// Enter submits login
+document.getElementById('annLoginInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAnnLogin();
+});
+// Ctrl/Cmd+Enter saves annotation input
+document.getElementById('annInputTextarea').addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') saveAnnInput();
+});
+// ⌘+Click / Ctrl+Click anywhere in the wireframe places an annotation without needing add mode
+document.addEventListener('click', e => {
+  if (!annAuthor) return;
+  if (!(e.metaKey || e.ctrlKey)) return;
+  const mainEl  = document.getElementById('main');
+  const panelEl = document.getElementById('sidePanel');
+  // Only intercept clicks within the wireframe content area or the side panel
+  if (!mainEl.contains(e.target) && !panelEl.contains(e.target)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  triggerAnnPlace(e);
+}, true); // capture phase — fires before child element handlers
+
+// ── Init ──────────────────────────────────────────────────
+annLoad();
 </script>
 </body>
 </html>
