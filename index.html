@@ -2219,6 +2219,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   flex-shrink: 0;
   margin-top: 1px;
 }
+.ann-list-num[data-ann-type="design"]        { background:#7C3AED; }
+.ann-list-num[data-ann-type="functionality"] { background:#059669; }
+.ann-list-num[data-ann-type="question"]      { background:#D97706; }
 .ann-list-text {
   font-size: 12px;
   color: var(--color-text);
@@ -2411,6 +2414,82 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-bubble.ann-bubble-editing:active {
   cursor: grabbing !important;
 }
+
+/* ── Annotation type colors ─────────────────────────────── */
+/* comment = blue (default, already set in .ann-bubble above) */
+.ann-bubble[data-ann-type="design"]             { background:#EDE9FE; color:#5B21B6; box-shadow:0 2px 8px rgba(124,58,237,0.3),0 0 0 2px #7C3AED; }
+.ann-bubble[data-ann-type="design"]:hover       { background:#DDD6FE; box-shadow:0 3px 12px rgba(124,58,237,0.4),0 0 0 2px #7C3AED; }
+.ann-bubble[data-ann-type="functionality"]      { background:#D1FAE5; color:#065F46; box-shadow:0 2px 8px rgba(5,150,105,0.3),0 0 0 2px #059669; }
+.ann-bubble[data-ann-type="functionality"]:hover{ background:#A7F3D0; box-shadow:0 3px 12px rgba(5,150,105,0.4),0 0 0 2px #059669; }
+.ann-bubble[data-ann-type="question"]           { background:#FEF3C7; color:#92400E; box-shadow:0 2px 8px rgba(217,119,6,0.3),0 0 0 2px #D97706; }
+.ann-bubble[data-ann-type="question"]:hover     { background:#FDE68A; box-shadow:0 3px 12px rgba(217,119,6,0.4),0 0 0 2px #D97706; }
+
+/* Type-specific flash animations */
+.ann-bubble[data-ann-type="design"].flash       { animation: ann-flash-design 0.9s ease; }
+.ann-bubble[data-ann-type="functionality"].flash{ animation: ann-flash-func   0.9s ease; }
+.ann-bubble[data-ann-type="question"].flash     { animation: ann-flash-qstn   0.9s ease; }
+@keyframes ann-flash-design {
+  0%   { box-shadow:0 0 0 0 rgba(124,58,237,0.7),0 0 0 2px #7C3AED; }
+  50%  { box-shadow:0 0 0 12px rgba(124,58,237,0),0 0 0 2px #7C3AED; }
+  100% { box-shadow:0 2px 8px rgba(124,58,237,0.3),0 0 0 2px #7C3AED; }
+}
+@keyframes ann-flash-func {
+  0%   { box-shadow:0 0 0 0 rgba(5,150,105,0.7),0 0 0 2px #059669; }
+  50%  { box-shadow:0 0 0 12px rgba(5,150,105,0),0 0 0 2px #059669; }
+  100% { box-shadow:0 2px 8px rgba(5,150,105,0.3),0 0 0 2px #059669; }
+}
+@keyframes ann-flash-qstn {
+  0%   { box-shadow:0 0 0 0 rgba(217,119,6,0.7),0 0 0 2px #D97706; }
+  50%  { box-shadow:0 0 0 12px rgba(217,119,6,0),0 0 0 2px #D97706; }
+  100% { box-shadow:0 2px 8px rgba(217,119,6,0.3),0 0 0 2px #D97706; }
+}
+
+/* Type-specific detail popover colors */
+.ann-detail-popover[data-ann-type="design"]       { border-top-color:#7C3AED; border-color:rgba(124,58,237,0.25); box-shadow:0 4px 20px rgba(124,58,237,0.15); }
+.ann-detail-popover[data-ann-type="design"] .ann-detail-num  { color:#7C3AED; }
+.ann-detail-popover[data-ann-type="design"] .ann-detail-actions { border-top-color:rgba(124,58,237,0.15); }
+.ann-detail-popover[data-ann-type="functionality"] { border-top-color:#059669; border-color:rgba(5,150,105,0.25); box-shadow:0 4px 20px rgba(5,150,105,0.15); }
+.ann-detail-popover[data-ann-type="functionality"] .ann-detail-num  { color:#059669; }
+.ann-detail-popover[data-ann-type="functionality"] .ann-detail-actions { border-top-color:rgba(5,150,105,0.15); }
+.ann-detail-popover[data-ann-type="question"]     { border-top-color:#D97706; border-color:rgba(217,119,6,0.25); box-shadow:0 4px 20px rgba(217,119,6,0.15); }
+.ann-detail-popover[data-ann-type="question"] .ann-detail-num  { color:#D97706; }
+.ann-detail-popover[data-ann-type="question"] .ann-detail-actions { border-top-color:rgba(217,119,6,0.15); }
+
+/* Type-specific input form colors */
+.ann-input-form[data-ann-type="design"]       { border-top-color:#7C3AED; border-color:rgba(124,58,237,0.25); box-shadow:0 6px 24px rgba(124,58,237,0.18); }
+.ann-input-form[data-ann-type="design"] .ann-input-label { color:#7C3AED; }
+.ann-input-form[data-ann-type="design"] .ann-input-textarea:focus { border-color:#7C3AED; }
+.ann-input-form[data-ann-type="functionality"] { border-top-color:#059669; border-color:rgba(5,150,105,0.25); box-shadow:0 6px 24px rgba(5,150,105,0.18); }
+.ann-input-form[data-ann-type="functionality"] .ann-input-label { color:#059669; }
+.ann-input-form[data-ann-type="functionality"] .ann-input-textarea:focus { border-color:#059669; }
+.ann-input-form[data-ann-type="question"]     { border-top-color:#D97706; border-color:rgba(217,119,6,0.25); box-shadow:0 6px 24px rgba(217,119,6,0.18); }
+.ann-input-form[data-ann-type="question"] .ann-input-label { color:#D97706; }
+.ann-input-form[data-ann-type="question"] .ann-input-textarea:focus { border-color:#D97706; }
+
+/* Type selector in input form */
+.ann-type-selector { display:flex; gap:4px; margin-bottom:9px; }
+.ann-type-btn {
+  flex:1; border:1.5px solid transparent; border-radius:4px; padding:4px 2px;
+  font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;
+  cursor:pointer; opacity:0.45; transition:opacity 0.12s, border-color 0.12s;
+  font-family:var(--font); line-height:1.2;
+}
+.ann-type-btn:hover { opacity:0.8; }
+.ann-type-btn.selected { opacity:1; border-color:currentColor; }
+.ann-type-btn[data-type="comment"]       { background:#DBEAFE; color:#1D5EB8; }
+.ann-type-btn[data-type="design"]        { background:#EDE9FE; color:#5B21B6; }
+.ann-type-btn[data-type="functionality"] { background:#D1FAE5; color:#065F46; }
+.ann-type-btn[data-type="question"]      { background:#FEF3C7; color:#92400E; }
+
+/* Type badges in sidebar list and detail popover */
+.ann-type-badge {
+  display:inline-block; font-size:9px; font-weight:700; text-transform:uppercase;
+  letter-spacing:0.05em; padding:1px 6px; border-radius:3px;
+}
+.ann-type-badge.type-comment       { background:#DBEAFE; color:#1D5EB8; }
+.ann-type-badge.type-design        { background:#EDE9FE; color:#5B21B6; }
+.ann-type-badge.type-functionality { background:#D1FAE5; color:#065F46; }
+.ann-type-badge.type-question      { background:#FEF3C7; color:#92400E; }
 .wf-badge-shortcut {
   font-size: 9px;
   color: rgba(255,255,255,0.4);
@@ -2784,8 +2863,14 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 <div class="ann-detail-popover" id="annDetailPopover"></div>
 
 <!-- Annotation input form (rendered by JS, positioned fixed near click) -->
-<div class="ann-input-form" id="annInputForm">
+<div class="ann-input-form" id="annInputForm" data-ann-type="comment">
   <div class="ann-input-label" id="annInputLabel">New annotation</div>
+  <div class="ann-type-selector">
+    <button class="ann-type-btn selected" data-type="comment"       onclick="setAnnType('comment')">Comment</button>
+    <button class="ann-type-btn"          data-type="design"        onclick="setAnnType('design')">Design</button>
+    <button class="ann-type-btn"          data-type="functionality" onclick="setAnnType('functionality')">Function</button>
+    <button class="ann-type-btn"          data-type="question"      onclick="setAnnType('question')">Question</button>
+  </div>
   <textarea class="ann-input-textarea" id="annInputTextarea" placeholder="Describe this element, interaction, or decision…" autocomplete="off"></textarea>
   <div class="ann-input-actions">
     <button class="panel-btn panel-btn-secondary" onclick="cancelAnnInput()">Cancel</button>
@@ -4629,6 +4714,7 @@ let annAuthor      = false;
 let annPendingX    = 0;
 let annPendingY    = 0;
 let annPendingLayer = 'main';   // ← new: tracks which layer the pending click landed on
+let annPendingType = 'comment'; // type selected in the input form
 let annEditingId   = null;
 let annActiveId    = null;
 // Drag state
@@ -4723,12 +4809,25 @@ function onAnnCapture(e) {
 }
 
 // ── Input form ────────────────────────────────────────────
+function setAnnType(type) {
+  annPendingType = type;
+  const form = document.getElementById('annInputForm');
+  form.setAttribute('data-ann-type', type);
+  form.querySelectorAll('.ann-type-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.type === type);
+  });
+}
 function showAnnInputForm(clientX, clientY, text) {
   const form = document.getElementById('annInputForm');
+  // When editing, pre-select the existing type; otherwise keep pending type
+  const type = annEditingId !== null
+    ? (annData.find(a => a.id === annEditingId)?.annType || 'comment')
+    : annPendingType;
+  setAnnType(type);
   document.getElementById('annInputLabel').textContent    = annEditingId !== null ? 'Edit annotation' : 'New annotation';
   document.getElementById('annInputTextarea').value       = text;
   // Position near click, clamped to viewport
-  const W = 288, H = 160, M = 12;
+  const W = 288, H = 190, M = 12;
   let left = clientX + 14;
   let top  = clientY - 16;
   if (left + W > window.innerWidth  - M) left = clientX - W - 14;
@@ -4744,7 +4843,7 @@ function saveAnnInput() {
   if (!text) { document.getElementById('annInputTextarea').focus(); return; }
   if (annEditingId !== null) {
     const ann = annData.find(a => a.id === annEditingId);
-    if (ann) ann.text = text;
+    if (ann) { ann.text = text; ann.annType = annPendingType; }
   } else {
     // Store layer + layer-space coords
     annData.push({
@@ -4753,6 +4852,7 @@ function saveAnnInput() {
       xPct: annPendingX,
       yPct: annPendingY,
       text,
+      annType: annPendingType,
       num: annNextNum++
     });
   }
@@ -4798,7 +4898,9 @@ function renderAnnBubbles() {
     }
 
     const isEditing = annEditingId === a.id;
+    const aType = a.annType || 'comment';
     return `<div class="ann-bubble${isEditing ? ' ann-bubble-editing' : ''}" id="ann-b-${a.id}"
+                 data-ann-type="${aType}"
                  style="left:${leftPct.toFixed(3)}%;top:${topPct.toFixed(3)}%"
                  onmousedown="startAnnDrag(event,${a.id})"
                  onclick="onAnnBubbleClick(event,${a.id},this)">${a.num}</div>`;
@@ -4818,17 +4920,22 @@ function renderAnnSidebar() {
   }
   const panelOpen = document.getElementById('sidePanel').classList.contains('open');
   const hint = annAuthor
-    ? `<div class="ann-sidebar-hint">⌘+click anywhere to annotate. Enable Add mode for persistent placement.</div>` : '';
+    ? `<div class="ann-sidebar-hint">⌘/Ctrl+click anywhere to annotate.</div>` : '';
 
   body.innerHTML = hint + annData.map(a => {
     const aLayer = a.layer || 'main';
+    const aType  = a.annType || 'comment';
+    const typeLabel = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' }[aType] || 'Comment';
     const panelClosed = aLayer === 'panel' && !panelOpen;
     const layerTag = aLayer === 'panel'
       ? `<span class="ann-layer-tag${panelClosed ? ' panel-closed' : ''}">panel${panelClosed ? ' · click to open' : ''}</span>` : '';
     return `<div class="ann-list-item${annActiveId === a.id ? ' active' : ''}"
                  id="ann-li-${a.id}" onclick="navigateToAnn(${a.id})">
-              <div class="ann-list-num">${a.num}</div>
-              <div class="ann-list-text">${escapeAnn(a.text)}${layerTag ? '<br>' + layerTag : ''}</div>
+              <div class="ann-list-num" data-ann-type="${aType}">${a.num}</div>
+              <div class="ann-list-text">
+                <span class="ann-type-badge type-${aType}" style="margin-bottom:3px;display:inline-block;">${typeLabel}</span><br>
+                ${escapeAnn(a.text)}${layerTag ? '<br>' + layerTag : ''}
+              </div>
             </div>`;
   }).join('');
 }
@@ -4841,13 +4948,16 @@ function clickAnnBubble(id, bubbleEl) {
   const ann = annData.find(a => a.id === id);
   if (!ann) return;
   const popover = document.getElementById('annDetailPopover');
+  const aType = ann.annType || 'comment';
+  const typeLabel = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' }[aType] || 'Comment';
+  popover.setAttribute('data-ann-type', aType);
   const authorActions = annAuthor
     ? `<div class="ann-detail-actions">
          <button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="editAnn(${id})">Edit</button>
          <button class="panel-btn panel-btn-destructive" style="height:26px;font-size:12px;padding:0 10px;" onclick="deleteAnn(${id})">Delete</button>
        </div>` : '';
   popover.innerHTML = `
-    <div class="ann-detail-num">Note ${ann.num}</div>
+    <div class="ann-detail-num"><span class="ann-type-badge type-${aType}">${typeLabel}</span> &nbsp;Note ${ann.num}</div>
     <div class="ann-detail-text">${escapeAnn(ann.text)}</div>
     ${authorActions}`;
   // Position relative to bubble
