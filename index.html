@@ -2490,6 +2490,71 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-type-badge.type-design        { background:#EDE9FE; color:#5B21B6; }
 .ann-type-badge.type-functionality { background:#D1FAE5; color:#065F46; }
 .ann-type-badge.type-question      { background:#FEF3C7; color:#92400E; }
+
+/* ── Sidebar tabs ── */
+.ann-sidebar-tabs-container { flex-shrink:0; }
+.ann-sidebar-tabs { display:flex; background:#D6E9FA; border-bottom:1px solid rgba(43,123,228,0.2); }
+.ann-sidebar-tab {
+  flex:1; padding:9px 0; font-size:11px; font-weight:700; text-align:center;
+  color:rgba(43,123,228,0.55); cursor:pointer; border:none; border-bottom:2px solid transparent;
+  background:none; font-family:var(--font); transition:color 0.15s, border-color 0.15s;
+}
+.ann-sidebar-tab:hover  { color:#2B7BE4; }
+.ann-sidebar-tab.active { color:#2B7BE4; border-bottom-color:#2B7BE4; background:rgba(43,123,228,0.06); }
+
+/* ── Author attribution ── */
+.ann-author-tag { font-size:10px; color:var(--color-text-muted); margin-bottom:2px; display:flex; align-items:center; gap:3px; }
+.ann-author-dot { width:5px; height:5px; border-radius:50%; background:#2B7BE4; flex-shrink:0; }
+.ann-author-dot.own { background:#059669; }
+
+/* ── Role badges ── */
+.ann-role-badge { display:inline-block; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; }
+.ann-role-badge.admin        { background:#EDE9FE; color:#5B21B6; }
+.ann-role-badge.contributor  { background:#D1FAE5; color:#065F46; }
+.ann-role-badge.viewer       { background:rgba(89,113,121,0.10); color:var(--color-text-muted); }
+
+/* ── Replies ── */
+.ann-reply-list  { padding:6px 0 2px 0; display:flex; flex-direction:column; gap:4px; }
+.ann-reply-item  { padding:6px 8px; border-radius:4px; background:rgba(43,123,228,0.05); border-left:2px solid rgba(43,123,228,0.2); }
+.ann-reply-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; }
+.ann-reply-author{ font-size:10px; font-weight:700; color:#2B7BE4; }
+.ann-reply-time  { font-size:10px; color:var(--color-text-muted); }
+.ann-reply-del   { background:none; border:none; cursor:pointer; color:var(--color-text-muted); padding:0 2px; line-height:1; display:flex; align-items:center; }
+.ann-reply-del:hover { color:var(--color-red); }
+.ann-reply-text  { font-size:12px; color:var(--color-text); line-height:1.45; }
+.ann-reply-trigger { background:none; border:none; cursor:pointer; font-size:11px; color:#2B7BE4; padding:3px 0 0; font-family:var(--font); }
+.ann-reply-trigger:hover { text-decoration:underline; }
+.ann-reply-form  { margin-top:6px; }
+.ann-reply-textarea { width:100%; height:54px; resize:none; border:1px solid var(--color-input-border); border-radius:4px; padding:6px 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); outline:none; box-sizing:border-box; line-height:1.4; }
+.ann-reply-textarea:focus { border-color:#2B7BE4; }
+.ann-reply-actions { display:flex; gap:5px; justify-content:flex-end; margin-top:5px; }
+.ann-reply-count { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#2B7BE4; background:#DBEAFE; border-radius:10px; padding:2px 8px; margin-top:3px; border:none; cursor:pointer; font-family:var(--font); transition:background 0.12s; }
+.ann-reply-count:hover { background:#C3D9F8; }
+.ann-reply-chevron { font-size:8px; transition:transform 0.15s; display:inline-block; }
+.ann-reply-count.expanded .ann-reply-chevron { transform:rotate(90deg); }
+
+/* ── User management tab ── */
+.ann-users-section { padding:8px; }
+.ann-users-list  { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
+.ann-user-item   { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:var(--color-surface); border:1px solid var(--color-border-light); }
+.ann-user-avatar { width:28px; height:28px; border-radius:50%; background:#2B7BE4; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ann-user-info   { flex:1; min-width:0; }
+.ann-user-name   { font-size:12px; font-weight:700; color:var(--color-text); }
+.ann-user-meta   { font-size:10px; color:var(--color-text-muted); margin-top:1px; }
+.ann-user-btns   { display:flex; gap:4px; flex-shrink:0; }
+.ann-user-btn    { width:24px; height:24px; border-radius:4px; border:1px solid var(--color-border); background:none; cursor:pointer; color:var(--color-text-muted); font-size:12px; display:flex; align-items:center; justify-content:center; transition:all 0.1s; }
+.ann-user-btn:hover         { border-color:#2B7BE4; color:#2B7BE4; background:rgba(43,123,228,0.08); }
+.ann-user-btn.danger:hover  { border-color:var(--color-red); color:var(--color-red); background:rgba(224,82,82,0.08); }
+.ann-user-edit-form { background:var(--color-surface-raised); border:1px solid var(--color-border); border-radius:6px; padding:10px; margin-bottom:4px; }
+.ann-form-sep    { border:none; border-top:1px solid rgba(43,123,228,0.15); margin:12px 0; }
+.ann-form-title  { font-size:11px; font-weight:700; color:#2B7BE4; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
+.ann-form-row    { margin-bottom:7px; }
+.ann-form-label  { display:block; font-size:10px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
+.ann-form-input  { width:100%; height:30px; border:1px solid var(--color-input-border); border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); box-sizing:border-box; outline:none; }
+.ann-form-input:focus { border-color:#2B7BE4; }
+.ann-form-select { width:100%; height:30px; border:1px solid var(--color-input-border); border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); box-sizing:border-box; outline:none; cursor:pointer; }
+.ann-form-select:focus { border-color:#2B7BE4; }
+.ann-form-error  { font-size:11px; color:var(--color-red); min-height:15px; margin-bottom:4px; }
 .wf-badge-shortcut {
   font-size: 9px;
   color: rgba(255,255,255,0.4);
@@ -2852,8 +2917,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       <span class="ann-sidebar-title">Annotations</span>
       <button class="ann-sidebar-close" onclick="closeAnnSidebar()" title="Close">✕</button>
     </div>
+    <div class="ann-sidebar-tabs-container" id="annSidebarTabs"></div>
     <div class="ann-sidebar-body" id="annSidebarBody">
-      <div class="ann-sidebar-empty" id="annSidebarEmpty">No annotations yet.</div>
+      <div class="ann-sidebar-empty">No annotations yet.</div>
     </div>
   </div>
 
@@ -2882,11 +2948,18 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 <div class="modal-backdrop" id="annLoginBackdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="annLoginTitle">
     <div class="modal-header">
-      <div class="modal-title" id="annLoginTitle">Annotator sign-in</div>
+      <div class="modal-title" id="annLoginTitle">Sign in to annotate</div>
     </div>
     <div class="modal-body">
-      <p style="margin:0 0 14px;font-size:14px;color:var(--color-text-secondary);line-height:1.55;">Enter your password to add, edit, or delete annotations. Developers can view annotations without signing in.</p>
-      <input class="form-input" type="password" id="annLoginInput" placeholder="Password" autocomplete="off">
+      <p style="margin:0 0 16px;font-size:14px;color:var(--color-text-secondary);line-height:1.55;">Sign in to add, edit, or reply to annotations. Your role determines what you can do.</p>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Username</label>
+        <input class="form-input" type="text" id="annLoginUser" placeholder="username" autocomplete="username">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Password</label>
+        <input class="form-input" type="password" id="annLoginInput" placeholder="password" autocomplete="current-password">
+      </div>
       <div class="ann-login-error" id="annLoginError"></div>
     </div>
     <div class="modal-footer">
@@ -4716,10 +4789,12 @@ renderTable();
 //
 // Step 3 — Paste both values below, commit, and push.
 const ANN_CONFIG = {
-  GIST_ID:      '4377397ba2b40bd586d9b515cdb0a5ba',   // ← paste your Gist ID here
-  GIST_PAT:     'REMOVED_TOKEN',   // ← paste your PAT here
+  GIST_ID:      '4377397ba2b40bd586d9b515cdb0a5ba',
+  GIST_PAT:     'REMOVED_TOKEN',
   GIST_FILE:    'rental-plan-annotations.json',
-  SESSION_DAYS: 30    // days to stay logged in between password prompts
+  SESSION_DAYS: 30,
+  // Bootstrap admin — only used when no users exist in the Gist yet
+  SEED_ADMIN:   { username: 'katy', password: '?ANl4byrint123', role: 'admin', displayName: 'Katy' }
 };
 
 const ANN_PASSWORD    = 'katy';
@@ -4729,17 +4804,22 @@ const ANN_SESSION_KEY = 'rfp_ann_session_v1';
 // Each annotation: { id, layer, xPct, yPct, text, num, annType }
 //   layer: 'main'  — coords are % of #main dimensions
 //   layer: 'panel' — coords are % of #sidePanel dimensions; only shown when panel open
-let annData        = [];
-let annNextNum     = 1;
-let annVisible     = false;
-let annAddMode     = false;
-let annAuthor      = false;
-let annPendingX    = 0;
-let annPendingY    = 0;
-let annPendingLayer = 'main';   // ← new: tracks which layer the pending click landed on
-let annPendingType = 'comment'; // type selected in the input form
-let annEditingId   = null;
-let annActiveId    = null;
+let annData         = [];
+let annNextNum      = 1;
+let annUsers        = [];    // full user list — loaded from Gist
+let annCurrentUser  = null;  // { username, role, displayName } — the signed-in user
+let annSidebarTab      = 'annotations'; // 'annotations' | 'users'
+let annOpenReplyId     = null;  // which annotation has its reply form open
+let annExpandedReplies = new Set(); // annotation ids whose reply thread is expanded
+let annVisible      = false;
+let annAddMode      = false;
+let annAuthor       = false; // true when any user is signed in
+let annPendingX     = 0;
+let annPendingY     = 0;
+let annPendingLayer = 'main';
+let annPendingType  = 'comment';
+let annEditingId    = null;
+let annActiveId     = null;
 // Drag state
 let annDragId        = null;
 let annDragStartX    = 0;
@@ -4753,15 +4833,18 @@ function annLoadLocal() {
   try {
     const raw = localStorage.getItem(ANN_STORAGE_KEY);
     if (raw) {
-      const d   = JSON.parse(raw);
+      const d    = JSON.parse(raw);
       annData    = d.annotations || [];
       annNextNum = d.nextNum     || (annData.length + 1);
+      annUsers   = d.users       || [];
     }
   } catch(e) {}
+  if (!annUsers.length) annUsers = [{ ...ANN_CONFIG.SEED_ADMIN }];
 }
 function annSaveLocal() {
   try {
-    localStorage.setItem(ANN_STORAGE_KEY, JSON.stringify({ annotations: annData, nextNum: annNextNum }));
+    localStorage.setItem(ANN_STORAGE_KEY,
+      JSON.stringify({ annotations: annData, nextNum: annNextNum, users: annUsers }));
   } catch(e) {}
 }
 async function annLoad() {
@@ -4777,7 +4860,9 @@ async function annLoad() {
           const d    = JSON.parse(content);
           annData    = d.annotations || [];
           annNextNum = d.nextNum     || (annData.length + 1);
-          annSaveLocal(); // keep local cache in sync
+          annUsers   = d.users       || [];
+          if (!annUsers.length) annUsers = [{ ...ANN_CONFIG.SEED_ADMIN }];
+          annSaveLocal();
           return;
         }
       }
@@ -4786,10 +4871,10 @@ async function annLoad() {
   annLoadLocal();
 }
 async function annSave() {
-  annSaveLocal(); // write local cache immediately (sync)
+  annSaveLocal();
   if (ANN_CONFIG.GIST_ID && ANN_CONFIG.GIST_PAT) {
     try {
-      const payload = JSON.stringify({ annotations: annData, nextNum: annNextNum }, null, 2);
+      const payload = JSON.stringify({ annotations: annData, nextNum: annNextNum, users: annUsers }, null, 2);
       await fetch(`https://api.github.com/gists/${ANN_CONFIG.GIST_ID}`, {
         method:  'PATCH',
         headers: { 'Authorization': `token ${ANN_CONFIG.GIST_PAT}`,
@@ -4805,17 +4890,26 @@ async function annSave() {
 function annCheckSession() {
   try {
     const raw = localStorage.getItem(ANN_SESSION_KEY);
-    if (!raw) return false;
-    return JSON.parse(raw).expires > Date.now();
-  } catch(e) { return false; }
+    if (!raw) return null;
+    const { expires, user } = JSON.parse(raw);
+    return (expires > Date.now()) ? user : null;
+  } catch(e) { return null; }
 }
-function annSaveSession() {
+function annSaveSession(user) {
   localStorage.setItem(ANN_SESSION_KEY,
-    JSON.stringify({ expires: Date.now() + ANN_CONFIG.SESSION_DAYS * 86400000 }));
+    JSON.stringify({ user, expires: Date.now() + ANN_CONFIG.SESSION_DAYS * 86400000 }));
 }
 function annClearSession() {
   localStorage.removeItem(ANN_SESSION_KEY);
 }
+
+// ── Permission helpers ────────────────────────────────────
+function isAdmin()         { return annCurrentUser?.role === 'admin'; }
+function canCreate()       { return annCurrentUser && ['admin','contributor'].includes(annCurrentUser.role); }
+function canReply()        { return !!annCurrentUser; } // all roles can reply
+function canEditAnn(ann)   { return annCurrentUser && (isAdmin() || ann.author === annCurrentUser.username); }
+function canDeleteAnn(ann) { return canEditAnn(ann); }
+function canDeleteReply(r) { return annCurrentUser && (isAdmin() || r.author === annCurrentUser.username); }
 
 // ── Visibility toggle ─────────────────────────────────────
 function setAnnVisible(v) {
@@ -4845,7 +4939,7 @@ function setAnnAddMode(on) {
 // ── Layer-aware placement ─────────────────────────────────
 // Called by both the capture overlay (add mode) and ⌘+Click shortcut.
 function triggerAnnPlace(e) {
-  if (!annAuthor) return;
+  if (!canCreate()) return;
   // Auto-enable annotations if not yet visible
   if (!annVisible) { setAnnVisible(true); renderAnnBubbles(); renderAnnSidebar(); }
 
@@ -4879,7 +4973,7 @@ function triggerAnnPlace(e) {
 
 // Capture overlay click (add-mode toggle is ON)
 function onAnnCapture(e) {
-  if (!annAddMode || !annAuthor) return;
+  if (!annAddMode || !canCreate()) return;
   triggerAnnPlace(e);
 }
 
@@ -4927,7 +5021,9 @@ function saveAnnInput() {
       xPct: annPendingX,
       yPct: annPendingY,
       text,
-      annType: annPendingType,
+      annType:  annPendingType,
+      author:   annCurrentUser?.username || '',
+      replies:  [],
       num: annNextNum++
     });
   }
@@ -4984,35 +5080,105 @@ function renderAnnBubbles() {
 
 // ── Sidebar rendering ─────────────────────────────────────
 function renderAnnSidebar() {
-  const body = document.getElementById('annSidebarBody');
+  const body     = document.getElementById('annSidebarBody');
+  const tabsEl   = document.getElementById('annSidebarTabs');
+  const typeLabelMap = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' };
+
+  // ── Tabs ──
+  const showUserTab = isAdmin();
+  if (tabsEl) {
+    tabsEl.innerHTML = annAuthor ? `
+      <div class="ann-sidebar-tabs">
+        <button class="ann-sidebar-tab${annSidebarTab==='annotations'?' active':''}" onclick="setAnnSidebarTab('annotations')">Annotations</button>
+        ${showUserTab ? `<button class="ann-sidebar-tab${annSidebarTab==='users'?' active':''}" onclick="setAnnSidebarTab('users')">Users</button>` : ''}
+      </div>` : '';
+  }
+
+  // ── Users tab ──
+  if (annSidebarTab === 'users' && isAdmin()) {
+    body.innerHTML = renderUsersTabHTML();
+    return;
+  }
+
+  // ── Annotations tab ──
   if (!annData.length) {
-    body.innerHTML = `<div class="ann-sidebar-empty" id="annSidebarEmpty">${
-      annAuthor
-        ? 'No annotations yet. ⌘+click (or Ctrl+click) anywhere on the wireframe to add one.'
-        : 'No annotations yet.'
+    body.innerHTML = `<div class="ann-sidebar-empty">${
+      canCreate() ? 'No annotations yet. ⌘+click (or Ctrl+click) anywhere on the wireframe to add one.'
+                  : 'No annotations yet.'
     }</div>`;
     return;
   }
+
+  const hint = canCreate() ? `<div class="ann-sidebar-hint">⌘/Ctrl+click anywhere to annotate.</div>` : '';
   const panelOpen = document.getElementById('sidePanel').classList.contains('open');
-  const hint = annAuthor
-    ? `<div class="ann-sidebar-hint">⌘/Ctrl+click anywhere to annotate.</div>` : '';
 
   body.innerHTML = hint + annData.map(a => {
     const aLayer = a.layer || 'main';
     const aType  = a.annType || 'comment';
-    const typeLabel = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' }[aType] || 'Comment';
     const panelClosed = aLayer === 'panel' && !panelOpen;
     const layerTag = aLayer === 'panel'
-      ? `<span class="ann-layer-tag${panelClosed ? ' panel-closed' : ''}">panel${panelClosed ? ' · click to open' : ''}</span>` : '';
-    return `<div class="ann-list-item${annActiveId === a.id ? ' active' : ''}"
-                 id="ann-li-${a.id}" onclick="navigateToAnn(${a.id})">
-              <div class="ann-list-num" data-ann-type="${aType}">${a.num}</div>
-              <div class="ann-list-text">
-                <span class="ann-type-badge type-${aType}" style="margin-bottom:3px;display:inline-block;">${typeLabel}</span><br>
-                ${escapeAnn(a.text)}${layerTag ? '<br>' + layerTag : ''}
-              </div>
-            </div>`;
+      ? `<span class="ann-layer-tag${panelClosed?' panel-closed':''}">panel${panelClosed?' · click to open':''}</span>` : '';
+
+    // Author
+    const isOwn = annCurrentUser && a.author === annCurrentUser.username;
+    const authorTag = a.author
+      ? `<div class="ann-author-tag"><span class="ann-author-dot${isOwn?' own':''}"></span>${escapeAnn(a.author)}${isOwn?' <em style="font-weight:400;font-style:normal;">(you)</em>':''}</div>` : '';
+
+    // Replies
+    const replies = a.replies || [];
+    const repliesHtml = replies.map(r => {
+      const rOwn = annCurrentUser && r.author === annCurrentUser.username;
+      const timeStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
+      const delBtn  = canDeleteReply(r) ? `<button class="ann-reply-del" onclick="deleteReply(${a.id},${r.id})" title="Delete reply"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;"><path d="M1.5 3h9M4.5 3V2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1M10 3l-.667 7A.5.5 0 0 1 8.836 10.5H3.164a.5.5 0 0 1-.497-.5L2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : '';
+      return `<div class="ann-reply-item">
+        <div class="ann-reply-header">
+          <span class="ann-reply-author">${escapeAnn(r.author)}${rOwn?' <em style="font-weight:400">(you)</em>':''}</span>
+          <span style="display:flex;align-items:center;gap:4px;"><span class="ann-reply-time">${timeStr}</span>${delBtn}</span>
+        </div>
+        <div class="ann-reply-text">${escapeAnn(r.text)}</div>
+      </div>`;
+    }).join('');
+
+    const expanded      = annExpandedReplies.has(a.id);
+    const replyCountTag = replies.length > 0
+      ? `<button class="ann-reply-count${expanded?' expanded':''}" onclick="toggleReplies(${a.id})"><span class="ann-reply-chevron">▶</span>↩ ${replies.length} repl${replies.length===1?'y':'ies'}</button>` : '';
+
+    const replyFormHtml = (annOpenReplyId === a.id && canReply()) ? `
+      <div class="ann-reply-form">
+        <textarea class="ann-reply-textarea" id="replyText-${a.id}" placeholder="Write a reply…"></textarea>
+        <div class="ann-reply-actions">
+          <button class="panel-btn panel-btn-secondary" style="height:24px;font-size:11px;padding:0 8px;" onclick="closeReplyForm()">Cancel</button>
+          <button class="panel-btn panel-btn-primary"   style="height:24px;font-size:11px;padding:0 8px;" onclick="saveReply(${a.id})">Reply</button>
+        </div>
+      </div>` : '';
+
+    const trashIcon = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;"><path d="M1.5 3h9M4.5 3V2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1M10 3l-.667 7A.5.5 0 0 1 8.836 10.5H3.164a.5.5 0 0 1-.497-.5L2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const annDeleteBtn = canDeleteAnn(a) ? `<button class="ann-reply-del" onclick="deleteAnn(${a.id})" title="Delete annotation" style="margin-top:1px;flex-shrink:0;">${trashIcon}</button>` : '';
+
+    return `<div class="ann-list-item${annActiveId===a.id?' active':''}" id="ann-li-${a.id}">
+      <div class="ann-list-num" data-ann-type="${aType}" onclick="navigateToAnn(${a.id})" style="cursor:pointer;margin-top:2px;">${a.num}</div>
+      <div class="ann-list-text" style="flex:1;min-width:0;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
+          <div onclick="navigateToAnn(${a.id})" style="cursor:pointer;flex:1;min-width:0;">
+            <span class="ann-type-badge type-${aType}" style="margin-bottom:3px;display:inline-block;">${typeLabelMap[aType]||aType}</span>
+            ${authorTag}
+            ${escapeAnn(a.text)}${layerTag?'<br>'+layerTag:''}
+          </div>
+          ${annDeleteBtn}
+        </div>
+        ${replyCountTag ? `<div style="margin-top:3px;">${replyCountTag}</div>` : ''}
+        ${(repliesHtml && expanded) ? `<div class="ann-reply-list">${repliesHtml}</div>` : ''}
+        ${canReply() ? `<button class="ann-reply-trigger" onclick="openReplyForm(${a.id})">↩ Reply</button>` : ''}
+        ${replyFormHtml}
+      </div>
+    </div>`;
   }).join('');
+
+  // Re-focus reply textarea if one is open
+  if (annOpenReplyId !== null) {
+    const ta = document.getElementById(`replyText-${annOpenReplyId}`);
+    if (ta) setTimeout(() => ta.focus(), 30);
+  }
 }
 
 // ── Bubble click → detail popover ────────────────────────
@@ -5026,15 +5192,20 @@ function clickAnnBubble(id, bubbleEl) {
   const aType = ann.annType || 'comment';
   const typeLabel = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' }[aType] || 'Comment';
   popover.setAttribute('data-ann-type', aType);
-  const authorActions = annAuthor
-    ? `<div class="ann-detail-actions">
-         <button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="editAnn(${id})">Edit</button>
-         <button class="panel-btn panel-btn-destructive" style="height:26px;font-size:12px;padding:0 10px;" onclick="deleteAnn(${id})">Delete</button>
-       </div>` : '';
+  const replyCount   = (ann.replies || []).length;
+  const authorLine   = ann.author ? `<div style="font-size:10px;color:var(--color-text-muted);margin-bottom:6px;">by <strong>${escapeAnn(ann.author)}</strong></div>` : '';
+  const replyBadge   = replyCount > 0 ? `<div style="margin-top:5px;"><span class="ann-reply-count">↩ ${replyCount} repl${replyCount===1?'y':'ies'}</span></div>` : '';
+  const replyBtn     = canReply()        ? `<button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="openReplyForm(${id});closeAnnDetail();if(!annVisible)setAnnVisible(true);">↩ Reply</button>` : '';
+  const editBtn      = canEditAnn(ann)   ? `<button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="editAnn(${id})">Edit</button>` : '';
+  const deleteBtn    = canDeleteAnn(ann) ? `<button class="panel-btn panel-btn-destructive" style="height:26px;font-size:12px;padding:0 10px;" onclick="deleteAnn(${id})">Delete</button>` : '';
+  const hasActions   = replyBtn || editBtn || deleteBtn;
+  const actionsHtml  = hasActions ? `<div class="ann-detail-actions">${replyBtn}${editBtn}${deleteBtn}</div>` : '';
   popover.innerHTML = `
     <div class="ann-detail-num"><span class="ann-type-badge type-${aType}">${typeLabel}</span> &nbsp;Note ${ann.num}</div>
+    ${authorLine}
     <div class="ann-detail-text">${escapeAnn(ann.text)}</div>
-    ${authorActions}`;
+    ${replyBadge}
+    ${actionsHtml}`;
   // Position relative to bubble
   const bRect = bubbleEl.getBoundingClientRect();
   positionAnnPopover(popover, bRect.right + 8, bRect.top - 4);
@@ -5114,6 +5285,8 @@ function editAnn(id) {
   showAnnInputForm(cx + 16, cy, ann.text);
 }
 function deleteAnn(id) {
+  const _ann = annData.find(a => a.id === id);
+  if (_ann && !canDeleteAnn(_ann)) return;
   closeAnnDetail();
   annData = annData.filter(a => a.id !== id);
   // Re-sequence numbers
@@ -5121,6 +5294,171 @@ function deleteAnn(id) {
   annNextNum = annData.length + 1;
   annSave();
   renderAnnBubbles();
+  renderAnnSidebar();
+}
+
+// ── Sidebar tab switching ─────────────────────────────────
+function setAnnSidebarTab(tab) {
+  annSidebarTab = tab;
+  renderAnnSidebar();
+}
+
+// ── Replies ───────────────────────────────────────────────
+function toggleReplies(annId) {
+  if (annExpandedReplies.has(annId)) {
+    annExpandedReplies.delete(annId);
+  } else {
+    annExpandedReplies.add(annId);
+  }
+  renderAnnSidebar();
+}
+function openReplyForm(annId) {
+  annOpenReplyId = annId;
+  annExpandedReplies.add(annId); // auto-expand thread when replying
+  if (!annVisible) setAnnVisible(true);
+  renderAnnSidebar();
+}
+function closeReplyForm() {
+  annOpenReplyId = null;
+  renderAnnSidebar();
+}
+function saveReply(annId) {
+  if (!canReply()) return;
+  const ta   = document.getElementById(`replyText-${annId}`);
+  const text = ta ? ta.value.trim() : '';
+  if (!text) { if (ta) ta.focus(); return; }
+  const ann = annData.find(a => a.id === annId);
+  if (!ann) return;
+  if (!ann.replies) ann.replies = [];
+  ann.replies.push({ id: Date.now(), author: annCurrentUser.username, text, timestamp: Date.now() });
+  annOpenReplyId = null;
+  annSave();
+  renderAnnSidebar();
+}
+function deleteReply(annId, replyId) {
+  const ann = annData.find(a => a.id === annId);
+  if (!ann) return;
+  const reply = (ann.replies || []).find(r => r.id === replyId);
+  if (!reply || !canDeleteReply(reply)) return;
+  ann.replies = ann.replies.filter(r => r.id !== replyId);
+  annSave();
+  renderAnnSidebar();
+}
+
+// ── Users tab rendering ───────────────────────────────────
+function renderUsersTabHTML() {
+  const usersHtml = annUsers.map(u => {
+    const isSelf    = annCurrentUser && u.username === annCurrentUser.username;
+    const roleLabel = { admin:'Admin', contributor:'Contributor', viewer:'Viewer' }[u.role] || u.role;
+    const initials  = (u.displayName || u.username).slice(0,2).toUpperCase();
+    return `<div class="ann-user-item" id="ann-user-row-${u.username}">
+      <div class="ann-user-avatar">${initials}</div>
+      <div class="ann-user-info">
+        <div class="ann-user-name">${escapeAnn(u.displayName||u.username)}${isSelf?' <em style="font-size:10px;font-weight:400">(you)</em>':''}</div>
+        <div class="ann-user-meta">@${escapeAnn(u.username)} · <span class="ann-role-badge ${u.role}">${roleLabel}</span></div>
+      </div>
+      <div class="ann-user-btns">
+        <button class="ann-user-btn" onclick="showUserEditForm('${u.username}')" title="Edit">✎</button>
+        ${!isSelf ? `<button class="ann-user-btn danger" onclick="confirmDeleteUser('${u.username}')" title="Remove">✕</button>` : ''}
+      </div>
+    </div>
+    <div class="ann-user-edit-form" id="ann-user-edit-${u.username}" style="display:none;">
+      <div class="ann-form-title">Edit user</div>
+      <div class="ann-form-row"><label class="ann-form-label">Display name</label><input class="ann-form-input" id="eu-display-${u.username}" value="${escapeAnn(u.displayName||u.username)}"></div>
+      <div class="ann-form-row"><label class="ann-form-label">New password <em style="font-weight:400">(leave blank to keep)</em></label><input class="ann-form-input" type="password" id="eu-pass-${u.username}" autocomplete="new-password"></div>
+      <div class="ann-form-row"><label class="ann-form-label">Role</label>
+        <select class="ann-form-select" id="eu-role-${u.username}">
+          <option value="admin"${u.role==='admin'?' selected':''}>Admin</option>
+          <option value="contributor"${u.role==='contributor'?' selected':''}>Contributor</option>
+          <option value="viewer"${u.role==='viewer'?' selected':''}>Viewer</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:8px;">
+        <button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;" onclick="hideUserEditForm('${u.username}')">Cancel</button>
+        <button class="panel-btn panel-btn-primary"   style="height:26px;font-size:12px;" onclick="saveUserEdit('${u.username}')">Save</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="ann-users-section">
+    <div class="ann-users-list">${usersHtml || '<div class="ann-sidebar-empty">No users yet.</div>'}</div>
+    <hr class="ann-form-sep">
+    <div class="ann-form-title">Add user</div>
+    <div class="ann-form-row"><label class="ann-form-label">Display name</label><input class="ann-form-input" id="nu-display" placeholder="e.g. Jane Smith"></div>
+    <div class="ann-form-row"><label class="ann-form-label">Username</label><input class="ann-form-input" id="nu-username" placeholder="e.g. jsmith" autocomplete="off"></div>
+    <div class="ann-form-row"><label class="ann-form-label">Password</label><input class="ann-form-input" type="password" id="nu-pass" autocomplete="new-password"></div>
+    <div class="ann-form-row"><label class="ann-form-label">Role</label>
+      <select class="ann-form-select" id="nu-role">
+        <option value="contributor">Contributor</option>
+        <option value="viewer">Viewer</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="ann-form-error" id="nu-error"></div>
+    <button class="panel-btn panel-btn-primary" style="width:100%;height:30px;font-size:12px;" onclick="addUser()">Add User</button>
+  </div>`;
+}
+
+// ── User CRUD ─────────────────────────────────────────────
+function showUserEditForm(username) {
+  document.querySelectorAll('[id^="ann-user-edit-"]').forEach(el => el.style.display = 'none');
+  const el = document.getElementById(`ann-user-edit-${username}`);
+  if (el) el.style.display = 'block';
+}
+function hideUserEditForm(username) {
+  const el = document.getElementById(`ann-user-edit-${username}`);
+  if (el) el.style.display = 'none';
+}
+function saveUserEdit(username) {
+  if (!isAdmin()) return;
+  const user = annUsers.find(u => u.username === username);
+  if (!user) return;
+  const newDisplay = document.getElementById(`eu-display-${username}`)?.value.trim();
+  const newPass    = document.getElementById(`eu-pass-${username}`)?.value;
+  const newRole    = document.getElementById(`eu-role-${username}`)?.value;
+  if (newDisplay) user.displayName = newDisplay;
+  if (newPass)    user.password    = newPass;
+  if (newRole)    user.role        = newRole;
+  // If editing current user, update session
+  if (annCurrentUser?.username === username) {
+    annCurrentUser.displayName = user.displayName;
+    annCurrentUser.role        = user.role;
+    annSaveSession(annCurrentUser);
+    annApplyAuthorUI();
+  }
+  annSave();
+  renderAnnSidebar();
+}
+function confirmDeleteUser(username) {
+  if (!isAdmin()) return;
+  const u = annUsers.find(u => u.username === username);
+  showConfirm({
+    title:     `Remove "${u?.displayName || username}"?`,
+    body:      'This removes their login access. Their annotations will remain.',
+    ok:        'Remove',
+    danger:    true,
+    onConfirm: () => {
+      annUsers = annUsers.filter(u => u.username !== username);
+      annSave();
+      renderAnnSidebar();
+    }
+  });
+}
+function addUser() {
+  if (!isAdmin()) return;
+  const display  = document.getElementById('nu-display')?.value.trim();
+  const username = document.getElementById('nu-username')?.value.trim().toLowerCase();
+  const password = document.getElementById('nu-pass')?.value;
+  const role     = document.getElementById('nu-role')?.value || 'contributor';
+  const errEl    = document.getElementById('nu-error');
+  if (!username)  { errEl.textContent = 'Username is required.'; return; }
+  if (!password)  { errEl.textContent = 'Password is required.'; return; }
+  if (annUsers.find(u => u.username.toLowerCase() === username)) {
+    errEl.textContent = 'Username already exists.'; return;
+  }
+  errEl.textContent = '';
+  annUsers.push({ username, password, role, displayName: display || username });
+  annSave();
   renderAnnSidebar();
 }
 
@@ -5138,35 +5476,43 @@ function closeAnnSidebar() {
 
 // ── Login ─────────────────────────────────────────────────
 function showAnnLogin() {
+  document.getElementById('annLoginUser').value  = '';
   document.getElementById('annLoginInput').value = '';
   document.getElementById('annLoginError').textContent = '';
   document.getElementById('annLoginBackdrop').classList.add('open');
-  setTimeout(() => document.getElementById('annLoginInput').focus(), 60);
+  setTimeout(() => document.getElementById('annLoginUser').focus(), 60);
 }
 function hideAnnLogin() {
   document.getElementById('annLoginBackdrop').classList.remove('open');
 }
 function submitAnnLogin() {
-  if (document.getElementById('annLoginInput').value === ANN_PASSWORD) {
-    annAuthor = true;
-    annSaveSession(); // persist login for SESSION_DAYS days
+  const username = (document.getElementById('annLoginUser')?.value || '').trim().toLowerCase();
+  const password = document.getElementById('annLoginInput').value;
+  const match    = annUsers.find(u => u.username.toLowerCase() === username && u.password === password);
+  if (match) {
+    annCurrentUser = { username: match.username, role: match.role, displayName: match.displayName || match.username };
+    annAuthor      = true;
+    annSaveSession(annCurrentUser);
     hideAnnLogin();
     annApplyAuthorUI();
-    renderAnnBubbles();  // re-render to show edit/delete in popovers
+    renderAnnBubbles();
     renderAnnSidebar();
   } else {
-    document.getElementById('annLoginError').textContent = 'Incorrect password.';
+    document.getElementById('annLoginError').textContent = 'Incorrect username or password.';
     document.getElementById('annLoginInput').select();
   }
 }
 function annApplyAuthorUI() {
+  const name = escapeAnn(annCurrentUser?.displayName || annCurrentUser?.username || 'User');
+  const roleLabel = { admin:'Admin', contributor:'Contributor', viewer:'Viewer' }[annCurrentUser?.role] || '';
   document.getElementById('wfAuthRow').innerHTML =
-    `<span class="wf-author-label">Signed in as Katy</span>
+    `<span class="wf-author-label">${name} <span class="ann-role-badge ${annCurrentUser?.role}" style="font-size:8px;">${roleLabel}</span></span>
      <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
-  if (annVisible) document.getElementById('wfAnnHint').style.display = '';
+  document.getElementById('wfAnnHint').style.display = (annVisible && canCreate()) ? '' : 'none';
 }
 function annLogout() {
-  annAuthor = false;
+  annCurrentUser = null;
+  annAuthor      = false;
   annClearSession();
   if (annAddMode) setAnnAddMode(false);
   document.getElementById('wfAnnHint').style.display = 'none';
@@ -5292,6 +5638,9 @@ document.addEventListener('keydown', e => {
   }
 });
 // Enter submits login
+document.getElementById('annLoginUser').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('annLoginInput').focus();
+});
 document.getElementById('annLoginInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') submitAnnLogin();
 });
@@ -5301,7 +5650,7 @@ document.getElementById('annInputTextarea').addEventListener('keydown', e => {
 });
 // ⌘+Click / Ctrl+Click anywhere in the wireframe places an annotation without needing add mode
 document.addEventListener('click', e => {
-  if (!annAuthor) return;
+  if (!canCreate()) return;
   if (!(e.metaKey || e.ctrlKey)) return;
   const mainEl  = document.getElementById('main');
   const panelEl = document.getElementById('sidePanel');
@@ -5314,12 +5663,18 @@ document.addEventListener('click', e => {
 
 // ── Init ──────────────────────────────────────────────────
 annLoad().then(() => {
-  // Restore session if still valid — no password prompt needed
-  if (annCheckSession()) {
-    annAuthor = true;
-    annApplyAuthorUI();
+  const savedUser = annCheckSession();
+  if (savedUser) {
+    // Verify the user still exists and get their current role/displayName
+    const live = annUsers.find(u => u.username === savedUser.username);
+    if (live) {
+      annCurrentUser = { username: live.username, role: live.role, displayName: live.displayName || live.username };
+      annAuthor = true;
+      annApplyAuthorUI();
+    } else {
+      annClearSession(); // user was deleted; force re-login
+    }
   }
-  // If annotations were somehow toggled on before load finished, refresh render
   if (annVisible) { renderAnnBubbles(); renderAnnSidebar(); }
 });
 </script>
