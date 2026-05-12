@@ -2944,6 +2944,34 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   </div>
 </div>
 
+<!-- Change password modal -->
+<div class="modal-backdrop" id="annChangePwBackdrop">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-title">Change password</div>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Current password</label>
+        <input class="form-input" type="password" id="cpCurrent" autocomplete="current-password">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">New password</label>
+        <input class="form-input" type="password" id="cpNew" autocomplete="new-password">
+      </div>
+      <div>
+        <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">Confirm new password</label>
+        <input class="form-input" type="password" id="cpConfirm" autocomplete="new-password">
+      </div>
+      <div class="ann-login-error" id="cpError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="panel-btn panel-btn-secondary" onclick="hideChangePassword()">Cancel</button>
+      <button class="panel-btn panel-btn-primary"   onclick="submitChangePassword()">Update password</button>
+    </div>
+  </div>
+</div>
+
 <!-- Annotation login modal -->
 <div class="modal-backdrop" id="annLoginBackdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="annLoginTitle">
@@ -5507,8 +5535,34 @@ function annApplyAuthorUI() {
   const roleLabel = { admin:'Admin', contributor:'Contributor', viewer:'Viewer' }[annCurrentUser?.role] || '';
   document.getElementById('wfAuthRow').innerHTML =
     `<span class="wf-author-label">${name} <span class="ann-role-badge ${annCurrentUser?.role}" style="font-size:8px;">${roleLabel}</span></span>
-     <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
+     <span style="display:flex;gap:8px;align-items:center;">
+       <button class="wf-auth-link" onclick="showChangePassword()">Change password</button>
+       <button class="wf-auth-link" onclick="annLogout()">Sign out</button>
+     </span>`;
   document.getElementById('wfAnnHint').style.display = (annVisible && canCreate()) ? '' : 'none';
+}
+function showChangePassword() {
+  ['cpCurrent','cpNew','cpConfirm'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cpError').textContent = '';
+  document.getElementById('annChangePwBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('cpCurrent').focus(), 60);
+}
+function hideChangePassword() {
+  document.getElementById('annChangePwBackdrop').classList.remove('open');
+}
+function submitChangePassword() {
+  const current  = document.getElementById('cpCurrent').value;
+  const newPw    = document.getElementById('cpNew').value;
+  const confirm  = document.getElementById('cpConfirm').value;
+  const errEl    = document.getElementById('cpError');
+  const user     = annUsers.find(u => u.username === annCurrentUser?.username);
+  if (!user || user.password !== current) { errEl.textContent = 'Current password is incorrect.'; document.getElementById('cpCurrent').select(); return; }
+  if (!newPw)           { errEl.textContent = 'New password cannot be empty.'; return; }
+  if (newPw !== confirm) { errEl.textContent = 'Passwords do not match.'; document.getElementById('cpConfirm').select(); return; }
+  user.password = newPw;
+  annSaveSession(annCurrentUser); // refresh session timestamp
+  annSave();
+  hideChangePassword();
 }
 function annLogout() {
   annCurrentUser = null;
@@ -5634,7 +5688,8 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (document.getElementById('annInputForm').classList.contains('visible')) { cancelAnnInput(); return; }
     if (document.getElementById('annDetailPopover').classList.contains('visible')) { closeAnnDetail(); renderAnnSidebar(); }
-    if (document.getElementById('annLoginBackdrop').classList.contains('open')) hideAnnLogin();
+    if (document.getElementById('annLoginBackdrop').classList.contains('open'))   hideAnnLogin();
+    if (document.getElementById('annChangePwBackdrop').classList.contains('open')) hideChangePassword();
   }
 });
 // Enter submits login
