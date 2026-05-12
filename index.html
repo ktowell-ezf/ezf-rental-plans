@@ -2211,6 +2211,8 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-list-item:last-child { border-bottom: none; }
 .ann-list-item:hover { background: rgba(255,255,255,0.06); }
 .ann-list-item.active { background: rgba(255,255,255,0.1); border-left: 2px solid #F4F4F5; padding-left: 6px; }
+.ann-list-item.unread { background: rgba(251,191,36,0.08); border-left: 2px solid #FBBF24; padding-left: 6px; }
+.ann-list-item.unread:hover { background: rgba(251,191,36,0.13); }
 .ann-list-num {
   width: 20px; height: 20px;
   border-radius: 50%;
@@ -2544,6 +2546,21 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 /* Like tooltip — appears below so it isn't clipped by the sidebar top */
 .ann-like-btn .like-tooltip { visibility:hidden; opacity:0; position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%); white-space:nowrap; background:rgba(30,30,30,0.92); color:#fff; font-size:10px; font-weight:400; padding:3px 8px; border-radius:4px; pointer-events:none; transition:opacity 0.12s; z-index:100000; }
 .ann-like-btn:hover .like-tooltip { visibility:visible; opacity:1; }
+
+/* ── Unread badge on toggle ── */
+.ann-unread-badge { position:absolute; top:-8px; right:-8px; min-width:18px; height:18px; border-radius:9px; background:#F87171; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 5px; box-sizing:border-box; line-height:1; border:2px solid #2C2C2C; z-index:10000; cursor:pointer; transition:background 0.12s; }
+.ann-unread-badge:hover { background:#EF4444; }
+
+/* ── @mention dropdown ── */
+.ann-mention-drop { position:fixed; z-index:999999; background:#27272A; border:1px solid #3F3F46; border-radius:6px; box-shadow:0 4px 16px rgba(0,0,0,0.4); overflow:hidden; display:none; min-width:140px; max-width:200px; }
+.ann-mention-drop.open { display:block; }
+.ann-mention-item { padding:6px 10px; font-size:12px; color:#E4E4E7; cursor:pointer; display:flex; align-items:center; gap:7px; font-family:var(--font); }
+.ann-mention-item:hover, .ann-mention-item.active { background:rgba(255,255,255,0.1); color:#F4F4F5; }
+.ann-mention-avatar { width:20px; height:20px; border-radius:50%; background:#52525B; color:#F4F4F5; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ann-mention-role  { font-size:9px; color:#71717A; margin-left:auto; text-transform:capitalize; }
+
+/* ── @mention highlight in text ── */
+.ann-mention-tag { color:#60A5FA; font-weight:600; }
 
 /* ── Emoji picker ── */
 .ann-emoji-picker { position:fixed; z-index:99999; background:var(--color-surface-raised); border:1px solid var(--color-border); border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.18); padding:6px; width:228px; display:none; }
@@ -2896,9 +2913,6 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
     <!-- Wireframe mode badge — interactive control panel (visible when data-wireframe="true") -->
     <div class="wf-badge" id="wfBadge">
-      <div class="wf-badge-title">Lo-Fi Wireframe</div>
-      <div class="wf-badge-sub">Not a design spec</div>
-      <div class="wf-badge-divider"></div>
       <div class="wf-badge-row">
         <span class="wf-badge-label">Annotations</span>
         <div class="wf-pill-toggle" onclick="toggleAnnotationsVisible()" id="wfAnnToggle" title="Show/hide annotations">
@@ -2911,6 +2925,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
       <div class="wf-badge-row" id="wfAuthRow">
         <button class="wf-auth-link" onclick="showAnnLogin()">Sign in to annotate</button>
       </div>
+      <div class="wf-badge-divider"></div>
+      <div class="wf-badge-title">Lo-Fi Wireframe</div>
+      <div class="wf-badge-sub">Not a design spec</div>
     </div>
 
     <!-- Annotation capture overlay (crosshair click-to-place, only active in add mode) -->
@@ -2971,6 +2988,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
 <!-- Floating emoji picker (shared) -->
 <div class="ann-emoji-picker" id="annEmojiPicker"></div>
+
+<!-- @mention autocomplete dropdown (shared) -->
+<div class="ann-mention-drop" id="annMentionDrop"></div>
 
 <!-- Change password modal -->
 <div class="modal-backdrop" id="annChangePwBackdrop">
@@ -4876,6 +4896,12 @@ let annPendingLayer = 'main';
 let annPendingType  = 'comment';
 let annEditingId    = null;
 let annEmojiTarget  = null; // id of textarea that emoji picker is bound to
+// ── Unread tracking ──────────────────────────────────────
+const ANN_UNREAD_KEY = 'rfp_ann_unread_v1'; // localStorage key: { username: { annId: replyCount } }
+// ── @mention state ────────────────────────────────────────
+let annMentionTarget = null;  // current textarea id
+let annMentionQuery  = '';    // text after @
+let annMentionIdx    = 0;     // active item index
 let annActiveId     = null;
 // Drag state
 let annDragId        = null;
@@ -4929,6 +4955,7 @@ async function annLoad() {
 }
 async function annSave() {
   annSaveLocal();
+  annUpdateUnreadBadge();
   if (ANN_CONFIG.GIST_ID && ANN_CONFIG.GIST_PAT) {
     try {
       const payload = JSON.stringify({ annotations: annData, nextNum: annNextNum, users: annUsers }, null, 2);
@@ -4976,6 +5003,7 @@ function setAnnVisible(v) {
   document.getElementById('annSidebar').classList.toggle('open', v);
   document.getElementById('wfAnnHint').style.display = (v && annAuthor) ? '' : 'none';
   if (!v && annAddMode) setAnnAddMode(false);
+  if (v) { annUpdateUnreadBadge(); }
 }
 function toggleAnnotationsVisible() {
   setAnnVisible(!annVisible);
@@ -5094,6 +5122,199 @@ function cancelAnnInput() {
   document.getElementById('annInputForm').classList.remove('visible');
   annEditingId = null;
   renderAnnBubbles(); // clear the editing class
+}
+
+// ── Unread reply tracking ─────────────────────────────────
+function annGetUnreadStore() {
+  try { return JSON.parse(localStorage.getItem(ANN_UNREAD_KEY) || '{}'); } catch(e) { return {}; }
+}
+function annSaveUnreadStore(store) {
+  localStorage.setItem(ANN_UNREAD_KEY, JSON.stringify(store));
+}
+// Does current user get notified about a new annotation?
+function annIsNotifiable(ann) {
+  if (!annCurrentUser) return false;
+  const u = annCurrentUser;
+  if (ann.author === u.username) return false; // user wrote it — never notify
+  if (ann.text.includes('@' + u.username)) return true; // @mentioned
+  if (u.role === 'admin') return true; // admins see all new annotations they didn't write
+  return false;
+}
+// Is current user involved in an annotation (for reply notifications)?
+function annIsInvolved(ann) {
+  if (!annCurrentUser) return false;
+  const u = annCurrentUser;
+  if (ann.author === u.username) return true;
+  if ((ann.replies || []).some(r => r.author === u.username)) return true;
+  if (ann.text.includes('@' + u.username)) return true;
+  if ((ann.replies || []).some(r => (r.text || '').includes('@' + u.username))) return true;
+  if (u.role === 'admin') return true;
+  return false;
+}
+// Is this annotation currently unread for the current user?
+function annIsUnread(ann) {
+  if (!annCurrentUser) return false;
+  const store    = annGetUnreadStore();
+  const userSeen = store[annCurrentUser.username] || {};
+  const entry    = userSeen[ann.id]; // { seen, replyCount } or undefined
+  const currentReplies = (ann.replies || []).length;
+  // New or unseen notifiable annotation
+  if (annIsNotifiable(ann) && (!entry || !entry.seen)) return true;
+  // New replies since user last viewed this annotation
+  if (annIsInvolved(ann)) {
+    const seenReplies = entry ? (entry.replyCount ?? 0) : 0;
+    if (currentReplies > seenReplies) return true;
+  }
+  return false;
+}
+function annCountUnread() {
+  if (!annCurrentUser) return 0;
+  return annData.filter(a => annIsUnread(a)).length;
+}
+// Mark a single annotation as read (called when user clicks it in sidebar)
+function annMarkRead(annId) {
+  if (!annCurrentUser) return;
+  const ann = annData.find(a => a.id === annId);
+  if (!ann) return;
+  const store = annGetUnreadStore();
+  if (!store[annCurrentUser.username]) store[annCurrentUser.username] = {};
+  store[annCurrentUser.username][annId] = { seen: true, replyCount: (ann.replies || []).length };
+  annSaveUnreadStore(store);
+  annUpdateUnreadBadge();
+}
+// Establish a baseline for a first-time user so existing content isn't all "unread"
+function annInitUnreadBaseline() {
+  if (!annCurrentUser) return;
+  const store = annGetUnreadStore();
+  if (store[annCurrentUser.username]) return; // already has a baseline
+  const baseline = {};
+  annData.forEach(a => { baseline[a.id] = { seen: true, replyCount: (a.replies || []).length }; });
+  store[annCurrentUser.username] = baseline;
+  annSaveUnreadStore(store);
+}
+function annMarkAllRead() {
+  if (!annCurrentUser) return;
+  const store    = annGetUnreadStore();
+  const baseline = {};
+  annData.forEach(a => { baseline[a.id] = { seen: true, replyCount: (a.replies || []).length }; });
+  store[annCurrentUser.username] = baseline;
+  annSaveUnreadStore(store);
+}
+function annUpdateUnreadBadge() {
+  const container = document.getElementById('wfBadge');
+  if (!container) return;
+  let badge = container.querySelector('.ann-unread-badge');
+  const count = annCountUnread();
+  if (count > 0) {
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'ann-unread-badge';
+      badge.title = 'Click to open annotations';
+      badge.addEventListener('click', () => {
+        if (!annVisible) { setAnnVisible(true); renderAnnBubbles(); renderAnnSidebar(); }
+      });
+      container.appendChild(badge);
+    }
+    badge.textContent = count > 99 ? '99+' : count;
+  } else {
+    if (badge) badge.remove();
+  }
+}
+
+// ── @mention autocomplete ─────────────────────────────────
+function hideMentionDrop() {
+  document.getElementById('annMentionDrop').classList.remove('open');
+  annMentionTarget = null;
+  annMentionQuery  = '';
+  annMentionIdx    = 0;
+}
+function showMentionDrop(targetId, query, triggerEl) {
+  annMentionTarget = targetId;
+  annMentionQuery  = query;
+  annMentionIdx    = 0;
+  const matches = annUsers.filter(u =>
+    u.username.toLowerCase().startsWith(query.toLowerCase()) ||
+    (u.displayName || '').toLowerCase().startsWith(query.toLowerCase())
+  ).slice(0, 6);
+  const drop = document.getElementById('annMentionDrop');
+  if (!matches.length) { hideMentionDrop(); return; }
+  drop.innerHTML = matches.map((u, i) =>
+    `<div class="ann-mention-item${i===0?' active':''}" onmousedown="selectMention('${u.username}')">
+      <div class="ann-mention-avatar">${(u.displayName||u.username)[0].toUpperCase()}</div>
+      <span>${u.displayName || u.username}</span>
+      <span class="ann-mention-role">${u.role}</span>
+    </div>`
+  ).join('');
+  drop.classList.add('open');
+  // Position below the textarea
+  const ta = document.getElementById(targetId);
+  if (ta) {
+    const r = ta.getBoundingClientRect();
+    let top  = r.bottom + 4;
+    let left = r.left;
+    if (top + 200 > window.innerHeight) top = r.top - drop.offsetHeight - 4;
+    if (left + 200 > window.innerWidth - 8) left = window.innerWidth - 208;
+    drop.style.top  = top  + 'px';
+    drop.style.left = left + 'px';
+  }
+}
+function selectMention(username) {
+  const ta = document.getElementById(annMentionTarget);
+  if (!ta) { hideMentionDrop(); return; }
+  const val   = ta.value;
+  const caret = ta.selectionStart;
+  // Find the @ that triggered this
+  const before = val.slice(0, caret);
+  const atIdx  = before.lastIndexOf('@');
+  if (atIdx === -1) { hideMentionDrop(); return; }
+  ta.value = val.slice(0, atIdx) + '@' + username + ' ' + val.slice(caret);
+  const newCaret = atIdx + username.length + 2;
+  ta.selectionStart = ta.selectionEnd = newCaret;
+  ta.focus();
+  hideMentionDrop();
+}
+function moveMentionIdx(dir) {
+  const drop  = document.getElementById('annMentionDrop');
+  const items = drop.querySelectorAll('.ann-mention-item');
+  if (!items.length) return;
+  items[annMentionIdx]?.classList.remove('active');
+  annMentionIdx = (annMentionIdx + dir + items.length) % items.length;
+  items[annMentionIdx]?.classList.add('active');
+}
+function handleMentionKeydown(e) {
+  const drop = document.getElementById('annMentionDrop');
+  if (!drop.classList.contains('open')) return false;
+  if (e.key === 'ArrowDown')  { e.preventDefault(); moveMentionIdx(1);  return true; }
+  if (e.key === 'ArrowUp')    { e.preventDefault(); moveMentionIdx(-1); return true; }
+  if (e.key === 'Enter' || e.key === 'Tab') {
+    e.preventDefault();
+    const active = drop.querySelector('.ann-mention-item.active');
+    if (active) active.dispatchEvent(new MouseEvent('mousedown'));
+    return true;
+  }
+  if (e.key === 'Escape') { hideMentionDrop(); return true; }
+  return false;
+}
+function handleMentionInput(e, targetId) {
+  const ta    = document.getElementById(targetId);
+  if (!ta) return;
+  const val   = ta.value;
+  const caret = ta.selectionStart;
+  const before = val.slice(0, caret);
+  const match  = before.match(/@(\w*)$/);
+  if (match) {
+    showMentionDrop(targetId, match[1], ta);
+  } else {
+    hideMentionDrop();
+  }
+}
+// Render @mentions as highlighted spans in display text
+function renderMentions(text) {
+  const escaped = escapeAnn(text);
+  return escaped.replace(/@(\w+)/g, (m, name) => {
+    const known = annUsers.find(u => u.username === name);
+    return known ? `<span class="ann-mention-tag">@${escapeAnn(name)}</span>` : m;
+  });
 }
 
 // ── Emoji picker ──────────────────────────────────────────
@@ -5277,7 +5498,7 @@ function renderAnnSidebar() {
           <span class="ann-reply-author">${escapeAnn(r.author)}${rOwn?' <em style="font-weight:400">(you)</em>':''}</span>
           <span style="display:flex;align-items:center;gap:4px;"><span class="ann-reply-time">${timeStr}</span>${delBtn}</span>
         </div>
-        <div class="ann-reply-text">${escapeAnn(r.text)}</div>
+        <div class="ann-reply-text">${renderMentions(r.text)}</div>
         ${rLikeBtn ? `<div style="margin-top:4px;">${rLikeBtn}</div>` : ''}
       </div>`;
     }).join('');
@@ -5313,14 +5534,15 @@ function renderAnnSidebar() {
       ? `<button class="ann-like-btn${liked?' liked':''}" onclick="toggleLike(${a.id})" style="flex-shrink:0;">${likeIcon}${likes.length > 0 ? `<span>${likes.length}</span>` : ''}${likeTooltip}</button>`
       : (likes.length > 0 ? `<span class="ann-like-btn" style="cursor:default;pointer-events:none;flex-shrink:0;"><span class="like-emoji">👍</span><span>${likes.length}</span><span class="like-tooltip">${likes.join(', ')} liked this</span></span>` : '');
 
-    return `<div class="ann-list-item${annActiveId===a.id?' active':''}" id="ann-li-${a.id}">
+    const isUnread = annIsUnread(a);
+    return `<div class="ann-list-item${annActiveId===a.id?' active':''}${isUnread?' unread':''}" id="ann-li-${a.id}">
       <div class="ann-list-num" data-ann-type="${aType}" onclick="navigateToAnn(${a.id})" style="cursor:pointer;margin-top:2px;">${a.num}</div>
       <div class="ann-list-text" style="flex:1;min-width:0;">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
           <div onclick="navigateToAnn(${a.id})" style="cursor:pointer;flex:1;min-width:0;">
             <span class="ann-type-badge type-${aType}" style="margin-bottom:3px;display:inline-block;">${typeLabelMap[aType]||aType}</span>
             ${authorTag}
-            ${escapeAnn(a.text)}${layerTag?'<br>'+layerTag:''}
+            ${renderMentions(a.text)}${layerTag?'<br>'+layerTag:''}
           </div>
           <div style="display:flex;align-items:flex-start;gap:4px;flex-shrink:0;margin-top:1px;">
             ${likeBtn}
@@ -5374,7 +5596,7 @@ function clickAnnBubble(id, bubbleEl) {
   popover.innerHTML = `
     <div class="ann-detail-num"><span class="ann-type-badge type-${aType}">${typeLabel}</span> &nbsp;Note ${ann.num}</div>
     ${authorLine}
-    <div class="ann-detail-text">${escapeAnn(ann.text)}</div>
+    <div class="ann-detail-text">${renderMentions(ann.text)}</div>
     ${replyBadge}
     ${likeBadge}
     ${actionsHtml}`;
@@ -5406,6 +5628,7 @@ function closeAnnDetail() {
 // ── Navigate from sidebar ─────────────────────────────────
 function navigateToAnn(id) {
   annActiveId = id;
+  annMarkRead(id);
   const ann = annData.find(a => a.id === id);
   if (!ann) return;
 
@@ -5680,6 +5903,8 @@ function submitAnnLogin() {
     annSaveSession(annCurrentUser);
     hideAnnLogin();
     annApplyAuthorUI();
+    annInitUnreadBaseline();
+    annUpdateUnreadBadge();
     renderAnnBubbles();
     renderAnnSidebar();
   } else {
@@ -5843,6 +6068,7 @@ document.addEventListener('click', e => {
 // Escape → cancel input form or close popover or close emoji picker
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (document.getElementById('annMentionDrop').classList.contains('open')) { hideMentionDrop(); return; }
     if (document.getElementById('annEmojiPicker').classList.contains('open')) { hideEmojiPicker(); return; }
     if (document.getElementById('annInputForm').classList.contains('visible')) { cancelAnnInput(); return; }
     if (document.getElementById('annDetailPopover').classList.contains('visible')) { closeAnnDetail(); renderAnnSidebar(); }
@@ -5864,9 +6090,34 @@ document.getElementById('annLoginUser').addEventListener('keydown', e => {
 document.getElementById('annLoginInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') submitAnnLogin();
 });
-// Ctrl/Cmd+Enter saves annotation input
+// Ctrl/Cmd+Enter saves annotation input; arrow/enter navigate mention drop
 document.getElementById('annInputTextarea').addEventListener('keydown', e => {
+  if (handleMentionKeydown(e)) return;
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') saveAnnInput();
+});
+document.getElementById('annInputTextarea').addEventListener('input', e => {
+  handleMentionInput(e, 'annInputTextarea');
+});
+// Event delegation for dynamically-created reply textareas
+document.getElementById('annSidebarBody').addEventListener('keydown', e => {
+  if (!e.target.classList.contains('ann-reply-textarea')) return;
+  if (handleMentionKeydown(e)) return;
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    const form = e.target.closest('.ann-reply-form');
+    if (form) {
+      const saveBtn = form.querySelector('.panel-btn-primary');
+      if (saveBtn) saveBtn.click();
+    }
+  }
+});
+document.getElementById('annSidebarBody').addEventListener('input', e => {
+  if (!e.target.classList.contains('ann-reply-textarea')) return;
+  handleMentionInput(e, e.target.id);
+});
+// Close mention drop on outside click
+document.addEventListener('mousedown', e => {
+  const drop = document.getElementById('annMentionDrop');
+  if (drop.classList.contains('open') && !drop.contains(e.target)) hideMentionDrop();
 });
 // ⌘+Click / Ctrl+Click anywhere in the wireframe places an annotation without needing add mode
 document.addEventListener('click', e => {
@@ -5892,11 +6143,13 @@ annLoad().then(() => {
       annCurrentUser = { username: live.username, role: live.role, displayName: live.displayName || live.username };
       annAuthor = true;
       annApplyAuthorUI();
+      annInitUnreadBaseline();
     } else {
       annClearSession(); // user was deleted; force re-login
     }
   }
   if (annVisible) { renderAnnBubbles(); renderAnnSidebar(); }
+  annUpdateUnreadBadge();
 });
 </script>
 </body>
