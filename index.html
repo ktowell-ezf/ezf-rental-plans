@@ -2739,11 +2739,8 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
           <span id="wfAnnOn">On</span><span id="wfAnnOff" class="active">Off</span>
         </div>
       </div>
-      <div class="wf-badge-row" id="wfAddRow" style="display:none;">
-        <span class="wf-badge-label">Add mode</span>
-        <div class="wf-pill-toggle" onclick="toggleAnnAddMode()" id="wfAddToggle" title="Click anywhere to add an annotation">
-          <span id="wfAddOn">On</span><span id="wfAddOff" class="active">Off</span>
-        </div>
+      <div class="wf-badge-row" id="wfAnnHint" style="display:none;">
+        <span style="font-size:10px;color:var(--color-text-secondary);line-height:1.4;">⌘/Ctrl + click to add a comment</span>
       </div>
       <div class="wf-badge-row" id="wfAuthRow">
         <button class="wf-auth-link" onclick="showAnnLogin()">Sign in to annotate</button>
@@ -4665,7 +4662,7 @@ function setAnnVisible(v) {
   document.getElementById('wfAnnOn').classList.toggle('active',  v);
   document.getElementById('wfAnnOff').classList.toggle('active', !v);
   document.getElementById('annSidebar').classList.toggle('open', v);
-  document.getElementById('wfAddRow').style.display = (v && annAuthor) ? '' : 'none';
+  document.getElementById('wfAnnHint').style.display = (v && annAuthor) ? '' : 'none';
   if (!v && annAddMode) setAnnAddMode(false);
 }
 function toggleAnnotationsVisible() {
@@ -4948,7 +4945,7 @@ function closeAnnSidebar() {
   document.getElementById('wfAnnOn').classList.remove('active');
   document.getElementById('wfAnnOff').classList.add('active');
   document.getElementById('annSidebar').classList.remove('open');
-  document.getElementById('wfAddRow').style.display = 'none';
+  document.getElementById('wfAnnHint').style.display = 'none';
   if (annAddMode) setAnnAddMode(false);
   closeAnnDetail();
   renderAnnBubbles();
@@ -4971,7 +4968,7 @@ function submitAnnLogin() {
     document.getElementById('wfAuthRow').innerHTML =
       `<span class="wf-author-label">Signed in as Katy</span>
        <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
-    if (annVisible) document.getElementById('wfAddRow').style.display = '';
+    if (annVisible) document.getElementById('wfAnnHint').style.display = '';
     renderAnnBubbles();  // re-render to show edit/delete in popovers
     renderAnnSidebar();
   } else {
@@ -4982,7 +4979,7 @@ function submitAnnLogin() {
 function annLogout() {
   annAuthor = false;
   if (annAddMode) setAnnAddMode(false);
-  document.getElementById('wfAddRow').style.display = 'none';
+  document.getElementById('wfAnnHint').style.display = 'none';
   document.getElementById('wfAuthRow').innerHTML =
     `<button class="wf-auth-link" onclick="showAnnLogin()">Sign in to annotate</button>`;
   closeAnnDetail();
