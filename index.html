@@ -4700,10 +4700,33 @@ renderTable();
 // ANNOTATION SYSTEM
 // ═══════════════════════════════════════════════════════════
 
+// ── Configuration ─────────────────────────────────────────
+// CROSS-DEVICE SETUP (one-time, ~5 minutes):
+//
+// Step 1 — Create a GitHub Personal Access Token (PAT):
+//   github.com → Settings → Developer settings →
+//   Personal access tokens → Tokens (classic) →
+//   Generate new token → check "gist" scope only → copy the token
+//
+// Step 2 — Create a Secret Gist at https://gist.github.com
+//   Filename: rental-plan-annotations.json
+//   Content:  {"annotations":[],"nextNum":1}
+//   Click "Create secret gist" → copy the ID from the URL
+//   (the long hex string after gist.github.com/)
+//
+// Step 3 — Paste both values below, commit, and push.
+const ANN_CONFIG = {
+  GIST_ID:      '4377397ba2b40bd586d9b515cdb0a5ba',   // ← paste your Gist ID here
+  GIST_PAT:     'REMOVED_TOKEN',   // ← paste your PAT here
+  GIST_FILE:    'rental-plan-annotations.json',
+  SESSION_DAYS: 30    // days to stay logged in between password prompts
+};
+
 const ANN_PASSWORD    = 'katy';
 const ANN_STORAGE_KEY = 'rfp_annotations_v1';
+const ANN_SESSION_KEY = 'rfp_ann_session_v1';
 
-// Each annotation: { id, layer, xPct, yPct, text, num }
+// Each annotation: { id, layer, xPct, yPct, text, num, annType }
 //   layer: 'main'  — coords are % of #main dimensions
 //   layer: 'panel' — coords are % of #sidePanel dimensions; only shown when panel open
 let annData        = [];
@@ -4726,20 +4749,72 @@ let annDragBT        = 0;   // bubble starting top %
 let annDragMoved     = false;
 
 // ── Persistence ───────────────────────────────────────────
-function annLoad() {
+function annLoadLocal() {
   try {
     const raw = localStorage.getItem(ANN_STORAGE_KEY);
     if (raw) {
-      const d = JSON.parse(raw);
+      const d   = JSON.parse(raw);
       annData    = d.annotations || [];
       annNextNum = d.nextNum     || (annData.length + 1);
     }
   } catch(e) {}
 }
-function annSave() {
+function annSaveLocal() {
   try {
     localStorage.setItem(ANN_STORAGE_KEY, JSON.stringify({ annotations: annData, nextNum: annNextNum }));
   } catch(e) {}
+}
+async function annLoad() {
+  if (ANN_CONFIG.GIST_ID && ANN_CONFIG.GIST_PAT) {
+    try {
+      const headers = { 'Accept': 'application/vnd.github.v3+json',
+                        'Authorization': `token ${ANN_CONFIG.GIST_PAT}` };
+      const res = await fetch(`https://api.github.com/gists/${ANN_CONFIG.GIST_ID}`, { headers });
+      if (res.ok) {
+        const gist    = await res.json();
+        const content = gist.files?.[ANN_CONFIG.GIST_FILE]?.content;
+        if (content) {
+          const d    = JSON.parse(content);
+          annData    = d.annotations || [];
+          annNextNum = d.nextNum     || (annData.length + 1);
+          annSaveLocal(); // keep local cache in sync
+          return;
+        }
+      }
+    } catch(e) { console.warn('[annotations] Gist load failed, using local cache:', e.message); }
+  }
+  annLoadLocal();
+}
+async function annSave() {
+  annSaveLocal(); // write local cache immediately (sync)
+  if (ANN_CONFIG.GIST_ID && ANN_CONFIG.GIST_PAT) {
+    try {
+      const payload = JSON.stringify({ annotations: annData, nextNum: annNextNum }, null, 2);
+      await fetch(`https://api.github.com/gists/${ANN_CONFIG.GIST_ID}`, {
+        method:  'PATCH',
+        headers: { 'Authorization': `token ${ANN_CONFIG.GIST_PAT}`,
+                   'Content-Type':  'application/json',
+                   'Accept':        'application/vnd.github.v3+json' },
+        body: JSON.stringify({ files: { [ANN_CONFIG.GIST_FILE]: { content: payload } } })
+      });
+    } catch(e) { console.warn('[annotations] Gist save failed:', e.message); }
+  }
+}
+
+// ── Session persistence ───────────────────────────────────
+function annCheckSession() {
+  try {
+    const raw = localStorage.getItem(ANN_SESSION_KEY);
+    if (!raw) return false;
+    return JSON.parse(raw).expires > Date.now();
+  } catch(e) { return false; }
+}
+function annSaveSession() {
+  localStorage.setItem(ANN_SESSION_KEY,
+    JSON.stringify({ expires: Date.now() + ANN_CONFIG.SESSION_DAYS * 86400000 }));
+}
+function annClearSession() {
+  localStorage.removeItem(ANN_SESSION_KEY);
 }
 
 // ── Visibility toggle ─────────────────────────────────────
@@ -5074,11 +5149,9 @@ function hideAnnLogin() {
 function submitAnnLogin() {
   if (document.getElementById('annLoginInput').value === ANN_PASSWORD) {
     annAuthor = true;
+    annSaveSession(); // persist login for SESSION_DAYS days
     hideAnnLogin();
-    document.getElementById('wfAuthRow').innerHTML =
-      `<span class="wf-author-label">Signed in as Katy</span>
-       <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
-    if (annVisible) document.getElementById('wfAnnHint').style.display = '';
+    annApplyAuthorUI();
     renderAnnBubbles();  // re-render to show edit/delete in popovers
     renderAnnSidebar();
   } else {
@@ -5086,8 +5159,15 @@ function submitAnnLogin() {
     document.getElementById('annLoginInput').select();
   }
 }
+function annApplyAuthorUI() {
+  document.getElementById('wfAuthRow').innerHTML =
+    `<span class="wf-author-label">Signed in as Katy</span>
+     <button class="wf-auth-link" onclick="annLogout()">Sign out</button>`;
+  if (annVisible) document.getElementById('wfAnnHint').style.display = '';
+}
 function annLogout() {
   annAuthor = false;
+  annClearSession();
   if (annAddMode) setAnnAddMode(false);
   document.getElementById('wfAnnHint').style.display = 'none';
   document.getElementById('wfAuthRow').innerHTML =
@@ -5233,7 +5313,15 @@ document.addEventListener('click', e => {
 }, true); // capture phase — fires before child element handlers
 
 // ── Init ──────────────────────────────────────────────────
-annLoad();
+annLoad().then(() => {
+  // Restore session if still valid — no password prompt needed
+  if (annCheckSession()) {
+    annAuthor = true;
+    annApplyAuthorUI();
+  }
+  // If annotations were somehow toggled on before load finished, refresh render
+  if (annVisible) { renderAnnBubbles(); renderAnnSidebar(); }
+});
 </script>
 </body>
 </html>
