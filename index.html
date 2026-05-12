@@ -2571,8 +2571,8 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
           <div class="filter-popover-section">
             <div class="filter-popover-label">Status</div>
             <div class="filter-popover-options">
-              <label class="filter-option"><input type="checkbox" id="fStatus-Active"   onchange="onFilterChange()"> Active</label>
-              <label class="filter-option"><input type="checkbox" id="fStatus-Inactive" onchange="onFilterChange()"> Inactive</label>
+              <label class="filter-option"><input type="checkbox" id="fStatus-Available"   onchange="onFilterChange()"> Available</label>
+              <label class="filter-option"><input type="checkbox" id="fStatus-Unavailable" onchange="onFilterChange()"> Unavailable</label>
             </div>
           </div>
 
@@ -2817,12 +2817,12 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 <script>
 // ── Data ──────────────────────────────────────────────────
 const plans = [
-  { id:1, name:'Court Time Bundle — 10hrs',    status:'Active',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, pricingType:'rates',  pricingRules:['Weekday Peak Rate','Weekend Morning Rate'],                                             desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
-  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Active',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Winter Evening Rate'],                                                                  desc:'5 drop-in visits, valid any time.', archived:false },
-  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Active',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  pricingType:'rates',  pricingRules:['Summer Block Rate'],                                                                    desc:'Flexible hourly pickleball court access.', archived:false },
-  { id:4, name:'Field Rental Block — 8hrs',    status:'Active',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Weekend Morning Rate','Summer Block Rate'],                                             desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
-  { id:5, name:'Room Booking Pack — 10 visits',status:'Inactive', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, pricingType:'custom', pricingRules:[],                                                                                       desc:'Meeting room access pack.', archived:false },
-  { id:6, name:'Annual Court Pass — 100hrs',   status:'Active',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  pricingType:'rates',  pricingRules:['Weekday Peak Rate','Winter Evening Rate','Weekend Morning Rate','Holiday Premium Rate'], desc:'Best value for regular court users.', archived:false },
+  { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, pricingType:'rates',  pricingRules:['Weekday Peak Rate','Weekend Morning Rate'],                                             desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
+  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Winter Evening Rate'],                                                                  desc:'5 drop-in visits, valid any time.', archived:false },
+  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  pricingType:'rates',  pricingRules:['Summer Block Rate'],                                                                    desc:'Flexible hourly pickleball court access.', archived:false },
+  { id:4, name:'Field Rental Block — 8hrs',    status:'Available',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Weekend Morning Rate','Summer Block Rate'],                                             desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
+  { id:5, name:'Room Booking Pack — 10 visits',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, pricingType:'custom', pricingRules:[],                                                                                       desc:'Meeting room access pack.', archived:false },
+  { id:6, name:'Annual Court Pass — 100hrs',   status:'Available',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  pricingType:'rates',  pricingRules:['Weekday Peak Rate','Winter Evening Rate','Weekend Morning Rate','Holiday Premium Rate'], desc:'Best value for regular court users.', archived:false },
 ];
 
 // Rental Rates — sourced from the Rental Rates admin page.
@@ -3063,6 +3063,8 @@ function archivePlanById(id) {
   closeAllMenus();
   const p = plans.find(p => p.id === id);
   if (!p) return;
+  p.preArchiveStatus = p.status;
+  p.status = 'Unavailable';
   p.archived = true;
   if (currentPlan && currentPlan.id === id) closePanel();
   updateTabCounts();
@@ -3070,7 +3072,11 @@ function archivePlanById(id) {
 }
 function restorePlan(id) {
   closeAllMenus();
-  plans.find(p => p.id === id).archived = false;
+  const p = plans.find(p => p.id === id);
+  if (!p) return;
+  p.status = p.preArchiveStatus || 'Available';
+  delete p.preArchiveStatus;
+  p.archived = false;
   updateTabCounts();
   renderTable();
 }
@@ -3180,7 +3186,7 @@ function onFilterChange() {
   filterModel.clear();
   filterPricingRules.clear();
   // ≤3 options: read by individual IDs
-  ['Active','Inactive'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
+  ['Available','Unavailable'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
   ['Hours','Occurrences'].forEach(v => { if (document.getElementById('fModel-'+v)?.checked) filterModel.add(v); });
   // >3 options: read from multiselect dropdown
   document.querySelectorAll('#ms-options-pricing input:checked').forEach(cb => filterPricingRules.add(cb.value));
@@ -3195,7 +3201,7 @@ function clearFilters(skipRender) {
   filterStatus.clear(); filterModel.clear(); filterPricingRules.clear();
   filterStdMin = null; filterStdMax = null; filterMemMin = null; filterMemMax = null;
   // ≤3 options
-  ['fStatus-Active','fStatus-Inactive','fModel-Hours','fModel-Occurrences'].forEach(id => {
+  ['fStatus-Available','fStatus-Unavailable','fModel-Hours','fModel-Occurrences'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
   // >3 options (multiselect dropdown)
@@ -3419,7 +3425,11 @@ function bulkArchive() {
   const ids = [...selectedIds];
   ids.forEach(id => {
     const p = plans.find(p => p.id === id);
-    if (p) p.archived = true;
+    if (p) {
+      p.preArchiveStatus = p.status;
+      p.status = 'Unavailable';
+      p.archived = true;
+    }
   });
   selectedIds.clear();
   // Close panel if the currently-open plan was archived
@@ -3432,7 +3442,11 @@ function bulkRestore() {
   const ids = [...selectedIds];
   ids.forEach(id => {
     const p = plans.find(p => p.id === id);
-    if (p) p.archived = false;
+    if (p) {
+      p.status = p.preArchiveStatus || 'Available';
+      delete p.preArchiveStatus;
+      p.archived = false;
+    }
   });
   selectedIds.clear();
   updateTabCounts();
@@ -3487,7 +3501,7 @@ function renderTable() {
         <input type="checkbox" class="row-cb" id="cb-${p.id}" ${selectedIds.has(p.id)?'checked':''} onchange="toggleRowCheck(${p.id},this)">
       </td>
       <td class="td-name">${p.name}</td>
-      <td><span class="badge badge-${p.status==='Active'?'active':'inactive'}"><span class="bdot"></span>${p.status}</span></td>
+      <td><span class="badge badge-${p.status==='Available'?'active':'inactive'}"><span class="bdot"></span>${p.status}</span></td>
       <td><span class="model-pill">${p.model}</span></td>
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
@@ -3549,7 +3563,7 @@ function buildHistoryHTML(plan) {
     {
       initials: 'KT', user: 'K. Towell', time: 'May 9, 2026 · 3:42 PM',
       changes: [
-        { field: 'Status',     oldVal: 'Inactive', newVal: 'Active' },
+        { field: 'Status',     oldVal: 'Unavailable', newVal: 'Available' },
         { field: 'Auto-Renew', oldVal: 'Disabled', newVal: 'Enabled' },
       ]
     },
@@ -3787,8 +3801,8 @@ function openEdit(id) {
               <span class="toggle-label">${p.status==='Active'?'Active':'Inactive'}</span>
               <span class="toggle-label-hint">${p.status==='Active'?'Available for sale':'Not available for sale'}</span>
             </div>
-            <div class="toggle ${p.status==='Active'?'':'off'}"
-                 data-on-label='Active'    data-off-label='Inactive'
+            <div class="toggle ${p.status==='Available'?'':'off'}"
+                 data-on-label='Available'    data-off-label='Unavailable'
                  data-on-hint='Available for sale' data-off-hint='Not available for sale'
                  onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
@@ -3949,7 +3963,7 @@ function openCreate() {
               <span class="toggle-label-hint">Available for sale</span>
             </div>
             <div class="toggle"
-                 data-on-label='Active'   data-off-label='Inactive'
+                 data-on-label='Available'   data-off-label='Unavailable'
                  data-on-hint='Available for sale' data-off-hint='Not available for sale'
                  onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
