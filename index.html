@@ -2367,7 +2367,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   resize: none;
   border: 1px solid var(--color-input-border);
   border-radius: 4px;
-  padding: 8px;
+  padding: 8px 28px 8px 8px;
   font-family: var(--font);
   font-size: 13px;
   color: var(--color-input-text);
@@ -2378,6 +2378,8 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   transition: border-color 0.15s, background 0.2s, color 0.2s;
 }
 .ann-input-textarea:focus { border-color: #2B7BE4; }
+.ann-textarea-wrap { position:relative; }
+.ann-textarea-wrap .ann-emoji-trigger { position:absolute; top:5px; right:5px; }
 .ann-input-actions {
   display: flex;
   gap: 6px;
@@ -2525,13 +2527,31 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-reply-trigger { background:none; border:none; cursor:pointer; font-size:11px; color:#2B7BE4; padding:3px 0 0; font-family:var(--font); }
 .ann-reply-trigger:hover { text-decoration:underline; }
 .ann-reply-form  { margin-top:6px; }
-.ann-reply-textarea { width:100%; height:54px; resize:none; border:1px solid var(--color-input-border); border-radius:4px; padding:6px 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); outline:none; box-sizing:border-box; line-height:1.4; }
+.ann-reply-textarea { width:100%; height:54px; resize:none; border:1px solid var(--color-input-border); border-radius:4px; padding:6px 26px 6px 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); outline:none; box-sizing:border-box; line-height:1.4; }
 .ann-reply-textarea:focus { border-color:#2B7BE4; }
 .ann-reply-actions { display:flex; gap:5px; justify-content:flex-end; margin-top:5px; }
 .ann-reply-count { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#2B7BE4; background:#DBEAFE; border-radius:10px; padding:2px 8px; margin-top:3px; border:none; cursor:pointer; font-family:var(--font); transition:background 0.12s; }
 .ann-reply-count:hover { background:#C3D9F8; }
 .ann-reply-chevron { font-size:8px; transition:transform 0.15s; display:inline-block; }
 .ann-reply-count.expanded .ann-reply-chevron { transform:rotate(90deg); }
+
+/* ── Like button ── */
+.ann-like-btn { position:relative; display:inline-flex; align-items:center; gap:3px; border:1px solid var(--color-border); border-radius:10px; background:none; cursor:pointer; font-size:11px; color:var(--color-text-muted); padding:1px 7px 1px 5px; font-family:var(--font); transition:all 0.12s; line-height:1.5; }
+.ann-like-btn:hover { border-color:#2B7BE4; color:#2B7BE4; background:rgba(43,123,228,0.07); }
+.ann-like-btn.liked { border-color:#2B7BE4; color:#2B7BE4; background:#DBEAFE; font-weight:700; }
+.ann-like-btn .like-emoji { font-size:12px; line-height:1; }
+/* Like tooltip — appears below so it isn't clipped by the sidebar top */
+.ann-like-btn .like-tooltip { visibility:hidden; opacity:0; position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%); white-space:nowrap; background:rgba(30,30,30,0.92); color:#fff; font-size:10px; font-weight:400; padding:3px 8px; border-radius:4px; pointer-events:none; transition:opacity 0.12s; z-index:100000; }
+.ann-like-btn:hover .like-tooltip { visibility:visible; opacity:1; }
+
+/* ── Emoji picker ── */
+.ann-emoji-picker { position:fixed; z-index:99999; background:var(--color-surface-raised); border:1px solid var(--color-border); border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.18); padding:6px; width:228px; display:none; }
+.ann-emoji-picker.open { display:block; }
+.ann-emoji-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:1px; }
+.ann-emoji-cell { width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:16px; border-radius:4px; cursor:pointer; border:none; background:none; transition:background 0.1s; line-height:1; }
+.ann-emoji-cell:hover { background:var(--color-surface-hover,rgba(0,0,0,0.07)); }
+.ann-emoji-trigger { border:none; background:none; cursor:pointer; padding:2px 3px; line-height:1; color:var(--color-text-muted); border-radius:4px; display:inline-flex; align-items:center; justify-content:center; transition:color 0.1s, background 0.1s; }
+.ann-emoji-trigger:hover { color:var(--color-text); background:rgba(0,0,0,0.07); }
 
 /* ── User management tab ── */
 .ann-users-section { padding:8px; }
@@ -2937,12 +2957,18 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
     <button class="ann-type-btn"          data-type="functionality" onclick="setAnnType('functionality')">Function</button>
     <button class="ann-type-btn"          data-type="question"      onclick="setAnnType('question')">Question</button>
   </div>
-  <textarea class="ann-input-textarea" id="annInputTextarea" placeholder="Describe this element, interaction, or decision…" autocomplete="off"></textarea>
+  <div class="ann-textarea-wrap">
+    <textarea class="ann-input-textarea" id="annInputTextarea" placeholder="Describe this element, interaction, or decision…" autocomplete="off"></textarea>
+    <button class="ann-emoji-trigger" title="Insert emoji" onclick="showEmojiPicker('annInputTextarea',this)"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5.8" cy="6.5" r="0.8" fill="currentColor"/><circle cx="10.2" cy="6.5" r="0.8" fill="currentColor"/><path d="M5.2 9.5c.6 1.2 5 1.2 5.6 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+  </div>
   <div class="ann-input-actions">
     <button class="panel-btn panel-btn-secondary" onclick="cancelAnnInput()">Cancel</button>
     <button class="panel-btn panel-btn-primary"   onclick="saveAnnInput()">Save</button>
   </div>
 </div>
+
+<!-- Floating emoji picker (shared) -->
+<div class="ann-emoji-picker" id="annEmojiPicker"></div>
 
 <!-- Change password modal -->
 <div class="modal-backdrop" id="annChangePwBackdrop">
@@ -4847,6 +4873,7 @@ let annPendingY     = 0;
 let annPendingLayer = 'main';
 let annPendingType  = 'comment';
 let annEditingId    = null;
+let annEmojiTarget  = null; // id of textarea that emoji picker is bound to
 let annActiveId     = null;
 // Drag state
 let annDragId        = null;
@@ -5052,6 +5079,7 @@ function saveAnnInput() {
       annType:  annPendingType,
       author:   annCurrentUser?.username || '',
       replies:  [],
+      likes:    [],
       num: annNextNum++
     });
   }
@@ -5064,6 +5092,80 @@ function cancelAnnInput() {
   document.getElementById('annInputForm').classList.remove('visible');
   annEditingId = null;
   renderAnnBubbles(); // clear the editing class
+}
+
+// ── Emoji picker ──────────────────────────────────────────
+const EMOJIS = [
+  '😊','😄','😂','🤣','😍','🥰','😎','🤔',
+  '👍','👎','👏','🙌','🤝','👀','🔥','💯',
+  '✅','❌','⚠️','💡','📌','📋','🔗','🔍',
+  '🎉','🎯','🚀','⭐','💎','🏆','✨','💥',
+  '❤️','🧡','💛','💚','💙','💜','🤍','🖤',
+  '😅','😬','😮','😢','😡','🤯','🥳','😴',
+  '📱','💻','🖥️','⌨️','🖱️','📊','📈','📉',
+  '🔒','🔓','⚙️','🛠️','💬','📣','🔔','📧'
+];
+function initEmojiPicker() {
+  const picker = document.getElementById('annEmojiPicker');
+  if (!picker) return;
+  picker.innerHTML = `<div class="ann-emoji-grid">${EMOJIS.map(e =>
+    `<button class="ann-emoji-cell" onclick="insertEmoji('${e}')">${e}</button>`
+  ).join('')}</div>`;
+}
+function showEmojiPicker(targetId, triggerEl) {
+  annEmojiTarget = targetId;
+  const picker = document.getElementById('annEmojiPicker');
+  picker.classList.add('open');
+  // Position near trigger
+  const tRect = triggerEl.getBoundingClientRect();
+  let top  = tRect.top - picker.offsetHeight - 6;
+  let left = tRect.left;
+  // If it would go off-screen vertically, flip below
+  if (top < 8) top = tRect.bottom + 6;
+  // If it would go off-screen right, shift left
+  if (left + 228 > window.innerWidth - 8) left = window.innerWidth - 228 - 8;
+  if (left < 8) left = 8;
+  picker.style.top  = top  + 'px';
+  picker.style.left = left + 'px';
+  // After class applied, reposition with real height
+  requestAnimationFrame(() => {
+    let t2 = tRect.top - picker.offsetHeight - 6;
+    if (t2 < 8) t2 = tRect.bottom + 6;
+    picker.style.top = t2 + 'px';
+  });
+}
+function hideEmojiPicker() {
+  document.getElementById('annEmojiPicker').classList.remove('open');
+  annEmojiTarget = null;
+}
+function insertEmoji(emoji) {
+  const ta = document.getElementById(annEmojiTarget);
+  if (!ta) { hideEmojiPicker(); return; }
+  const start = ta.selectionStart ?? ta.value.length;
+  const end   = ta.selectionEnd   ?? ta.value.length;
+  ta.value = ta.value.slice(0, start) + emoji + ta.value.slice(end);
+  ta.selectionStart = ta.selectionEnd = start + emoji.length;
+  ta.focus();
+  hideEmojiPicker();
+}
+
+// ── Likes ─────────────────────────────────────────────────
+function toggleLike(annId) {
+  if (!annCurrentUser) return;
+  const ann = annData.find(a => a.id === annId);
+  if (!ann) return;
+  if (!ann.likes) ann.likes = [];
+  const idx = ann.likes.indexOf(annCurrentUser.username);
+  if (idx >= 0) { ann.likes.splice(idx, 1); }
+  else          { ann.likes.push(annCurrentUser.username); }
+  annSave();
+  renderAnnSidebar();
+  // Update popover if open for this annotation
+  const pop = document.getElementById('annDetailPopover');
+  if (pop.classList.contains('visible') && annActiveId === annId) {
+    const bubble = document.getElementById(`ann-b-${annId}`);
+    if (bubble) clickAnnBubble(annId, bubble);
+  }
 }
 
 // ── Bubble rendering — layer-aware ────────────────────────
@@ -5173,7 +5275,10 @@ function renderAnnSidebar() {
 
     const replyFormHtml = (annOpenReplyId === a.id && canReply()) ? `
       <div class="ann-reply-form">
-        <textarea class="ann-reply-textarea" id="replyText-${a.id}" placeholder="Write a reply…"></textarea>
+        <div class="ann-textarea-wrap">
+          <textarea class="ann-reply-textarea" id="replyText-${a.id}" placeholder="Write a reply…"></textarea>
+          <button class="ann-emoji-trigger" title="Insert emoji" onclick="showEmojiPicker('replyText-${a.id}',this)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5.8" cy="6.5" r="0.8" fill="currentColor"/><circle cx="10.2" cy="6.5" r="0.8" fill="currentColor"/><path d="M5.2 9.5c.6 1.2 5 1.2 5.6 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+        </div>
         <div class="ann-reply-actions">
           <button class="panel-btn panel-btn-secondary" style="height:24px;font-size:11px;padding:0 8px;" onclick="closeReplyForm()">Cancel</button>
           <button class="panel-btn panel-btn-primary"   style="height:24px;font-size:11px;padding:0 8px;" onclick="saveReply(${a.id})">Reply</button>
@@ -5182,6 +5287,18 @@ function renderAnnSidebar() {
 
     const trashIcon = `<svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;"><path d="M1.5 3h9M4.5 3V2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1M10 3l-.667 7A.5.5 0 0 1 8.836 10.5H3.164a.5.5 0 0 1-.497-.5L2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     const annDeleteBtn = canDeleteAnn(a) ? `<button class="ann-reply-del" onclick="deleteAnn(${a.id})" title="Delete annotation" style="margin-top:1px;flex-shrink:0;">${trashIcon}</button>` : '';
+
+    // Like button — positioned in header row, top-right
+    const likes   = a.likes || [];
+    const liked   = annCurrentUser && likes.includes(annCurrentUser.username);
+    const thumbSvg = `<svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;"><path d="M4 13V6.5L7 1.5c.8 0 1.5.7 1.5 1.5v2.5H12a1 1 0 0 1 1 1.1l-.8 4.5A1 1 0 0 1 11.2 12H4zm0 0H2a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const likeIcon    = likes.length > 0 ? `<span class="like-emoji">👍</span>` : thumbSvg;
+    const likeTooltip = likes.length > 0
+      ? `<span class="like-tooltip">${likes.join(', ')} liked this</span>`
+      : (annCurrentUser ? `<span class="like-tooltip">Like</span>` : '');
+    const likeBtn = annCurrentUser
+      ? `<button class="ann-like-btn${liked?' liked':''}" onclick="toggleLike(${a.id})" style="flex-shrink:0;">${likeIcon}${likes.length > 0 ? `<span>${likes.length}</span>` : ''}${likeTooltip}</button>`
+      : (likes.length > 0 ? `<span class="ann-like-btn" style="cursor:default;pointer-events:none;flex-shrink:0;"><span class="like-emoji">👍</span><span>${likes.length}</span><span class="like-tooltip">${likes.join(', ')} liked this</span></span>` : '');
 
     return `<div class="ann-list-item${annActiveId===a.id?' active':''}" id="ann-li-${a.id}">
       <div class="ann-list-num" data-ann-type="${aType}" onclick="navigateToAnn(${a.id})" style="cursor:pointer;margin-top:2px;">${a.num}</div>
@@ -5192,11 +5309,14 @@ function renderAnnSidebar() {
             ${authorTag}
             ${escapeAnn(a.text)}${layerTag?'<br>'+layerTag:''}
           </div>
-          ${annDeleteBtn}
+          <div style="display:flex;align-items:flex-start;gap:4px;flex-shrink:0;margin-top:1px;">
+            ${likeBtn}
+            ${annDeleteBtn}
+          </div>
         </div>
         ${replyCountTag ? `<div style="margin-top:3px;">${replyCountTag}</div>` : ''}
         ${(repliesHtml && expanded) ? `<div class="ann-reply-list">${repliesHtml}</div>` : ''}
-        ${canReply() ? `<button class="ann-reply-trigger" onclick="openReplyForm(${a.id})">↩ Reply</button>` : ''}
+        ${canReply() ? `<div style="margin-top:4px;"><button class="ann-reply-trigger" onclick="openReplyForm(${a.id})" style="padding:0;">↩ Reply</button></div>` : ''}
         ${replyFormHtml}
       </div>
     </div>`;
@@ -5221,8 +5341,18 @@ function clickAnnBubble(id, bubbleEl) {
   const typeLabel = { comment:'Comment', design:'Design', functionality:'Functionality', question:'Question' }[aType] || 'Comment';
   popover.setAttribute('data-ann-type', aType);
   const replyCount   = (ann.replies || []).length;
+  const annLikes     = ann.likes || [];
+  const annLiked     = annCurrentUser && annLikes.includes(annCurrentUser.username);
   const authorLine   = ann.author ? `<div style="font-size:10px;color:var(--color-text-muted);margin-bottom:6px;">by <strong>${escapeAnn(ann.author)}</strong></div>` : '';
   const replyBadge   = replyCount > 0 ? `<div style="margin-top:5px;"><span class="ann-reply-count">↩ ${replyCount} repl${replyCount===1?'y':'ies'}</span></div>` : '';
+  const popThumbSvg  = `<svg width="12" height="12" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;"><path d="M4 13V6.5L7 1.5c.8 0 1.5.7 1.5 1.5v2.5H12a1 1 0 0 1 1 1.1l-.8 4.5A1 1 0 0 1 11.2 12H4zm0 0H2a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const popLikeIcon  = annLikes.length > 0 ? `<span class="like-emoji">👍</span>` : popThumbSvg;
+  const popLikeTooltip = annLikes.length > 0
+    ? `<span class="like-tooltip">${annLikes.join(', ')} liked this</span>`
+    : (annCurrentUser ? `<span class="like-tooltip">Like</span>` : '');
+  const likeBadge    = annCurrentUser
+    ? `<button class="ann-like-btn${annLiked?' liked':''}" onclick="toggleLike(${id})" style="margin-top:5px;">${popLikeIcon}${annLikes.length > 0 ? `<span>${annLikes.length}</span>` : ''}${popLikeTooltip}</button>`
+    : (annLikes.length > 0 ? `<span class="ann-like-btn" style="cursor:default;pointer-events:none;margin-top:5px;"><span class="like-emoji">👍</span><span>${annLikes.length}</span><span class="like-tooltip">${annLikes.join(', ')} liked this</span></span>` : '');
   const replyBtn     = canReply()        ? `<button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="openReplyForm(${id});closeAnnDetail();if(!annVisible)setAnnVisible(true);">↩ Reply</button>` : '';
   const editBtn      = canEditAnn(ann)   ? `<button class="panel-btn panel-btn-secondary" style="height:26px;font-size:12px;padding:0 10px;" onclick="editAnn(${id})">Edit</button>` : '';
   const deleteBtn    = canDeleteAnn(ann) ? `<button class="panel-btn panel-btn-destructive" style="height:26px;font-size:12px;padding:0 10px;" onclick="deleteAnn(${id})">Delete</button>` : '';
@@ -5233,6 +5363,7 @@ function clickAnnBubble(id, bubbleEl) {
     ${authorLine}
     <div class="ann-detail-text">${escapeAnn(ann.text)}</div>
     ${replyBadge}
+    ${likeBadge}
     ${actionsHtml}`;
   // Position relative to bubble
   const bRect = bubbleEl.getBoundingClientRect();
@@ -5683,13 +5814,21 @@ document.addEventListener('click', e => {
     renderAnnSidebar();
   }
 });
-// Escape → cancel input form or close popover
+// Escape → cancel input form or close popover or close emoji picker
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
+    if (document.getElementById('annEmojiPicker').classList.contains('open')) { hideEmojiPicker(); return; }
     if (document.getElementById('annInputForm').classList.contains('visible')) { cancelAnnInput(); return; }
     if (document.getElementById('annDetailPopover').classList.contains('visible')) { closeAnnDetail(); renderAnnSidebar(); }
     if (document.getElementById('annLoginBackdrop').classList.contains('open'))   hideAnnLogin();
     if (document.getElementById('annChangePwBackdrop').classList.contains('open')) hideChangePassword();
+  }
+});
+// Close emoji picker on outside click
+document.addEventListener('mousedown', e => {
+  const picker = document.getElementById('annEmojiPicker');
+  if (picker.classList.contains('open') && !picker.contains(e.target) && !e.target.classList.contains('ann-emoji-trigger')) {
+    hideEmojiPicker();
   }
 });
 // Enter submits login
@@ -5717,6 +5856,7 @@ document.addEventListener('click', e => {
 }, true); // capture phase — fires before child element handlers
 
 // ── Init ──────────────────────────────────────────────────
+initEmojiPicker();
 annLoad().then(() => {
   const savedUser = annCheckSession();
   if (savedUser) {
