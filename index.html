@@ -2126,12 +2126,12 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   letter-spacing: 0.3px;
 }
 
-/* ── Annotation sidebar ── */
+/* ── Annotation sidebar — dark theme ── */
 .ann-sidebar {
   width: 0;
   min-width: 0;
   flex-shrink: 0;
-  background: #EBF3FD;
+  background: #18181B;
   border-left: 2px solid transparent;
   display: flex;
   flex-direction: column;
@@ -2143,59 +2143,60 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-sidebar.open {
   width: 264px;
   min-width: 264px;
-  border-left-color: #2B7BE4;
+  border-left-color: #3F3F46;
 }
 .ann-sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 13px 16px 12px;
-  border-bottom: 1px solid rgba(43,123,228,0.25);
+  border-bottom: 1px solid #3F3F46;
   flex-shrink: 0;
-  background: #D6E9FA;
+  background: #18181B;
   transition: background 0.2s, border-color 0.2s;
 }
 .ann-sidebar-title {
   font-size: 13px;
   font-weight: 700;
-  color: #2B7BE4;
+  color: #F4F4F5;
   white-space: nowrap;
   transition: color 0.2s;
 }
 .ann-sidebar-close {
   width: 24px; height: 24px;
   border-radius: 4px;
-  border: 1px solid rgba(43,123,228,0.3);
+  border: 1px solid #52525B;
   background: none;
-  color: #2B7BE4;
+  color: #A1A1AA;
   font-size: 13px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   transition: all 0.1s;
 }
-.ann-sidebar-close:hover { border-color: #2B7BE4; background: rgba(43,123,228,0.1); }
+.ann-sidebar-close:hover { border-color: #F4F4F5; color: #F4F4F5; background: rgba(255,255,255,0.08); }
 .ann-sidebar-body {
   flex: 1;
   overflow-y: auto;
   padding: 8px;
 }
 .ann-sidebar-body::-webkit-scrollbar { width: 4px; }
-.ann-sidebar-body::-webkit-scrollbar-thumb { background: rgba(43,123,228,0.25); border-radius: 2px; }
+.ann-sidebar-body::-webkit-scrollbar-thumb { background: #52525B; border-radius: 2px; }
 .ann-sidebar-hint {
   font-size: 11px;
-  color: var(--color-text-muted);
-  font-style: italic;
-  padding: 4px 6px 8px;
+  color: #F4F4F5;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 6px;
+  padding: 7px 10px;
+  margin: 4px 0 8px;
   line-height: 1.5;
-  transition: color 0.2s;
 }
 .ann-sidebar-empty {
   font-size: 13px;
-  color: var(--color-text-muted);
+  color: #71717A;
   font-style: italic;
   padding: 12px 6px;
-  transition: color 0.2s;
 }
 .ann-list-item {
   display: flex;
@@ -2205,9 +2206,11 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.1s;
+  border-bottom: 1px solid #27272A;
 }
-.ann-list-item:hover { background: rgba(43,123,228,0.1); }
-.ann-list-item.active { background: rgba(43,123,228,0.18); border-left: 2px solid #2B7BE4; padding-left: 6px; }
+.ann-list-item:last-child { border-bottom: none; }
+.ann-list-item:hover { background: rgba(255,255,255,0.06); }
+.ann-list-item.active { background: rgba(255,255,255,0.1); border-left: 2px solid #F4F4F5; padding-left: 6px; }
 .ann-list-num {
   width: 20px; height: 20px;
   border-radius: 50%;
@@ -2224,10 +2227,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-list-num[data-ann-type="question"]      { background:#D97706; }
 .ann-list-text {
   font-size: 12px;
-  color: var(--color-text);
+  color: #E4E4E7;
   line-height: 1.5;
   flex: 1;
-  transition: color 0.2s;
 }
 
 /* ── Annotation layer (inside #main) ── */
@@ -2394,13 +2396,12 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  color: var(--color-text-muted);
-  background: var(--color-surface-raised);
-  border: 1px solid var(--color-border-light);
+  color: #71717A;
+  background: #27272A;
+  border: 1px solid #3F3F46;
   padding: 1px 5px;
   border-radius: 3px;
   margin-top: 3px;
-  transition: all 0.2s;
 }
 .ann-layer-tag.panel-closed {
   color: var(--color-orange, #E07A00);
@@ -2495,19 +2496,19 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
 /* ── Sidebar tabs ── */
 .ann-sidebar-tabs-container { flex-shrink:0; }
-.ann-sidebar-tabs { display:flex; background:#D6E9FA; border-bottom:1px solid rgba(43,123,228,0.2); }
+.ann-sidebar-tabs { display:flex; background:#18181B; border-bottom:1px solid #3F3F46; }
 .ann-sidebar-tab {
   flex:1; padding:9px 0; font-size:11px; font-weight:700; text-align:center;
-  color:rgba(43,123,228,0.55); cursor:pointer; border:none; border-bottom:2px solid transparent;
+  color:#71717A; cursor:pointer; border:none; border-bottom:2px solid transparent;
   background:none; font-family:var(--font); transition:color 0.15s, border-color 0.15s;
 }
-.ann-sidebar-tab:hover  { color:#2B7BE4; }
-.ann-sidebar-tab.active { color:#2B7BE4; border-bottom-color:#2B7BE4; background:rgba(43,123,228,0.06); }
+.ann-sidebar-tab:hover  { color:#D4D4D8; }
+.ann-sidebar-tab.active { color:#F4F4F5; border-bottom-color:#F4F4F5; background:rgba(255,255,255,0.05); }
 
 /* ── Author attribution ── */
-.ann-author-tag { font-size:10px; color:var(--color-text-muted); margin-bottom:2px; display:flex; align-items:center; gap:3px; }
-.ann-author-dot { width:5px; height:5px; border-radius:50%; background:#2B7BE4; flex-shrink:0; }
-.ann-author-dot.own { background:#059669; }
+.ann-author-tag { font-size:10px; color:#71717A; margin-bottom:2px; display:flex; align-items:center; gap:3px; }
+.ann-author-dot { width:5px; height:5px; border-radius:50%; background:#A1A1AA; flex-shrink:0; }
+.ann-author-dot.own { background:#34D399; }
 
 /* ── Role badges ── */
 .ann-role-badge { display:inline-block; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; padding:1px 6px; border-radius:3px; }
@@ -2517,28 +2518,28 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
 /* ── Replies ── */
 .ann-reply-list  { padding:6px 0 2px 0; display:flex; flex-direction:column; gap:4px; }
-.ann-reply-item  { padding:6px 8px; border-radius:4px; background:rgba(43,123,228,0.05); border-left:2px solid rgba(43,123,228,0.2); }
+.ann-reply-item  { padding:6px 8px; border-radius:4px; background:rgba(255,255,255,0.05); border-left:2px solid rgba(255,255,255,0.15); }
 .ann-reply-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; }
-.ann-reply-author{ font-size:10px; font-weight:700; color:#2B7BE4; }
-.ann-reply-time  { font-size:10px; color:var(--color-text-muted); }
-.ann-reply-del   { background:none; border:none; cursor:pointer; color:var(--color-text-muted); padding:0 2px; line-height:1; display:flex; align-items:center; }
-.ann-reply-del:hover { color:var(--color-red); }
-.ann-reply-text  { font-size:12px; color:var(--color-text); line-height:1.45; }
-.ann-reply-trigger { background:none; border:none; cursor:pointer; font-size:11px; color:#2B7BE4; padding:3px 0 0; font-family:var(--font); }
-.ann-reply-trigger:hover { text-decoration:underline; }
+.ann-reply-author{ font-size:10px; font-weight:700; color:#D4D4D8; }
+.ann-reply-time  { font-size:10px; color:#71717A; }
+.ann-reply-del   { background:none; border:none; cursor:pointer; color:#71717A; padding:0 2px; line-height:1; display:flex; align-items:center; }
+.ann-reply-del:hover { color:#F87171; }
+.ann-reply-text  { font-size:12px; color:#E4E4E7; line-height:1.45; }
+.ann-reply-trigger { background:none; border:none; cursor:pointer; font-size:11px; color:#A1A1AA; padding:3px 0 0; font-family:var(--font); }
+.ann-reply-trigger:hover { color:#F4F4F5; text-decoration:underline; }
 .ann-reply-form  { margin-top:6px; }
-.ann-reply-textarea { width:100%; height:54px; resize:none; border:1px solid var(--color-input-border); border-radius:4px; padding:6px 26px 6px 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); outline:none; box-sizing:border-box; line-height:1.4; }
-.ann-reply-textarea:focus { border-color:#2B7BE4; }
+.ann-reply-textarea { width:100%; height:54px; resize:none; border:1px solid #3F3F46; border-radius:4px; padding:6px 26px 6px 8px; font-family:var(--font); font-size:12px; color:#E4E4E7; background:#27272A; outline:none; box-sizing:border-box; line-height:1.4; }
+.ann-reply-textarea:focus { border-color:#A1A1AA; }
 .ann-reply-actions { display:flex; gap:5px; justify-content:flex-end; margin-top:5px; }
-.ann-reply-count { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#2B7BE4; background:#DBEAFE; border-radius:10px; padding:2px 8px; margin-top:3px; border:none; cursor:pointer; font-family:var(--font); transition:background 0.12s; }
-.ann-reply-count:hover { background:#C3D9F8; }
+.ann-reply-count { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700; color:#D4D4D8; background:rgba(255,255,255,0.1); border-radius:10px; padding:2px 8px; margin-top:3px; border:none; cursor:pointer; font-family:var(--font); transition:background 0.12s; }
+.ann-reply-count:hover { background:rgba(255,255,255,0.16); }
 .ann-reply-chevron { font-size:8px; transition:transform 0.15s; display:inline-block; }
 .ann-reply-count.expanded .ann-reply-chevron { transform:rotate(90deg); }
 
 /* ── Like button ── */
-.ann-like-btn { position:relative; display:inline-flex; align-items:center; gap:3px; border:1px solid var(--color-border); border-radius:10px; background:none; cursor:pointer; font-size:11px; color:var(--color-text-muted); padding:1px 7px 1px 5px; font-family:var(--font); transition:all 0.12s; line-height:1.5; }
-.ann-like-btn:hover { border-color:#2B7BE4; color:#2B7BE4; background:rgba(43,123,228,0.07); }
-.ann-like-btn.liked { border-color:#2B7BE4; color:#2B7BE4; background:#DBEAFE; font-weight:700; }
+.ann-like-btn { position:relative; display:inline-flex; align-items:center; gap:3px; border:1px solid #3F3F46; border-radius:10px; background:none; cursor:pointer; font-size:11px; color:#71717A; padding:1px 7px 1px 5px; font-family:var(--font); transition:all 0.12s; line-height:1.5; }
+.ann-like-btn:hover { border-color:#A1A1AA; color:#F4F4F5; background:rgba(255,255,255,0.08); }
+.ann-like-btn.liked { border-color:#D4D4D8; color:#F4F4F5; background:rgba(255,255,255,0.14); font-weight:700; }
 .ann-like-btn .like-emoji { font-size:12px; line-height:1; }
 /* Like tooltip — appears below so it isn't clipped by the sidebar top */
 .ann-like-btn .like-tooltip { visibility:hidden; opacity:0; position:absolute; top:calc(100% + 5px); left:50%; transform:translateX(-50%); white-space:nowrap; background:rgba(30,30,30,0.92); color:#fff; font-size:10px; font-weight:400; padding:3px 8px; border-radius:4px; pointer-events:none; transition:opacity 0.12s; z-index:100000; }
@@ -2550,31 +2551,32 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .ann-emoji-grid { display:grid; grid-template-columns:repeat(8,1fr); gap:1px; }
 .ann-emoji-cell { width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:16px; border-radius:4px; cursor:pointer; border:none; background:none; transition:background 0.1s; line-height:1; }
 .ann-emoji-cell:hover { background:var(--color-surface-hover,rgba(0,0,0,0.07)); }
-.ann-emoji-trigger { border:none; background:none; cursor:pointer; padding:2px 3px; line-height:1; color:var(--color-text-muted); border-radius:4px; display:inline-flex; align-items:center; justify-content:center; transition:color 0.1s, background 0.1s; }
-.ann-emoji-trigger:hover { color:var(--color-text); background:rgba(0,0,0,0.07); }
+.ann-emoji-trigger { border:none; background:none; cursor:pointer; padding:2px 3px; line-height:1; color:#71717A; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; transition:color 0.1s, background 0.1s; }
+.ann-emoji-trigger:hover { color:#F4F4F5; background:rgba(255,255,255,0.1); }
+/* Inside reply textarea wrap — dark context override already handled by above */
 
 /* ── User management tab ── */
 .ann-users-section { padding:8px; }
 .ann-users-list  { display:flex; flex-direction:column; gap:5px; margin-bottom:12px; }
-.ann-user-item   { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:var(--color-surface); border:1px solid var(--color-border-light); }
-.ann-user-avatar { width:28px; height:28px; border-radius:50%; background:#2B7BE4; color:#fff; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.ann-user-item   { display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:6px; background:#27272A; border:1px solid #3F3F46; }
+.ann-user-avatar { width:28px; height:28px; border-radius:50%; background:#52525B; color:#F4F4F5; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .ann-user-info   { flex:1; min-width:0; }
-.ann-user-name   { font-size:12px; font-weight:700; color:var(--color-text); }
-.ann-user-meta   { font-size:10px; color:var(--color-text-muted); margin-top:1px; }
+.ann-user-name   { font-size:12px; font-weight:700; color:#F4F4F5; }
+.ann-user-meta   { font-size:10px; color:#71717A; margin-top:1px; }
 .ann-user-btns   { display:flex; gap:4px; flex-shrink:0; }
-.ann-user-btn    { width:24px; height:24px; border-radius:4px; border:1px solid var(--color-border); background:none; cursor:pointer; color:var(--color-text-muted); font-size:12px; display:flex; align-items:center; justify-content:center; transition:all 0.1s; }
-.ann-user-btn:hover         { border-color:#2B7BE4; color:#2B7BE4; background:rgba(43,123,228,0.08); }
-.ann-user-btn.danger:hover  { border-color:var(--color-red); color:var(--color-red); background:rgba(224,82,82,0.08); }
-.ann-user-edit-form { background:var(--color-surface-raised); border:1px solid var(--color-border); border-radius:6px; padding:10px; margin-bottom:4px; }
-.ann-form-sep    { border:none; border-top:1px solid rgba(43,123,228,0.15); margin:12px 0; }
-.ann-form-title  { font-size:11px; font-weight:700; color:#2B7BE4; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
+.ann-user-btn    { width:24px; height:24px; border-radius:4px; border:1px solid #52525B; background:none; cursor:pointer; color:#A1A1AA; font-size:12px; display:flex; align-items:center; justify-content:center; transition:all 0.1s; }
+.ann-user-btn:hover         { border-color:#F4F4F5; color:#F4F4F5; background:rgba(255,255,255,0.1); }
+.ann-user-btn.danger:hover  { border-color:#F87171; color:#F87171; background:rgba(248,113,113,0.12); }
+.ann-user-edit-form { background:#27272A; border:1px solid #3F3F46; border-radius:6px; padding:10px; margin-bottom:4px; }
+.ann-form-sep    { border:none; border-top:1px solid #3F3F46; margin:12px 0; }
+.ann-form-title  { font-size:11px; font-weight:700; color:#A1A1AA; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px; }
 .ann-form-row    { margin-bottom:7px; }
-.ann-form-label  { display:block; font-size:10px; font-weight:700; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
-.ann-form-input  { width:100%; height:30px; border:1px solid var(--color-input-border); border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); box-sizing:border-box; outline:none; }
-.ann-form-input:focus { border-color:#2B7BE4; }
-.ann-form-select { width:100%; height:30px; border:1px solid var(--color-input-border); border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:var(--color-input-text); background:var(--color-input-bg); box-sizing:border-box; outline:none; cursor:pointer; }
-.ann-form-select:focus { border-color:#2B7BE4; }
-.ann-form-error  { font-size:11px; color:var(--color-red); min-height:15px; margin-bottom:4px; }
+.ann-form-label  { display:block; font-size:10px; font-weight:700; color:#71717A; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
+.ann-form-input  { width:100%; height:30px; border:1px solid #3F3F46; border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:#E4E4E7; background:#18181B; box-sizing:border-box; outline:none; }
+.ann-form-input:focus { border-color:#A1A1AA; }
+.ann-form-select { width:100%; height:30px; border:1px solid #3F3F46; border-radius:4px; padding:0 8px; font-family:var(--font); font-size:12px; color:#E4E4E7; background:#18181B; box-sizing:border-box; outline:none; cursor:pointer; }
+.ann-form-select:focus { border-color:#A1A1AA; }
+.ann-form-error  { font-size:11px; color:#F87171; min-height:15px; margin-bottom:4px; }
 .wf-badge-shortcut {
   font-size: 9px;
   color: rgba(255,255,255,0.4);
@@ -5239,7 +5241,7 @@ function renderAnnSidebar() {
     return;
   }
 
-  const hint = canCreate() ? `<div class="ann-sidebar-hint">⌘/Ctrl+click anywhere to annotate.</div>` : '';
+  const hint = canCreate() ? `<div class="ann-sidebar-hint">⌘/Ctrl+click anywhere on the prototype to annotate.</div>` : '';
   const panelOpen = document.getElementById('sidePanel').classList.contains('open');
 
   body.innerHTML = hint + annData.map(a => {
@@ -5260,12 +5262,23 @@ function renderAnnSidebar() {
       const rOwn = annCurrentUser && r.author === annCurrentUser.username;
       const timeStr = r.timestamp ? new Date(r.timestamp).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '';
       const delBtn  = canDeleteReply(r) ? `<button class="ann-reply-del" onclick="deleteReply(${a.id},${r.id})" title="Delete reply"><svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;"><path d="M1.5 3h9M4.5 3V2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1M10 3l-.667 7A.5.5 0 0 1 8.836 10.5H3.164a.5.5 0 0 1-.497-.5L2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : '';
+      const rLikes  = r.likes || [];
+      const rLiked  = annCurrentUser && rLikes.includes(annCurrentUser.username);
+      const rThumbSvg = `<svg width="11" height="11" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;flex-shrink:0;"><path d="M4 13V6.5L7 1.5c.8 0 1.5.7 1.5 1.5v2.5H12a1 1 0 0 1 1 1.1l-.8 4.5A1 1 0 0 1 11.2 12H4zm0 0H2a1 1 0 0 1-1-1V7.5a1 1 0 0 1 1-1h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      const rLikeIcon = rLikes.length > 0 ? `<span style="font-size:11px;line-height:1;">👍</span>` : rThumbSvg;
+      const rLikeTooltip = rLikes.length > 0
+        ? `<span class="like-tooltip">${rLikes.join(', ')} liked this</span>`
+        : (annCurrentUser ? `<span class="like-tooltip">Like</span>` : '');
+      const rLikeBtn = annCurrentUser
+        ? `<button class="ann-like-btn${rLiked?' liked':''}" onclick="toggleReplyLike(${a.id},${r.id})" style="padding:0px 5px 0px 4px;font-size:10px;">${rLikeIcon}${rLikes.length > 0 ? `<span>${rLikes.length}</span>` : ''}${rLikeTooltip}</button>`
+        : (rLikes.length > 0 ? `<span class="ann-like-btn" style="cursor:default;pointer-events:none;padding:0px 5px 0px 4px;font-size:10px;"><span style="font-size:11px;line-height:1;">👍</span><span>${rLikes.length}</span><span class="like-tooltip">${rLikes.join(', ')} liked this</span></span>` : '');
       return `<div class="ann-reply-item">
         <div class="ann-reply-header">
           <span class="ann-reply-author">${escapeAnn(r.author)}${rOwn?' <em style="font-weight:400">(you)</em>':''}</span>
           <span style="display:flex;align-items:center;gap:4px;"><span class="ann-reply-time">${timeStr}</span>${delBtn}</span>
         </div>
         <div class="ann-reply-text">${escapeAnn(r.text)}</div>
+        ${rLikeBtn ? `<div style="margin-top:4px;">${rLikeBtn}</div>` : ''}
       </div>`;
     }).join('');
 
@@ -5489,8 +5502,21 @@ function saveReply(annId) {
   const ann = annData.find(a => a.id === annId);
   if (!ann) return;
   if (!ann.replies) ann.replies = [];
-  ann.replies.push({ id: Date.now(), author: annCurrentUser.username, text, timestamp: Date.now() });
+  ann.replies.push({ id: Date.now(), author: annCurrentUser.username, text, timestamp: Date.now(), likes: [] });
   annOpenReplyId = null;
+  annSave();
+  renderAnnSidebar();
+}
+function toggleReplyLike(annId, replyId) {
+  if (!annCurrentUser) return;
+  const ann = annData.find(a => a.id === annId);
+  if (!ann) return;
+  const reply = (ann.replies || []).find(r => r.id === replyId);
+  if (!reply) return;
+  if (!reply.likes) reply.likes = [];
+  const idx = reply.likes.indexOf(annCurrentUser.username);
+  if (idx >= 0) { reply.likes.splice(idx, 1); }
+  else          { reply.likes.push(annCurrentUser.username); }
   annSave();
   renderAnnSidebar();
 }
