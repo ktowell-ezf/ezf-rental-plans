@@ -1210,7 +1210,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
   padding-left: 4px;
 }
 
-/* ── Pricing type selector (Rental Rates vs Custom Pricing) ── */
+/* ── Pricing section spacing ── */
 .pricing-type-selector {
   margin-bottom: 16px;
 }
@@ -1253,6 +1253,106 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .pricing-mode-btn.active { background: var(--color-green); color: var(--primitive-white); }
 .pricing-mode-btn:hover:not(.active) { background: var(--color-surface-raised); color: var(--color-text); }
 [data-wireframe="true"] .pricing-mode-btn.active { background: #555; }
+
+/* ── Field-level validation ── */
+.form-input.has-error,
+.form-textarea.has-error {
+  border-color: var(--color-red) !important;
+  background: rgba(255,107,107,0.04);
+}
+.field-error-msg {
+  font-size: 12px;
+  color: var(--color-red);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ── Auto-Renew extended fields ── */
+#autoRenewFields {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.renew-field-group { display: flex; flex-direction: column; gap: 8px; }
+.renew-trigger-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.renew-trigger-option input[type="radio"] {
+  margin-top: 3px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary, #4f6ef7);
+  cursor: pointer;
+}
+.renew-trigger-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  flex-wrap: wrap;
+  line-height: 1.9;
+}
+.renew-as-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--color-text);
+}
+/* Custom select for "renews as" dropdown */
+.csel-wrap { position: relative; display: inline-block; }
+.csel-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-input-bg, var(--color-surface));
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  min-width: 190px;
+  white-space: nowrap;
+}
+.csel-trigger:hover { border-color: var(--color-primary, #4f6ef7); }
+.csel-arrow { margin-left: auto; font-size: 10px; color: var(--color-text-muted); }
+.csel-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 260px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.14);
+  z-index: 300;
+  overflow: hidden;
+  display: none;
+}
+.csel-dropdown.open { display: block; }
+.csel-opt {
+  padding: 9px 14px;
+  cursor: pointer;
+}
+.csel-opt:hover { background: var(--color-hover, rgba(0,0,0,.04)); }
+.csel-opt.selected { background: var(--color-primary-subtle, rgba(79,110,247,.08)); }
+.csel-opt-label { font-size: 13px; font-weight: 500; color: var(--color-text); }
+.csel-opt-desc  { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
+.csel-divider {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 14px 4px;
+}
+.csel-group-header { font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.csel-group-desc   { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
 
 /* ── Pricing validation error banner ── */
 .pricing-error {
@@ -1669,6 +1769,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 /* Inline layout helpers */
 .inline-row { display: flex; align-items: center; gap: 8px; }
 .inline-label { font-size: 13px; color: var(--color-text-muted); white-space: nowrap; transition: color 0.2s; }
+.qty-row { display: flex; align-items: center; gap: 12px; }
+.qty-unlimited-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--color-text); cursor: pointer; white-space: nowrap; }
+.qty-unlimited-label input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--color-green); cursor: pointer; }
 .form-row { display: flex; gap: 12px; }
 .form-row .form-field { flex: 1; }
 .input-with-prefix { position: relative; }
@@ -2752,7 +2855,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
           <!-- Status (2 options — inline checkboxes) -->
           <div class="filter-popover-section">
-            <div class="filter-popover-label">Status</div>
+            <div class="filter-popover-label">Selling Status</div>
             <div class="filter-popover-options">
               <label class="filter-option"><input type="checkbox" id="fStatus-Available"   onchange="onFilterChange()"> Available</label>
               <label class="filter-option"><input type="checkbox" id="fStatus-Unavailable" onchange="onFilterChange()"> Unavailable</label>
@@ -2772,34 +2875,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 
           <hr class="filter-popover-divider">
 
-          <!-- Pricing Rules multiselect (populated by JS) -->
+          <!-- Non-member Price range -->
           <div class="filter-popover-section">
-            <div class="ms-wrap">
-              <button class="ms-trigger" id="ms-trigger-pricing" onclick="toggleMs('pricing', event)">
-                <span class="ms-trigger-left">
-                  <span class="ms-trigger-label">Pricing Rules</span>
-                  <span class="ms-sel-badge" id="ms-badge-pricing"></span>
-                </span>
-                <span class="ms-chevron">▾</span>
-              </button>
-              <div class="ms-body" id="ms-body-pricing">
-                <div class="ms-search-wrap" id="ms-search-wrap-pricing">
-                  <input class="ms-search" type="text" placeholder="Search rules…" id="ms-search-pricing" oninput="filterMsOptions('pricing', this.value)">
-                  <button class="search-clear" onclick="clearMsSearch('pricing')" title="Clear search">✕</button>
-                </div>
-                <div class="ms-options" id="ms-options-pricing">
-                  <!-- Populated by JS -->
-                  <div class="ms-no-results">No results</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <hr class="filter-popover-divider">
-
-          <!-- Standard Price range -->
-          <div class="filter-popover-section">
-            <div class="filter-popover-label">Standard Price</div>
+            <div class="filter-popover-label">Non-member Price</div>
             <div class="filter-price-range">
               <div class="filter-price-wrap">
                 <span class="currency">$</span>
@@ -2846,12 +2924,12 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
           <tr>
             <th class="cb-col"><input type="checkbox" class="row-cb" id="selectAll" title="Select all" onchange="toggleSelectAll(this)"></th>
             <th class="sortable">Name <span class="sarr">↕</span></th>
-            <th>Status</th>
+            <th>Selling Status</th>
             <th>Purchase Model</th>
-            <th class="sortable">Standard Price <span class="sarr">↕</span></th>
+            <th>Quantity</th>
+            <th class="sortable">Non-member Price <span class="sarr">↕</span></th>
             <th>Member Price</th>
             <th>Expiration</th>
-            <th>Pricing Rules</th>
             <th style="width:80px;text-align:right;padding-right:18px;">Actions</th>
           </tr>
         </thead>
@@ -2879,22 +2957,6 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
     <div id="row-tooltip" role="tooltip">
       <div class="row-tooltip-name" id="row-tooltip-name"></div>
       <div class="row-tooltip-desc" id="row-tooltip-desc"></div>
-    </div>
-
-    <!-- Rate suggestion modal — shown when custom pricing matches existing rates -->
-    <div class="modal-backdrop" id="rateSuggestBackdrop">
-      <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="rateSuggestTitle">
-        <div class="modal-header">
-          <div class="modal-title" id="rateSuggestTitle">Matching rates found</div>
-        </div>
-        <div class="modal-body">
-          <p class="rate-suggest-intro" id="rateSuggestIntro"></p>
-          <div class="rate-suggest-list" id="rateSuggestList"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="panel-btn panel-btn-secondary" id="rateSuggestKeep">Keep custom pricing</button>
-        </div>
-      </div>
     </div>
 
     <!-- Confirmation modal — replaces native confirm() -->
@@ -3048,12 +3110,12 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 <script>
 // ── Data ──────────────────────────────────────────────────
 const plans = [
-  { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, pricingType:'rates',  pricingRules:['Weekday Peak Rate','Weekend Morning Rate'],                                             desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
-  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Winter Evening Rate'],                                                                  desc:'5 drop-in visits, valid any time.', archived:false },
-  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  pricingType:'rates',  pricingRules:['Summer Block Rate'],                                                                    desc:'Flexible hourly pickleball court access.', archived:false },
-  { id:4, name:'Field Rental Block — 8hrs',    status:'Available',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, pricingType:'rates',  pricingRules:['Weekend Morning Rate','Summer Block Rate'],                                             desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
-  { id:5, name:'Room Booking Pack — 10 visits',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, pricingType:'custom', pricingRules:[],                                                                                       desc:'Meeting room access pack.', archived:false },
-  { id:6, name:'Annual Court Pass — 100hrs',   status:'Available',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  pricingType:'rates',  pricingRules:['Weekday Peak Rate','Winter Evening Rate','Weekend Morning Rate','Holiday Premium Rate'], desc:'Best value for regular court users.', archived:false },
+  { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, rentalType:'Court', startDate:'2026-01-01', desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
+  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, rentalType:'Court', startDate:'',          desc:'5 drop-in visits, valid any time.', archived:false },
+  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:7, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-03-01', desc:'Flexible hourly pickleball court access.', archived:false },
+  { id:4, name:'Field Rental Block — 8hrs',    status:'Available',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, rentalType:'Field', startDate:'',          desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
+  { id:5, name:'Room Booking Pack — 10 visits',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, rentalType:'Room',  startDate:'2026-02-01', desc:'Meeting room access pack.', archived:false },
+  { id:6, name:'Annual Court Pass — 100hrs',   status:'Available',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:30, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-01-15', desc:'Best value for regular court users.', archived:false },
 ];
 
 // Rental Rates — sourced from the Rental Rates admin page.
@@ -3145,10 +3207,9 @@ let selectedRow = null;
 let searchQuery  = '';
 let isDirty = false; // true only after the user has changed a field
 let selectedIds  = new Set(); // ids of checked rows
-// filterStatus / filterModel / filterPricingRules: Sets of selected values; empty = "all"
-let filterStatus       = new Set();
-let filterModel        = new Set();
-let filterPricingRules = new Set();
+// filterStatus / filterModel: Sets of selected values; empty = "all"
+let filterStatus = new Set();
+let filterModel  = new Set();
 // Price range filters — null means "no bound set"
 let filterStdMin = null, filterStdMax = null;
 let filterMemMin = null, filterMemMax = null;
@@ -3405,7 +3466,7 @@ function closeFilterPopover() {
 }
 function syncFilterBtnState() {
   const priceActive = filterStdMin !== null || filterStdMax !== null || filterMemMin !== null || filterMemMax !== null;
-  const total = filterStatus.size + filterModel.size + filterPricingRules.size + (priceActive ? 1 : 0);
+  const total = filterStatus.size + filterModel.size + (priceActive ? 1 : 0);
   const btn   = document.getElementById('filterBtn');
   const badge = document.getElementById('filterBadge');
   btn.classList.toggle('active', total > 0);
@@ -3415,13 +3476,9 @@ function syncFilterBtnState() {
 function onFilterChange() {
   filterStatus.clear();
   filterModel.clear();
-  filterPricingRules.clear();
   // ≤3 options: read by individual IDs
   ['Available','Unavailable'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
   ['Hours','Occurrences'].forEach(v => { if (document.getElementById('fModel-'+v)?.checked) filterModel.add(v); });
-  // >3 options: read from multiselect dropdown
-  document.querySelectorAll('#ms-options-pricing input:checked').forEach(cb => filterPricingRules.add(cb.value));
-  updateMsBadge('pricing', filterPricingRules.size);
   const toNum = id => { const v = document.getElementById(id)?.value; return (v !== '' && v != null) ? parseFloat(v) : null; };
   filterStdMin = toNum('fStdMin'); filterStdMax = toNum('fStdMax');
   filterMemMin = toNum('fMemMin'); filterMemMax = toNum('fMemMax');
@@ -3429,15 +3486,12 @@ function onFilterChange() {
   renderTable();
 }
 function clearFilters(skipRender) {
-  filterStatus.clear(); filterModel.clear(); filterPricingRules.clear();
+  filterStatus.clear(); filterModel.clear();
   filterStdMin = null; filterStdMax = null; filterMemMin = null; filterMemMax = null;
   // ≤3 options
   ['fStatus-Available','fStatus-Unavailable','fModel-Hours','fModel-Occurrences'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
-  // >3 options (multiselect dropdown)
-  document.querySelectorAll('#ms-options-pricing input[type="checkbox"]').forEach(cb => cb.checked = false);
-  updateMsBadge('pricing', 0);
   ['fStdMin','fStdMax','fMemMin','fMemMax'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
@@ -3507,18 +3561,12 @@ function planMatchesFilters(p) {
     p.model.toLowerCase().includes(q) ||
     p.pricingModel.toLowerCase().includes(q) ||
     String(p.stdPrice).includes(q) ||
-    (p.desc || '').toLowerCase().includes(q) ||
-    (p.pricingRules || []).some(r => r.toLowerCase().includes(q))
+    (p.desc || '').toLowerCase().includes(q)
   )) return false;
   // Status filter
   if (filterStatus.size > 0 && !filterStatus.has(p.status)) return false;
   // Model filter (p.model is e.g. "Hours" or "Occurrences")
   if (filterModel.size > 0 && !filterModel.has(p.model)) return false;
-  // Pricing rules filter — plan must have at least one of the selected rules
-  if (filterPricingRules.size > 0) {
-    const planRules = p.pricingRules || [];
-    if (!planRules.some(r => filterPricingRules.has(r))) return false;
-  }
   // Standard price range
   const stdVal = parsePrice(p.stdPrice);
   if (filterStdMin !== null && (stdVal === null || stdVal < filterStdMin)) return false;
@@ -3734,13 +3782,10 @@ function renderTable() {
       <td class="td-name">${p.name}</td>
       <td><span class="badge badge-${p.status==='Available'?'active':'inactive'}"><span class="bdot"></span>${p.status}</span></td>
       <td><span class="model-pill">${p.model}</span></td>
+      <td>${p.qty==='Unlimited'?'Unlimited':p.qty}</td>
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
       <td class="${p.expiry === 'None' ? 'td-muted' : ''}">${p.expiry === 'None' ? 'No expiration' : p.expiry}</td>
-      <td class="td-pricing-rules${p.pricingRules && p.pricingRules.length ? '' : ' empty'}"
-          title="${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : ''}">
-        ${p.pricingRules && p.pricingRules.length ? p.pricingRules.join(', ') : 'Custom Rule'}
-      </td>
       <td style="text-align:right;padding-right:14px;">
         <div class="row-menu-wrap">
           <button class="menu-btn" id="menu-btn-${p.id}" title="Actions" onclick="toggleMenu(${p.id},event)">&#8942;</button>
@@ -3905,11 +3950,15 @@ function attachDirtyListeners() {
   // Remove any stale listeners before re-attaching
   body.removeEventListener('input',  markDirty);
   body.removeEventListener('change', markDirty);
+  body.removeEventListener('input',  clearInputError);
+  body.removeEventListener('change', clearInputError);
   setTimeout(() => {
     // Only attach if the panel is still open in an edit/create context
     if (currentMode === 'edit' || currentMode === 'create') {
       body.addEventListener('input',  markDirty);
       body.addEventListener('change', markDirty);
+      body.addEventListener('input',  clearInputError);
+      body.addEventListener('change', clearInputError);
     }
   }, 250);
 }
@@ -3932,62 +3981,79 @@ function openView(id) {
   currentMode = 'view';
   highlightRow(id);
   const p = currentPlan;
-  const badge = `<span class="badge badge-${p.status==='Active'?'active':'inactive'}" style="font-size:11px;padding:2px 8px;"><span class="bdot"></span>${p.status}</span>`;
-
-  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, badge, ['Plan Summary'], 0);
+  document.getElementById('panelHeader').innerHTML = buildHeader(p.name, null, ['Plan Summary'], 0);
   document.getElementById('panelBody').innerHTML = `
     <div id="vtab-0">
       <div class="panel-section">
-        <div class="panel-section-title">Overview</div>
+        <div class="panel-section-title">Plan Info</div>
         <div class="view-field">
+          <div class="view-label">Plan Name</div>
+          <div class="view-value">${p.name}</div>
+        </div>
+        <div class="view-field">
+          <div class="view-label">Rental Type</div>
+          <div class="view-value ${p.rentalType?'':'empty'}">${p.rentalType||'Not specified'}</div>
+        </div>
+        <div class="view-field" style="margin-bottom:0;">
           <div class="view-label">Description</div>
           <div class="view-value ${p.desc?'':'empty'}">${p.desc||'No description added'}</div>
         </div>
       </div>
       <div class="panel-section">
-        <div class="panel-section-title">Package Details</div>
-        <div class="view-row">
-          <div class="view-field">
-            <div class="view-label">Purchase Model</div>
-            <div class="view-value"><span class="model-pill">${p.model}</span></div>
+        <div class="panel-section-title">Plan Settings</div>
+        <div class="view-field">
+          <div class="view-label">Selling Status</div>
+          <div class="view-value">
+            <span class="badge badge-${p.status==='Available'?'active':'inactive'}"><span class="bdot"></span>${p.status}</span>
           </div>
-          <div class="view-field">
-            <div class="view-label">Quantity</div>
-            <div class="view-value">${p.qty} ${p.model==='Hours'?'hours':'occurrences'}</div>
-          </div>
+        </div>
+        <div class="view-field">
+          <div class="view-label">Plan Start Date</div>
+          <div class="view-value ${p.startDate?'':'empty'}">${p.startDate ? new Date(p.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Not set'}</div>
         </div>
         <div class="view-field">
           <div class="view-label">Expiration</div>
           <div class="view-value ${p.expiry==='None'?'empty':''}">
-            ${p.expiry==='None'?'No expiration — active until balance depleted':p.expiry+' from purchase date'}
+            ${p.expiry==='None'?'No expiration':p.expiry+' from purchase'}
           </div>
         </div>
-        <div class="view-field" style="margin-bottom:0;">
+        <div class="view-field" ${p.autoRenew?'':'style="margin-bottom:0;"'}>
           <div class="view-label">Auto-Renew</div>
-          <div class="view-value">${p.autoRenew?'Yes':'No'}</div>
+          <div class="view-value">${p.autoRenew?'Enabled':'Disabled'}</div>
         </div>
+        ${p.autoRenew ? `
+        <div class="view-field">
+          <div class="view-label">Renewal Trigger</div>
+          <div class="view-value">${p.autoRenewTrigger==='threshold' ? 'When renewal threshold is reached' : `${p.autoRenewTriggerNum||'—'} ${p.autoRenewTriggerUnit||'days'} before expiration`}</div>
+        </div>
+        <div class="view-field" style="margin-bottom:0;">
+          <div class="view-label">Renews As</div>
+          <div class="view-value">${p.autoRenewAs==='self'||!p.autoRenewAs ? 'A copy of itself' : (p.autoRenewAsLabel || plans.find(x=>x.id===p.autoRenewAs)?.name || 'Unknown plan')}</div>
+        </div>` : ''}
       </div>
       <div class="panel-section" style="margin-bottom:0;">
         <div class="panel-section-title">Pricing</div>
-        ${p.pricingType === 'rates' ? `
+        <div class="view-field">
+          <div class="view-label">Purchase Model</div>
+          <div class="view-value">${p.pricingModel==='Flat'?'Per Occurrence':'Per Hour'}</div>
+        </div>
+        <div class="view-field">
+          <div class="view-label">Quantity</div>
+          <div class="view-value">${p.qty==='Unlimited'?'Unlimited':p.qty}</div>
+        </div>
+        <div class="view-field" style="margin-bottom:6px;">
+          <div class="view-label">Fees</div>
+        </div>
+        <div class="view-row" style="margin-bottom:0;padding-left:0;">
           <div class="view-field" style="margin-bottom:0;">
-            <div class="view-label">Applied Rates</div>
-            <div style="margin-top:6px;">${buildViewRateList(p.pricingRules)}</div>
-          </div>` : `
-          <div class="view-field" style="margin-bottom:8px;">
-            <div class="view-label">Custom Rates</div>
-            <div class="view-value" style="margin-top:4px;">${p.pricingModel==='Flat'?'Flat Price':'Per Unit'}</div>
+            <div class="view-label">Non-member</div>
+            <div class="view-value">${p.stdPrice}</div>
           </div>
-          <div class="view-row" style="margin-bottom:0;">
-            <div class="view-field" style="margin-bottom:0;">
-              <div class="view-label">Standard</div>
-              <div class="view-value">${p.stdPrice}</div>
-            </div>
-            <div class="view-field" style="margin-bottom:0;">
-              <div class="view-label">Member</div>
-              <div class="view-value">${p.memPrice}</div>
-            </div>
-          </div>`}
+          <div class="view-field" style="margin-bottom:0;">
+            <div class="view-label">Member</div>
+            <div class="view-value">${p.memPrice}</div>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -4022,26 +4088,42 @@ function openEdit(id) {
           <input class="form-input" type="text" value="${p.name}" autocomplete="off">
         </div>
         <div class="form-field">
+          <label class="field-label">Rental Type<span class="req">*</span></label>
+          <select class="form-select" id="edit-rental-type" onchange="markDirty()">
+            <option value="">— Select a type —</option>
+            <option value="Court"  ${p.rentalType==='Court' ?'selected':''}>Court</option>
+            <option value="Field"  ${p.rentalType==='Field' ?'selected':''}>Field</option>
+            <option value="Lane"   ${p.rentalType==='Lane'  ?'selected':''}>Lane</option>
+            <option value="Pool"   ${p.rentalType==='Pool'  ?'selected':''}>Pool</option>
+            <option value="Room"   ${p.rentalType==='Room'  ?'selected':''}>Room</option>
+            <option value="Track"  ${p.rentalType==='Track' ?'selected':''}>Track</option>
+          </select>
+        </div>
+        <div class="form-field">
           <label class="field-label">Description<span class="req">*</span></label>
           <textarea class="form-textarea" autocomplete="off">${p.desc}</textarea>
         </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Plan Settings</div>
         <div class="form-field">
-          <label class="field-label">Status</label>
+          <label class="field-label">Selling Status</label>
           <div class="toggle-row">
             <div class="toggle-info">
-              <span class="toggle-label">${p.status==='Active'?'Active':'Inactive'}</span>
-              <span class="toggle-label-hint">${p.status==='Active'?'Available for sale':'Not available for sale'}</span>
+              <span class="toggle-label">${p.status==='Available'?'Available':'Unavailable'}</span>
             </div>
             <div class="toggle ${p.status==='Available'?'':'off'}"
                  data-on-label='Available'    data-off-label='Unavailable'
-                 data-on-hint='Available for sale' data-off-hint='Not available for sale'
                  onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
         </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Expiration</div>
         <div class="form-field">
+          <label class="field-label">Plan Start Date</label>
+          <input class="form-input" type="date" id="edit-start-date" style="width:180px;"
+                 value="${p.startDate||''}" onchange="markDirty()">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Expiration</label>
           <div class="toggle-row" style="margin-bottom:12px;">
             <div class="toggle-info">
               <span class="toggle-label">${p.expiry!=='None'?'Enabled':'No expiration'}</span>
@@ -4056,17 +4138,17 @@ function openEdit(id) {
             <div class="inline-row" style="margin-bottom:8px;">
               <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}">
               <select class="form-select" style="width:110px;">
-                <option>Days</option><option>Months</option><option>Years</option>
+                <option ${!/week|month|year/i.test(p.expiry)?'selected':''}>Days</option>
+                <option ${/week/i.test(p.expiry)?'selected':''}>Weeks</option>
+                <option ${/month/i.test(p.expiry)?'selected':''}>Months</option>
+                <option ${/year/i.test(p.expiry)?'selected':''}>Years</option>
               </select>
               <span class="inline-label">from purchase</span>
             </div>
           </div>
-          <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
         </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Auto-Renew</div>
         <div class="form-field">
+          <label class="field-label">Auto-Renew</label>
           <div class="toggle-row">
             <div class="toggle-info">
               <span class="toggle-label">${p.autoRenew?'Enabled':'Disabled'}</span>
@@ -4075,67 +4157,102 @@ function openEdit(id) {
             <div class="toggle ${p.autoRenew?'':'off'}"
                  data-on-label='Enabled'  data-off-label='Disabled'
                  data-on-hint='Clients can opt in at purchase time' data-off-hint='Clients cannot opt in at purchase time'
-                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
+                 onclick="this.classList.toggle('off');updateToggle(this);toggleAutoRenewFields();markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+          <div id="autoRenewFields" style="${p.autoRenew?'':'display:none;'}">
+            <div class="renew-field-group">
+              <div class="renew-trigger-option">
+                <input type="radio" name="renew-trigger" id="renew-before" value="before-expiration" checked onchange="markDirty()">
+                <label for="renew-before" class="renew-trigger-label">
+                  <input class="form-input" type="number" min="1" placeholder="e.g. 7" style="width:68px;" oninput="markDirty()" onclick="document.getElementById('renew-before').checked=true">
+                  <select class="form-select" style="width:106px;" onchange="markDirty()" onclick="document.getElementById('renew-before').checked=true">
+                    <option>Days</option><option>Weeks</option><option>Months</option><option>Years</option>
+                  </select>
+                  before expiration
+                </label>
+              </div>
+              <div class="renew-trigger-option">
+                <input type="radio" name="renew-trigger" id="renew-threshold" value="threshold" onchange="markDirty()">
+                <label for="renew-threshold" class="renew-trigger-label">when the renewal threshold is reached</label>
+              </div>
+            </div>
+            <div class="renew-field-group">
+              <div class="renew-as-row">
+                This package renews as
+                <div class="csel-wrap">
+                  <button type="button" class="csel-trigger" onclick="toggleRenewAs(event)">
+                    <span id="renewAsLabel">A copy of itself</span>
+                    <span class="csel-arrow">▾</span>
+                  </button>
+                  <div class="csel-dropdown" id="renewAsDropdown">
+                    <div class="csel-opt selected" data-value="self" onclick="selectRenewAs('self','A copy of itself')">
+                      <div class="csel-opt-label">A copy of itself</div>
+                      <div class="csel-opt-desc">Plan will renew with identical details and fees</div>
+                    </div>
+                    <div class="csel-divider">
+                      <div class="csel-group-header">As another plan</div>
+                      <div class="csel-group-desc">Useful for rolling one plan into another</div>
+                    </div>
+                    ${plans.filter(p2=>p2.id!==p.id&&!p2.archived).map(p2=>`
+                    <div class="csel-opt" data-value="${p2.id}" onclick="selectRenewAs(${p2.id},'${p2.name.replace(/'/g,"\\'")}')">
+                      <div class="csel-opt-label">${p2.name}</div>
+                    </div>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div id="etab-1" style="display:none;">
       <div class="pricing-error" id="edit-pricing-error"></div>
-      <div class="pricing-type-selector">
-        <div class="pricing-type-label">Pricing type</div>
-        <div class="pricing-mode-seg">
-          <button class="pricing-mode-btn ${p.pricingType==='rates'?'active':''}"
-                  onclick="setPricingType('rates',this,'edit')">Rental Rates</button>
-          <button class="pricing-mode-btn ${p.pricingType==='custom'?'active':''}"
-                  onclick="setPricingType('custom',this,'edit')">Custom Pricing</button>
-        </div>
-      </div>
-      <div id="edit-pricing-rates" style="${p.pricingType==='custom'?'display:none;':''}">
-        <div class="panel-section">
-          <div class="panel-section-title">Rental Rates</div>
-          <div class="form-field">
-            <label class="field-label">Applied Rates<span class="opt"> (optional)</span></label>
-            ${buildRateListHTML(p.pricingType==='rates'?p.pricingRules:[], 'edit')}
-            <div class="field-hint" style="margin-top:8px;">Rates are defined on the <a href="#" style="color:var(--color-green);text-decoration:none;font-weight:700;">Rental Rates</a> page. Each rate's rules are automatically applied based on client criteria — you cannot select rules individually.</div>
-          </div>
-        </div>
-      </div>
-      <div id="edit-pricing-custom" style="${p.pricingType==='rates'?'display:none;':''}">
-        <div class="panel-section">
-          <div class="panel-section-title">Custom Pricing</div>
-          <div class="form-field">
-            <label class="field-label">Pricing Model<span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-option ${p.pricingModel==='Flat'?'selected':''}" onclick="selectRadio(this);markDirty()">
-                <div class="radio-option-label">Flat Price</div>
-                <div class="radio-option-desc">One fixed price for the bundle</div>
-              </div>
-              <div class="radio-option ${p.pricingModel==='Per Unit'?'selected':''}" onclick="selectRadio(this);markDirty()">
-                <div class="radio-option-label">Per Unit</div>
-                <div class="radio-option-desc">Price × ${p.model.toLowerCase()}</div>
-              </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Pricing</div>
+        <div class="form-field">
+          <label class="field-label">Purchase Model<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option ${p.pricingModel==='Flat'?'selected':''}" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Occurrence</div>
+              <div class="radio-option-desc">One fixed price per rental</div>
+            </div>
+            <div class="radio-option ${p.pricingModel==='Per Unit'?'selected':''}" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Hour</div>
+              <div class="radio-option-desc">Time-based pricing</div>
             </div>
           </div>
-          <div class="form-field">
-            <label class="field-label">Rental Rates<span class="req">*</span></label>
-            <div class="form-row">
-              <div class="form-field" style="margin-bottom:0;">
-                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Standard</label>
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
-                </div>
-                <div class="field-hint">Non-member price</div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Quantity<span class="req">*</span></label>
+          <div class="qty-row">
+            <input class="form-input" type="number" id="edit-qty" min="1"
+                   placeholder="${p.qty==='Unlimited'?'Unlimited':'e.g. 10'}"
+                   value="${p.qty==='Unlimited'?'':p.qty}"
+                   ${p.qty==='Unlimited'?'disabled':''} style="width:100px;" autocomplete="off"
+                   oninput="markDirty()">
+            <label class="qty-unlimited-label">
+              <input type="checkbox" ${p.qty==='Unlimited'?'checked':''} onchange="toggleUnlimited(this,'edit-qty')"> Unlimited
+            </label>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Fees<span class="req">*</span></label>
+          <div class="form-row">
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Non-member</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
               </div>
-              <div class="form-field" style="margin-bottom:0;">
-                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
-                </div>
-                <div class="field-hint">Discounted member price</div>
+              <div class="field-hint">Standard non-member price</div>
+            </div>
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
               </div>
+              <div class="field-hint">Discounted member price</div>
             </div>
           </div>
         </div>
@@ -4183,26 +4300,42 @@ function openCreate() {
           <input class="form-input" type="text" placeholder="e.g. Court Time Bundle — 10hrs" autocomplete="off">
         </div>
         <div class="form-field">
+          <label class="field-label">Rental Type<span class="req">*</span></label>
+          <select class="form-select" id="create-rental-type" onchange="markDirty()">
+            <option value="">— Select a type —</option>
+            <option value="Court">Court</option>
+            <option value="Field">Field</option>
+            <option value="Lane">Lane</option>
+            <option value="Pool">Pool</option>
+            <option value="Room">Room</option>
+            <option value="Track">Track</option>
+          </select>
+        </div>
+        <div class="form-field">
           <label class="field-label">Description<span class="req">*</span></label>
           <textarea class="form-textarea" placeholder="Brief description visible to staff when selling…" autocomplete="off"></textarea>
         </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Plan Settings</div>
         <div class="form-field">
-          <label class="field-label">Status</label>
+          <label class="field-label">Selling Status</label>
           <div class="toggle-row">
             <div class="toggle-info">
-              <span class="toggle-label">Active</span>
-              <span class="toggle-label-hint">Available for sale</span>
+              <span class="toggle-label">Available</span>
             </div>
             <div class="toggle"
                  data-on-label='Available'   data-off-label='Unavailable'
-                 data-on-hint='Available for sale' data-off-hint='Not available for sale'
                  onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
           </div>
         </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Expiration</div>
         <div class="form-field">
+          <label class="field-label">Plan Start Date</label>
+          <input class="form-input" type="date" id="create-start-date" style="width:180px;"
+                 value="${new Date().toISOString().split('T')[0]}" onchange="markDirty()">
+        </div>
+        <div class="form-field">
+          <label class="field-label">Expiration</label>
           <div class="toggle-row" style="margin-bottom:12px;">
             <div class="toggle-info">
               <span class="toggle-label">No expiration</span>
@@ -4217,17 +4350,17 @@ function openCreate() {
             <div class="inline-row" style="margin-bottom:8px;">
               <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off">
               <select class="form-select" style="width:110px;">
-                <option>Days</option><option>Months</option><option>Years</option>
+                <option>Days</option>
+                <option>Weeks</option>
+                <option>Months</option>
+                <option>Years</option>
               </select>
               <span class="inline-label">from purchase</span>
             </div>
           </div>
-          <div class="field-hint">If disabled, the plan stays active until the balance is fully depleted.</div>
         </div>
-      </div>
-      <div class="panel-section">
-        <div class="panel-section-title">Auto-Renew</div>
         <div class="form-field">
+          <label class="field-label">Auto-Renew</label>
           <div class="toggle-row">
             <div class="toggle-info">
               <span class="toggle-label">Disabled</span>
@@ -4236,67 +4369,100 @@ function openCreate() {
             <div class="toggle off"
                  data-on-label='Enabled'  data-off-label='Disabled'
                  data-on-hint='Clients can opt in at purchase time' data-off-hint='Clients cannot opt in at purchase time'
-                 onclick="this.classList.toggle('off');updateToggle(this);markDirty()"><div class="toggle-knob"></div></div>
+                 onclick="this.classList.toggle('off');updateToggle(this);toggleAutoRenewFields();markDirty()"><div class="toggle-knob"></div></div>
+          </div>
+          <div id="autoRenewFields" style="display:none;">
+            <div class="renew-field-group">
+              <div class="renew-trigger-option">
+                <input type="radio" name="renew-trigger" id="renew-before" value="before-expiration" checked onchange="markDirty()">
+                <label for="renew-before" class="renew-trigger-label">
+                  <input class="form-input" type="number" min="1" placeholder="e.g. 7" style="width:68px;" oninput="markDirty()" onclick="document.getElementById('renew-before').checked=true">
+                  <select class="form-select" style="width:106px;" onchange="markDirty()" onclick="document.getElementById('renew-before').checked=true">
+                    <option>Days</option><option>Weeks</option><option>Months</option><option>Years</option>
+                  </select>
+                  before expiration
+                </label>
+              </div>
+              <div class="renew-trigger-option">
+                <input type="radio" name="renew-trigger" id="renew-threshold" value="threshold" onchange="markDirty()">
+                <label for="renew-threshold" class="renew-trigger-label">when the renewal threshold is reached</label>
+              </div>
+            </div>
+            <div class="renew-field-group">
+              <div class="renew-as-row">
+                This package renews as
+                <div class="csel-wrap">
+                  <button type="button" class="csel-trigger" onclick="toggleRenewAs(event)">
+                    <span id="renewAsLabel">A copy of itself</span>
+                    <span class="csel-arrow">▾</span>
+                  </button>
+                  <div class="csel-dropdown" id="renewAsDropdown">
+                    <div class="csel-opt selected" data-value="self" onclick="selectRenewAs('self','A copy of itself')">
+                      <div class="csel-opt-label">A copy of itself</div>
+                      <div class="csel-opt-desc">Plan will renew with identical details and fees</div>
+                    </div>
+                    <div class="csel-divider">
+                      <div class="csel-group-header">As another plan</div>
+                      <div class="csel-group-desc">Useful for rolling one plan into another</div>
+                    </div>
+                    ${plans.filter(p2=>!p2.archived).map(p2=>`
+                    <div class="csel-opt" data-value="${p2.id}" onclick="selectRenewAs(${p2.id},'${p2.name.replace(/'/g,"\\'")}')">
+                      <div class="csel-opt-label">${p2.name}</div>
+                    </div>`).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
     <div id="ctab-1" style="display:none;">
       <div class="pricing-error" id="create-pricing-error"></div>
-      <div class="pricing-type-selector">
-        <div class="pricing-type-label">Pricing type</div>
-        <div class="pricing-mode-seg">
-          <button class="pricing-mode-btn active"
-                  onclick="setPricingType('rates',this,'create')">Rental Rates</button>
-          <button class="pricing-mode-btn"
-                  onclick="setPricingType('custom',this,'create')">Custom Pricing</button>
-        </div>
-      </div>
-      <div id="create-pricing-rates">
-        <div class="panel-section">
-          <div class="panel-section-title">Rental Rates</div>
-          <div class="form-field">
-            <label class="field-label">Applied Rates<span class="opt"> (optional)</span></label>
-            ${buildRateListHTML([], 'create')}
-            <div class="field-hint" style="margin-top:8px;">Rates are defined on the <a href="#" style="color:var(--color-green);text-decoration:none;font-weight:700;">Rental Rates</a> page. Each rate's rules are automatically applied based on client criteria — you cannot select rules individually.</div>
-          </div>
-        </div>
-      </div>
-      <div id="create-pricing-custom" style="display:none;">
-        <div class="panel-section">
-          <div class="panel-section-title">Custom Pricing</div>
-          <div class="form-field">
-            <label class="field-label">Pricing Model<span class="req">*</span></label>
-            <div class="radio-group">
-              <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
-                <div class="radio-option-label">Flat Price</div>
-                <div class="radio-option-desc">One fixed price for the bundle</div>
-              </div>
-              <div class="radio-option" onclick="selectRadio(this);markDirty()">
-                <div class="radio-option-label">Per Unit</div>
-                <div class="radio-option-desc">Price × hours or occurrences</div>
-              </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Pricing</div>
+        <div class="form-field">
+          <label class="field-label">Purchase Model<span class="req">*</span></label>
+          <div class="radio-group">
+            <div class="radio-option selected" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Occurrence</div>
+              <div class="radio-option-desc">One fixed price per rental</div>
+            </div>
+            <div class="radio-option" onclick="selectRadio(this);markDirty()">
+              <div class="radio-option-label">Per Hour</div>
+              <div class="radio-option-desc">Time-based pricing</div>
             </div>
           </div>
-          <div class="form-field">
-            <label class="field-label">Rental Rates<span class="req">*</span></label>
-            <div class="form-row">
-              <div class="form-field" style="margin-bottom:0;">
-                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Standard</label>
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
-                </div>
-                <div class="field-hint">Non-member price</div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Quantity<span class="req">*</span></label>
+          <div class="qty-row">
+            <input class="form-input" type="number" id="create-qty" min="1"
+                   placeholder="Unlimited" style="width:100px;" autocomplete="off"
+                   disabled oninput="markDirty()">
+            <label class="qty-unlimited-label">
+              <input type="checkbox" checked onchange="toggleUnlimited(this,'create-qty')"> Unlimited
+            </label>
+          </div>
+        </div>
+        <div class="form-field">
+          <label class="field-label">Fees<span class="req">*</span></label>
+          <div class="form-row">
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Non-member</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
               </div>
-              <div class="form-field" style="margin-bottom:0;">
-                <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
-                <div class="input-with-prefix">
-                  <span class="input-prefix">$</span>
-                  <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
-                </div>
-                <div class="field-hint">Discounted member price</div>
+              <div class="field-hint">Standard non-member price</div>
+            </div>
+            <div class="form-field" style="margin-bottom:0;">
+              <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
+              <div class="input-with-prefix">
+                <span class="input-prefix">$</span>
+                <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
               </div>
+              <div class="field-hint">Discounted member price</div>
             </div>
           </div>
         </div>
@@ -4316,6 +4482,14 @@ function openCreate() {
 }
 
 // ── Helpers ───────────────────────────────────────────────
+function toggleUnlimited(cb, inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.disabled = cb.checked;
+  if (cb.checked) { input.value = ''; input.placeholder = 'Unlimited'; }
+  else { input.placeholder = 'e.g. 10'; }
+  markDirty();
+}
 function selectRadio(el) {
   el.closest('.radio-group').querySelectorAll('.radio-option').forEach(r => r.classList.remove('selected'));
   el.classList.add('selected');
@@ -4331,6 +4505,41 @@ function updateToggle(el) {
   if (label) label.textContent = isOn ? (el.dataset.onLabel || '') : (el.dataset.offLabel || '');
   if (hint)  hint.textContent  = isOn ? (el.dataset.onHint  || '') : (el.dataset.offHint  || '');
 }
+function toggleAutoRenewFields() {
+  const toggle = document.querySelector('[data-on-label="Enabled"][data-off-label="Disabled"]');
+  const fields = document.getElementById('autoRenewFields');
+  if (fields && toggle) {
+    fields.style.display = toggle.classList.contains('off') ? 'none' : 'flex';
+  }
+}
+
+function toggleRenewAs(e) {
+  e.stopPropagation();
+  const dropdown = document.getElementById('renewAsDropdown');
+  if (dropdown) dropdown.classList.toggle('open');
+}
+
+function selectRenewAs(value, label) {
+  const trigger = document.getElementById('renewAsLabel');
+  if (trigger) trigger.textContent = label;
+  const dropdown = document.getElementById('renewAsDropdown');
+  if (dropdown) {
+    dropdown.querySelectorAll('.csel-opt').forEach(o => o.classList.remove('selected'));
+    const opt = dropdown.querySelector(`[data-value="${value}"]`);
+    if (opt) opt.classList.add('selected');
+    dropdown.classList.remove('open');
+  }
+  markDirty();
+}
+
+// Close the renew-as dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.csel-wrap')) {
+    const d = document.getElementById('renewAsDropdown');
+    if (d) d.classList.remove('open');
+  }
+});
+
 function toggleExpiry() {
   const t = document.getElementById('expiryToggle');
   if (!t) return;
@@ -4339,17 +4548,7 @@ function toggleExpiry() {
   if (f) f.style.display = t.classList.contains('off') ? 'none' : 'block';
   updateToggle(t);
 }
-// ── Pricing type switcher (Rental Rates vs Custom Pricing) ───────────────
-// context: 'edit' | 'create'
-function setPricingType(mode, btn, context) {
-  btn.closest('.pricing-mode-seg').querySelectorAll('.pricing-mode-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById(context + '-pricing-rates').style.display  = mode === 'rates'  ? '' : 'none';
-  document.getElementById(context + '-pricing-custom').style.display = mode === 'custom' ? '' : 'none';
-  markDirty();
-}
-
-// ── Rental Rate list helpers ──────────────────────────────
+// ── Rental Rate list helpers (retained for potential future use) ──────────
 
 // Build the HTML for a view-mode (read-only) list of selected rates.
 function buildViewRateList(pricingRules) {
@@ -4595,65 +4794,144 @@ function selectAllRates(context, selectAll) {
   markDirty();
 }
 
-// Validate that pricing has been configured before saving.
-// If invalid: switches to Pricing tab and shows inline error.
-// If custom pricing is valid but matches existing rates: shows suggestion modal.
+// ── Field-level validation helpers ────────────────────────
+// Add a red border + inline error message below a field.
+// appendAfter: the element to insert the message after (defaults to inputEl).
+function showFieldError(inputEl, msg, appendAfter) {
+  inputEl.classList.add('has-error');
+  const anchor = appendAfter || inputEl;
+  // Avoid duplicate messages
+  const next = anchor.nextElementSibling;
+  if (msg && (!next || !next.classList.contains('field-error-msg'))) {
+    const err = document.createElement('div');
+    err.className = 'field-error-msg';
+    err.textContent = msg;
+    anchor.insertAdjacentElement('afterend', err);
+  }
+}
+
+// Remove all validation state from a container.
+function clearFieldErrors(container) {
+  container.querySelectorAll('.has-error').forEach(el => el.classList.remove('has-error'));
+  container.querySelectorAll('.field-error-msg').forEach(el => el.remove());
+}
+
+// Called on input events — clears error state for the field that was just edited.
+function clearInputError(e) {
+  const el = e.target;
+  if (!el.matches('input, textarea, select')) return;
+  el.classList.remove('has-error');
+  // Walk up through element → .qty-row / .inline-row → .form-field,
+  // removing the first .field-error-msg sibling found along the way.
+  const containers = [el, el.closest('.qty-row'), el.closest('.inline-row'), el.closest('.form-field')];
+  for (const c of containers) {
+    if (!c) continue;
+    const next = c.nextElementSibling;
+    if (next && next.classList.contains('field-error-msg')) { next.remove(); break; }
+  }
+  // Pricing special case: once any price input has a valid value, clear both
+  // inputs' red borders and the shared error message below the section.
+  if (el.type === 'number' && parseFloat(el.value) > 0) {
+    const section = el.closest('.panel-section');
+    if (section) {
+      section.querySelectorAll('input[type="number"].has-error').forEach(i => i.classList.remove('has-error'));
+      section.querySelectorAll('.field-error-msg').forEach(m => m.remove());
+    }
+  }
+}
+
+// Validate all required fields, show inline errors, then save if clean.
 // context: 'edit' | 'create'
 function validateAndSave(context) {
-  const prefix    = context === 'edit' ? 'e' : 'c';
-  const ratesEl   = document.getElementById(context + '-pricing-rates');
-  const customEl  = document.getElementById(context + '-pricing-custom');
-  const errorEl   = document.getElementById(context + '-pricing-error');
+  const prefix = context === 'edit' ? 'e' : 'c';
+  const tab0   = document.getElementById(prefix + 'tab-0');
+  const tab1   = document.getElementById(prefix + 'tab-1');
 
-  const isRatesMode  = ratesEl  && ratesEl.style.display  !== 'none';
-  const isCustomMode = customEl && customEl.style.display !== 'none';
+  // Clear previous validation state
+  if (tab0) clearFieldErrors(tab0);
+  if (tab1) clearFieldErrors(tab1);
+  const oldBanner = document.getElementById(context + '-pricing-error');
+  if (oldBanner) oldBanner.classList.remove('visible');
 
-  let errorMsg = '';
+  let tab0HasError = false;
+  let tab1HasError = false;
 
-  if (isRatesMode) {
-    const anyChecked = ratesEl.querySelectorAll('.rate-cb:checked').length > 0;
-    if (!anyChecked) {
-      errorMsg = 'Select at least one rental rate before saving, or switch to Custom Pricing.';
+  // ── Tab 0: Plan Details ───────────────────────────────────
+  if (tab0) {
+    // Plan Name
+    const nameInput = tab0.querySelector('input[type="text"]');
+    if (nameInput && !nameInput.value.trim()) {
+      showFieldError(nameInput, 'Plan name is required.');
+      tab0HasError = true;
     }
-  } else if (isCustomMode) {
-    const inputs = customEl.querySelectorAll('input[type="number"]');
-    const anyFilled = [...inputs].some(i => i.value.trim() !== '' && parseFloat(i.value) > 0);
+
+    // Rental Type
+    const rentalTypeEl = tab0.querySelector('select');
+    if (rentalTypeEl && !rentalTypeEl.value) {
+      showFieldError(rentalTypeEl, 'Select a rental type.');
+      tab0HasError = true;
+    }
+
+    // Description
+    const descEl = tab0.querySelector('textarea');
+    if (descEl && !descEl.value.trim()) {
+      showFieldError(descEl, 'Description is required.');
+      tab0HasError = true;
+    }
+
+    // Expiry duration — required only when the expiry toggle is ON
+    const expiryToggle = document.getElementById('expiryToggle');
+    if (expiryToggle && !expiryToggle.classList.contains('off')) {
+      const expiryFields  = document.getElementById('expiryFields');
+      const expiryNum     = expiryFields?.querySelector('input[type="number"]');
+      const expiryInlineRow = expiryFields?.querySelector('.inline-row');
+      if (expiryNum && (!expiryNum.value.trim() || parseInt(expiryNum.value) < 1)) {
+        showFieldError(expiryNum, 'Enter a duration for the expiration period.', expiryInlineRow || expiryNum);
+        tab0HasError = true;
+      }
+    }
+  }
+
+  // ── Tab 1: Pricing ────────────────────────────────────────
+  if (tab1) {
+    // Quantity — must have a positive number unless Unlimited is checked
+    const qtyInput = document.getElementById(context === 'edit' ? 'edit-qty' : 'create-qty');
+    const qtyRow   = qtyInput?.closest('.qty-row');
+    const qtyCb    = qtyRow?.querySelector('input[type="checkbox"]');
+    if (qtyInput && !(qtyCb && qtyCb.checked)) {
+      if (!qtyInput.value.trim() || parseInt(qtyInput.value) < 1) {
+        showFieldError(qtyInput, 'Enter a quantity, or check Unlimited.', qtyRow);
+        tab1HasError = true;
+      }
+    }
+
+    const priceInputs = [...tab1.querySelectorAll('input[type="number"]')].filter(i => i !== qtyInput);
+    const anyFilled   = priceInputs.some(i => i.value.trim() !== '' && parseFloat(i.value) > 0);
     if (!anyFilled) {
-      errorMsg = 'Enter at least one price (Standard or Member) before saving, or switch to Rental Rates.';
+      // Highlight both inputs
+      priceInputs.forEach(i => i.classList.add('has-error'));
+      // Single error message after the last form-field in the pricing section
+      const formFields = tab1.querySelectorAll('.form-field');
+      const lastField  = formFields[formFields.length - 1];
+      if (lastField) {
+        const err = document.createElement('div');
+        err.className = 'field-error-msg';
+        err.textContent = 'Enter at least a Non-member or Member price.';
+        lastField.insertAdjacentElement('afterend', err);
+      }
+      tab1HasError = true;
     }
-  } else {
-    errorMsg = 'Choose a pricing type and add pricing before saving.';
   }
 
-  if (errorMsg) {
-    // Switch to Pricing tab if not already there
-    const pricingTab = document.getElementById(prefix + 'tab-1');
-    if (pricingTab && pricingTab.style.display === 'none') {
-      const tabs = document.querySelectorAll('.panel-tab');
-      if (tabs[1]) switchTab(tabs[1], 1);
-    }
-    // Show error banner (scroll it into view)
-    if (errorEl) {
-      errorEl.textContent = '⚠ ' + errorMsg;
-      errorEl.classList.add('visible');
-      errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+  // ── Switch to the first tab containing errors ─────────────
+  if (tab0HasError || tab1HasError) {
+    const tabs = document.querySelectorAll('.panel-tab');
+    const targetTabIdx = tab0HasError ? 0 : 1;
+    if (tabs[targetTabIdx]) switchTab(tabs[targetTabIdx], targetTabIdx);
+    // Scroll first error into view
+    const firstErr = (tab0HasError ? tab0 : tab1)?.querySelector('.has-error, .field-error-msg');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     return;
-  }
-
-  // Clear error
-  if (errorEl) errorEl.classList.remove('visible');
-
-  // If saving with custom pricing, check whether any existing rates match
-  if (isCustomMode) {
-    const inputs   = customEl.querySelectorAll('input[type="number"]');
-    const stdVal   = inputs[0] ? parseFloat(inputs[0].value) || 0 : 0;
-    const memVal   = inputs[1] ? parseFloat(inputs[1].value) || 0 : 0;
-    const matches  = findMatchingRates(stdVal, memVal);
-    if (matches.length > 0) {
-      showRateSuggestions(matches, context, () => commitSave(context));
-      return; // wait for user's decision in the modal
-    }
   }
 
   commitSave(context);
@@ -4662,151 +4940,95 @@ function validateAndSave(context) {
 // Persist the edit/create and close the panel.
 function commitSave(context) {
   if (context === 'edit' && currentPlan) {
-    const nameInput = document.querySelector('#etab-0 .form-input');
-    if (nameInput && nameInput.value.trim()) currentPlan.name = nameInput.value.trim();
-    const statusToggle = document.querySelector('#etab-0 .toggle');
-    if (statusToggle) currentPlan.status = statusToggle.classList.contains('off') ? 'Inactive' : 'Active';
+    const p = currentPlan;
+
+    // ── Plan Details (etab-0) ──────────────────────────────
+    // Plan Name
+    const nameInput = document.querySelector('#etab-0 input[type="text"]');
+    if (nameInput && nameInput.value.trim()) p.name = nameInput.value.trim();
+
+    // Rental Type
+    const rentalTypeEl = document.getElementById('edit-rental-type');
+    if (rentalTypeEl) p.rentalType = rentalTypeEl.value;
+
+    // Plan Start Date
+    const startDateEl = document.getElementById('edit-start-date');
+    if (startDateEl) p.startDate = startDateEl.value;
+
+    // Description
+    const descEl = document.querySelector('#etab-0 textarea');
+    if (descEl) p.desc = descEl.value.trim();
+
+    // Quantity
+    const qtyInput = document.getElementById('edit-qty');
+    const qtyCb    = qtyInput?.closest('.qty-row')?.querySelector('input[type="checkbox"]');
+    if (qtyInput) p.qty = (qtyCb && qtyCb.checked) ? 'Unlimited' : (parseInt(qtyInput.value) || p.qty);
+
+    // Selling Status (first .toggle in etab-0)
+    const toggles = document.querySelectorAll('#etab-0 .toggle');
+    if (toggles[0]) p.status = toggles[0].classList.contains('off') ? 'Unavailable' : 'Available';
+
+    // Expiration
+    const expiryToggle = document.getElementById('expiryToggle');
+    if (expiryToggle) {
+      if (expiryToggle.classList.contains('off')) {
+        p.expiry = 'None';
+      } else {
+        const expiryNum  = document.querySelector('#expiryFields input[type="number"]');
+        const expiryUnit = document.querySelector('#expiryFields select');
+        const num  = expiryNum  ? expiryNum.value.trim()  : '';
+        const unit = expiryUnit ? expiryUnit.value.toLowerCase() : 'days';
+        if (num) p.expiry = `${num} ${unit}`;
+      }
+    }
+
+    // Auto-Renew (third .toggle in etab-0) + renewal settings
+    if (toggles[2]) {
+      p.autoRenew = !toggles[2].classList.contains('off');
+      if (p.autoRenew) {
+        const triggerBefore = document.getElementById('renew-before');
+        p.autoRenewTrigger = (triggerBefore && triggerBefore.checked) ? 'before-expiration' : 'threshold';
+        if (p.autoRenewTrigger === 'before-expiration') {
+          const numEl  = document.querySelector('#autoRenewFields .renew-trigger-label input[type="number"]');
+          const unitEl = document.querySelector('#autoRenewFields .renew-trigger-label select');
+          if (numEl)  p.autoRenewTriggerNum  = parseInt(numEl.value) || p.autoRenewTriggerNum || 7;
+          if (unitEl) p.autoRenewTriggerUnit = unitEl.value || p.autoRenewTriggerUnit || 'Days';
+        }
+        const renewAsLabel = document.getElementById('renewAsLabel');
+        const selectedOpt  = document.querySelector('#renewAsDropdown .csel-opt.selected');
+        if (selectedOpt) {
+          const val = selectedOpt.dataset.value;
+          p.autoRenewAs      = val === 'self' ? 'self' : parseInt(val);
+          p.autoRenewAsLabel = renewAsLabel ? renewAsLabel.textContent.trim() : 'A copy of itself';
+        }
+      } else {
+        p.autoRenewTrigger = null;
+        p.autoRenewTriggerNum = null;
+        p.autoRenewTriggerUnit = null;
+        p.autoRenewAs = null;
+        p.autoRenewAsLabel = null;
+      }
+    }
+
+    // ── Pricing (etab-1) ──────────────────────────────────
+    // Purchase Model
+    const selectedRadioLabel = document.querySelector('#etab-1 .radio-option.selected .radio-option-label');
+    if (selectedRadioLabel) {
+      p.pricingModel = selectedRadioLabel.textContent.trim() === 'Per Occurrence' ? 'Flat' : 'Per Unit';
+    }
+
+    // Non-member & Member prices
+    const priceInputs = document.querySelectorAll('#etab-1 input[type="number"]');
+    const fmt = (val, isPerUnit) => val ? (isPerUnit ? `$${parseFloat(val).toFixed(2)}/hr` : `$${parseFloat(val).toFixed(2)}`) : null;
+    const perUnit = p.pricingModel === 'Per Unit';
+    if (priceInputs[0] && priceInputs[0].value) p.stdPrice = fmt(priceInputs[0].value, perUnit) || p.stdPrice;
+    if (priceInputs[1] && priceInputs[1].value) p.memPrice = fmt(priceInputs[1].value, perUnit) || p.memPrice;
   }
   isDirty = false;
   closePanel();
   renderTable();
 }
 
-// ── Rate matching heuristic ──────────────────────────────
-// Returns ALL_RENTAL_RATES entries that plausibly match the
-// custom pricing the user entered. In production this would
-// be a server-side schedule comparison; here we use simple
-// price-ratio signals as a prototype stand-in.
-function findMatchingRates(stdVal, memVal) {
-  const results = [];
-  if (!stdVal && !memVal) return results;
-
-  const ratio = (stdVal > 0 && memVal > 0) ? memVal / stdVal : null;
-
-  // Meaningful member discount → suggest off-peak or seasonal rates
-  if (ratio !== null && ratio <= 0.88) {
-    ALL_RENTAL_RATES.forEach(r => {
-      if ((r.category === 'Off-peak' || r.category === 'Seasonal') && !results.includes(r))
-        results.push(r);
-    });
-  }
-
-  // Higher standard price → suggest peak rates (surcharge patterns)
-  if (stdVal > 50) {
-    ALL_RENTAL_RATES.forEach(r => {
-      if (r.category === 'Peak' && !results.includes(r))
-        results.push(r);
-    });
-  }
-
-  // Holiday marker: large multiplier implied (std significantly higher than member)
-  if (ratio !== null && ratio <= 0.70) {
-    ALL_RENTAL_RATES.forEach(r => {
-      if (r.category === 'Holiday' && !results.includes(r))
-        results.push(r);
-    });
-  }
-
-  // Always surface at least one suggestion so the feature is demonstrable
-  if (results.length === 0 && ALL_RENTAL_RATES.length > 0) {
-    results.push(ALL_RENTAL_RATES[0]);
-  }
-
-  return results.slice(0, 3); // cap to avoid overwhelming the modal
-}
-
-// ── Rate suggestion modal ────────────────────────────────
-let _rateSuggestKeepCallback = null;
-
-function showRateSuggestions(matches, context, onKeep) {
-  _rateSuggestKeepCallback = onKeep;
-
-  document.getElementById('rateSuggestIntro').textContent =
-    'The pricing you entered resembles ' +
-    (matches.length === 1 ? 'an existing rental rate' : 'existing rental rates') +
-    '. Using an established rate ensures pricing rules are applied consistently across all bookings.';
-
-  const list = document.getElementById('rateSuggestList');
-  list.innerHTML = matches.map(r => {
-    const rulesHtml = r.rules.map(rule =>
-      `<div class="rate-rule-line">${rule}</div>`
-    ).join('');
-    return `
-      <div class="rate-suggest-card">
-        <div class="rate-suggest-card-header">
-          <div class="rate-suggest-card-name">${r.name}</div>
-          <span class="rate-category-tag">${r.category}</span>
-          <span class="rate-suggest-match-label">Match</span>
-        </div>
-        <div class="rate-suggest-card-desc">${r.desc}</div>
-        ${(r.stdRate || r.memRate) ? `<div class="rate-suggest-card-desc" style="font-weight:700;color:var(--color-text);margin-top:-2px;margin-bottom:6px;">$${r.stdRate} / ${r.unit} <span style="font-weight:400;color:var(--color-text-secondary);">standard</span> &nbsp;·&nbsp; $${r.memRate} / ${r.unit} <span style="font-weight:400;color:var(--color-text-secondary);">members</span></div>` : ''}
-        <div class="rate-suggest-card-rules">${rulesHtml}</div>
-        <button class="rate-suggest-use-btn"
-                onclick="useRateSuggestion('${r.name}','${context}')">Use this rate</button>
-      </div>`;
-  }).join('');
-
-  document.getElementById('rateSuggestBackdrop').classList.add('open');
-}
-
-function hideRateSuggestions() {
-  document.getElementById('rateSuggestBackdrop').classList.remove('open');
-  _rateSuggestKeepCallback = null;
-}
-
-// User chose to switch to an existing rate instead of custom pricing.
-function useRateSuggestion(rateName, context) {
-  hideRateSuggestions();
-
-  // Switch pricing mode to Rental Rates
-  const prefix   = context === 'edit' ? 'e' : 'c';
-  const tabEl    = document.getElementById(prefix + 'tab-1');
-  const ratesBtn = tabEl?.querySelector('.pricing-mode-btn:first-child');
-  if (ratesBtn) setPricingType('rates', ratesBtn, context);
-
-  // Pre-check the matching rate checkbox
-  const list = document.getElementById(context + '-rate-list');
-  if (list) {
-    list.querySelectorAll('.rate-item').forEach(item => {
-      if (item.dataset.name === rateName.toLowerCase()) {
-        const cb = item.querySelector('.rate-cb');
-        if (cb) cb.checked = true;
-      }
-    });
-  }
-
-  // Show the Pricing tab so the user can review before saving again
-  const tabs = document.querySelectorAll('.panel-tab');
-  if (tabs[1]) switchTab(tabs[1], 1);
-
-  markDirty();
-}
-
-// Wire up the "Keep custom pricing" button — proceeds with the original save
-document.getElementById('rateSuggestKeep').addEventListener('click', () => {
-  const cb = _rateSuggestKeepCallback;
-  hideRateSuggestions();
-  if (cb) cb();
-});
-// Close on backdrop click
-document.getElementById('rateSuggestBackdrop').addEventListener('click', e => {
-  if (e.target === e.currentTarget) hideRateSuggestions();
-});
-// Close on Escape (appended to existing keydown listener context)
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('rateSuggestBackdrop').classList.contains('open')) {
-    hideRateSuggestions();
-  }
-});
-
-// Expand/collapse the rules list on a rate item.
-function toggleRateExpand(btn) {
-  const item = btn.closest('.rate-item, .view-rate-item');
-  item.classList.toggle('expanded');
-  const count = btn.dataset.count;
-  const label = count + ' rule' + (count !== '1' ? 's' : '');
-  btn.textContent = item.classList.contains('expanded') ? '▾ ' + label : '▸ ' + label;
-}
 
 function archivePlan() {
   if (!currentPlan) return;
@@ -4828,19 +5050,6 @@ document.addEventListener('click', function(e) {
     closeAllMenus();
   }
 });
-
-// ── Populate Rental Rates filter multiselect (toolbar filter) ────────────
-(function() {
-  const container = document.getElementById('ms-options-pricing');
-  if (!container) return;
-  const noRes = container.querySelector('.ms-no-results');
-  ALL_RENTAL_RATES.forEach(r => {
-    const label = document.createElement('label');
-    label.className = 'ms-option';
-    label.innerHTML = `<input type="checkbox" value="${r.name}" onchange="onFilterChange()"> ${r.name}`;
-    container.insertBefore(label, noRes);
-  });
-})();
 
 updateTabCounts();
 renderTable();

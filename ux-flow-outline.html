@@ -421,8 +421,8 @@
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Toolbar <span class="card-chevron">▶</span></div>
       <div class="card-body">
         <ul class="item-list">
-          <li>Search field — matches against any visible plan detail (name, purchase model, pricing model, description, applied rate names)</li>
-          <li><strong>Filters</strong> button opens popover: Status · Purchase Model · Pricing Rules multiselect · Standard Price range · Member Price range · Clear filters</li>
+          <li>Search field — matches against any visible plan detail (name, purchase model, pricing model, description)</li>
+          <li><strong>Filters</strong> button opens popover: Status · Purchase Model · Non-member Price range · Member Price range · Clear filters</li>
           <li>Results count ("X plans") — replaced by "X selected" when rows are checked</li>
         </ul>
       </div>
@@ -445,8 +445,7 @@
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Grid Columns &amp; Actions <span class="card-chevron">▶</span></div>
       <div class="card-body">
         <ul class="item-list">
-          <li>Checkbox · Name · Status badge · Purchase Model · Standard Price · Member Price · Expiration · Pricing Rules</li>
-          <li>Pricing Rules cell shows applied rate names when rates are assigned; shows <em>Custom Rule</em> (italicized) when the plan uses ad hoc pricing with no applied rates</li>
+          <li>Checkbox · Name · Status badge · Purchase Model · Non-member Price · Member Price · Expiration</li>
           <li>Row actions (⋯): View, Edit, Archive — or Restore / Delete on Archived tab</li>
           <li>Add Rental Plan button in page header opens the Add Rental Plan side panel</li>
         </ul>
@@ -498,29 +497,9 @@
             <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Hours or Occurrences — one per plan</span></div>
             <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Numeric input</span></div>
             <div class="field-item"><span class="field-name">Pricing Model</span><span class="field-note">Flat Price or Per Unit</span></div>
-            <div class="field-item"><span class="field-name">Standard Price</span><span class="field-note">Currency input</span></div>
-            <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Separate price point — Story 2 ✓</span></div>
+            <div class="field-item"><span class="field-name">Non-member Price</span><span class="field-note">Currency input — standard price for non-members</span></div>
+            <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Discounted price for members — Story 2 ✓</span></div>
           </div>
-        </div>
-        <hr class="divider">
-        <div class="subsection">
-          <div class="subsection-label">Applied Rates mode</div>
-          <ul class="item-list">
-            <li>Search field to filter the rates list</li>
-            <li>Filter button opens popover: Rule Type (Special Rate / Discount) · Purchase Model</li>
-            <li>Selectable list sourced from Rental Rates admin page</li>
-            <li>Each rate shows: name · purchase model tag · std and member price · description</li>
-            <li>▸ N rules toggle reveals named pricing rules — each shows rule name, rule type badge, and description</li>
-            <li>Select All / Deselect All controls</li>
-          </ul>
-        </div>
-        <hr class="divider">
-        <div class="subsection">
-          <div class="subsection-label">Custom Pricing mode</div>
-          <ul class="item-list">
-            <li>Manual standard and member price inputs (flat or per-unit per Pricing Model selection)</li>
-          </ul>
-          <div class="note design"><strong>How custom rates are tracked:</strong> When a plan is saved with custom pricing unique to that rental plan, the rate is created and displayed as a read-only entry in the Rental Rates grid — it does not appear as a selectable option when searching applied rates on the Add or Edit Rental Plan panels. In the Rental Rates grid, the Rental Type value for these rows will be <strong>Rental Plan: [plan name]</strong>. Rather than Edit/Delete actions, these rows will show a button that navigates directly to the associated rental plan. A design update to the rental rates grid can be provided if approved.</div>
         </div>
       </div>
     </div>
@@ -564,17 +543,11 @@
           <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Read-only</span></div>
           <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Read-only</span></div>
           <div class="field-item"><span class="field-name">Pricing Model</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Standard Price</span><span class="field-note">Read-only</span></div>
+          <div class="field-item"><span class="field-name">Non-member Price</span><span class="field-note">Read-only</span></div>
           <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Read-only</span></div>
           <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Duration from purchase date, or "No expiration" — read-only</span></div>
           <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Enabled / Disabled — read-only</span></div>
         </div>
-        <hr class="divider">
-        <div class="subsection-label">Applied Rates</div>
-        <ul class="item-list">
-          <li>Read-only card list — each card shows rate name and price</li>
-          <li>▸ N rules toggle (collapsed by default) — expands to show named pricing rules with rule type badges</li>
-        </ul>
       </div>
     </div>
   </div>
@@ -613,7 +586,7 @@
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 2 — Pricing <span class="card-chevron">▶</span></div>
       <div class="card-body">
         <ul class="item-list">
-          <li>Same rate picker as Create, pre-populated with saved selections</li>
+          <li>Same pricing fields as Create — Pricing Model, Non-member Price, Member Price — pre-populated with saved values</li>
         </ul>
       </div>
     </div>
@@ -738,14 +711,8 @@
 
     <div class="decision-card">
       <div class="decision-label">Decision 3 · Story 1</div>
-      <div class="decision-title">Applied Rates vs. Custom Pricing</div>
-      <div class="decision-body">The Pricing tab offers both Applied Rates (sourced from the Rental Rates admin page) and Custom Pricing modes via a segmented control. The PRD does not explicitly define this as a UI pattern. Confirm this aligns with product intent.</div>
-    </div>
-
-    <div class="decision-card">
-      <div class="decision-label">Decision 4 · Story 1</div>
-      <div class="decision-title">Rate Rules Display in Plan Summary</div>
-      <div class="decision-body">Pricing rules attached to each Applied Rate are shown collapsed by default behind an expandable ▸ N rules toggle in the Plan Summary view, consistent with the Edit/Create panels. Confirm this is the right level of detail for the read-only summary.</div>
+      <div class="decision-title">Member vs. Non-member Pricing Only</div>
+      <div class="decision-body">The Pricing tab uses Member and Non-member pricing only — no Rental Rates integration, Applied Rates, Custom Rates, or Pricing Rules. Confirm this is the correct scope before handoff.</div>
     </div>
   </div>
 

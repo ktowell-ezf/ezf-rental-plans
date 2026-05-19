@@ -24,8 +24,7 @@ This wireframe covers the **Admin Configuration** experience only: the standalon
 - **Filters** button opens popover with:
   - Status (Active / Inactive checkboxes)
   - Purchase Model (Hours / Occurrences checkboxes)
-  - Pricing Rules multiselect with search
-  - Standard Price range (min / max)
+  - Non-member Price range (min / max)
   - Member Price range (min / max)
   - Clear filters
 - Results count ("X plans") displayed left of search; replaced by selection count ("X selected") when rows are checked
@@ -41,7 +40,7 @@ This wireframe covers the **Admin Configuration** experience only: the standalon
 - Name
 - Status (Active / Inactive badge)
 - Purchase Model (Hours / Occurrences)
-- Standard Price
+- Non-member Price
 - Member Price
 - Expiry
 - Row actions menu (⋯): View, Edit, Archive (or Restore / Delete on archived tab)
@@ -75,27 +74,16 @@ This wireframe covers the **Admin Configuration** experience only: the standalon
 | Purchase Model | Hours or Occurrences (radio/segmented control) — one per plan, not both |
 | Quantity | Numeric input (hours or occurrences based on model) |
 | Pricing Model | Flat Price or Per Unit (segmented control) |
-| Standard Price | Currency input |
+| Non-member Price | Currency input |
 | Member Price | Currency input — satisfies Story 2 member pricing |
 | Expiry | Toggle on/off; when on, duration input appears (days) — satisfies Story 11 |
 | Auto-Renew | Toggle on/off — satisfies Story 14 (admin configuration side) |
 
 ### Tab 2 — Pricing
 
-Two modes toggled by a segmented control:
-
-**Applied Rates mode**
-- Search field to filter the rates list
-- **Filter** button opens popover with Rule Type (Special Rate / Discount) and Purchase Model checkboxes
-- Selectable list of rates sourced from the Rental Rates admin page; each rate shows:
-  - Rate name and Purchase Model tag
-  - Standard and member price
-  - Description
-  - Expandable "▸ N rules" toggle revealing the rate's named pricing rules, each showing its rule name, rule type badge (Special Rate / Discount), and description
-- Select All / Deselect All controls
-
-**Custom Pricing mode**
-- Manual standard and member price inputs (flat or per-unit depending on Pricing Model selected in Plan Details)
+- **Pricing Model** — Flat Price or Per Unit (radio selection)
+- **Non-member Price** — currency input; standard price for non-members
+- **Member Price** — currency input; discounted price for members
 
 ### Panel Footer
 - **Save** (primary) | **Cancel** (secondary)
@@ -109,27 +97,18 @@ Two modes toggled by a segmented control:
 ### Panel Header
 - Plan name as title
 - "Viewing rental plan" subtitle
-- Two tabs: **Plan Summary** | **Pricing**
+- Single tab: **Plan Summary**
 - Edit button in header opens the Edit panel for this plan
 
-### Tab 1 — Plan Summary (read-only)
+### Plan Summary (read-only)
 
 Displays all configured fields in a structured read-only layout:
 
 - Name, Status badge, Description
 - Purchase Model, Quantity
-- Pricing Model, Standard Price, Member Price
+- Pricing Model, Non-member Price, Member Price
 - Expiry (duration or "No expiration")
 - Auto-Renew (Enabled / Disabled)
-
-**Applied Rates section** — displayed as a card list; each card shows:
-- Rate name
-- Standard and member price
-- "▸ N rules" toggle (collapsed by default) — expands to show named pricing rules with rule type badges and descriptions, consistent with the Pricing tab's edit/create display
-
-### Tab 2 — Pricing (read-only)
-
-Same applied rates card list as Plan Summary pricing section, shown in read-only context.
 
 ---
 
@@ -146,7 +125,7 @@ Same applied rates card list as Plan Summary pricing section, shown in read-only
 Same fields as Create, pre-populated with saved values. All fields editable.
 
 ### Tab 2 — Pricing
-Same rate picker as Create, pre-populated with saved selections.
+Same pricing fields as Create, pre-populated with saved values: Pricing Model, Non-member Price, Member Price.
 
 ### Tab 3 — History *(Edit mode only)*
 Read-only chronological audit log addressing PRD Open Question Q2. Each entry shows:
@@ -171,11 +150,11 @@ The following PRD stories are not covered by this wireframe and will require sep
 |---|---|---|
 | Story 3 | Staff sales flow — sell a Rental Plan to a client | Separate EZUI sales flow; similar to selling Membership Plans |
 | Story 4 | Client Profile — view purchased Rental Plans and balance history | Separate Client Profile tab/sub-tab |
-| Story 5 | Schedule — automatic deduction at booking time | Schedule integration; depends on Rental Rates (#54004) |
+| Story 5 | Schedule — automatic deduction at booking time | Schedule integration |
 | Story 6 | Schedule — insufficient balance handling at booking | Depends on Story 5 |
 | Story 7 | Schedule — restore balance when rental is deleted | Depends on Story 5; open questions remain (see Q4) |
 | Story 8 | Reporting — Rental Plan sales summary | Separate reports page |
-| Story 9 | Self Service — client view of purchased plans | Post-MVP; blocked on Self Service + Rental Rates integration |
+| Story 9 | Self Service — client view of purchased plans | Post-MVP; blocked on Self Service integration |
 | Story 12 | Auto-refund to package on rental cancellation | Depends on Stories 5 and 12 open decisions |
 | Story 13 | Admin — manual refund of unused package rentals | Accessible from Client Profile, not this admin page |
 | Story 15 | Client — family package sharing | Separate flow from Client Profile |
@@ -201,6 +180,4 @@ The following PRD stories are not covered by this wireframe and will require sep
 
 2. **Audit History tab (Q2)** — Added to the Edit panel as a proactive design decision to address Q2. Confirm whether this satisfies the audit trail requirement or whether a more robust solution (e.g., separate audit log page, exportable log) is needed.
 
-3. **Applied Rates vs. Custom Pricing** — The wireframe presents both options within the Pricing tab via a segmented control. The PRD does not explicitly define this as a UI pattern; confirm this aligns with product intent.
-
-4. **Rate Rules display** — Pricing rules attached to each Applied Rate are shown collapsed by default behind an expandable toggle, matching the display in the Edit/Create panels. Confirm this is the right level of detail for the Plan Summary view.
+3. **Member vs. Non-member Pricing** — The Pricing tab uses Member and Non-member pricing only (no Rental Rates integration or Custom Rates concept). Confirm this is the correct scope before handoff.
