@@ -801,6 +801,39 @@ body {
 .filter-price-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .filter-price-input:focus { border-color: var(--color-green); }
 .filter-price-input::placeholder { color: var(--color-input-placeholder); }
+.filter-date-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.filter-date-input:focus { border-color: var(--color-green); }
+.filter-num-input {
+  width: 100%;
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  transition: border-color 0.15s;
+  -moz-appearance: textfield;
+}
+.filter-num-input::-webkit-inner-spin-button,
+.filter-num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.filter-num-input:focus { border-color: var(--color-green); }
+.filter-num-input::placeholder { color: var(--color-input-placeholder); }
+.filter-range-suffix { font-size: 11px; color: var(--color-text-muted); margin-left: 4px; flex-shrink: 0; align-self: center; }
 .filter-popover-section { padding: 0 14px 10px; }
 .filter-popover-label {
   font-size: 11px;
@@ -1262,7 +1295,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 }
 .field-error-msg {
   font-size: 12px;
-  color: var(--color-red);
+  color: #E05252;
   margin-top: 4px;
   line-height: 1.4;
 }
@@ -1327,7 +1360,7 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .csel-arrow { margin-left: auto; font-size: 10px; color: var(--color-text-muted); }
 .csel-dropdown {
   position: absolute;
-  top: calc(100% + 4px);
+  bottom: calc(100% + 4px);
   left: 0;
   min-width: 260px;
   background: var(--color-surface);
@@ -1353,6 +1386,23 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 }
 .csel-group-header { font-size: 11px; font-weight: 600; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: .04em; }
 .csel-group-desc   { font-size: 11px; color: var(--color-text-muted); margin-top: 2px; }
+.csel-search-wrap  { padding: 6px 8px 2px; }
+.csel-search {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--color-input-border);
+  border-radius: 4px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--color-input-text);
+  background: var(--color-input-bg);
+  outline: none;
+  box-sizing: border-box;
+}
+.csel-search:focus { border-color: var(--color-primary, #4f6ef7); }
+.csel-search::placeholder { color: var(--color-input-placeholder); }
+.csel-no-results { padding: 8px 14px; font-size: 12px; color: var(--color-text-muted); font-style: italic; display: none; }
 
 /* ── Pricing validation error banner ── */
 .pricing-error {
@@ -2910,6 +2960,18 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
           </div>
 
           <hr class="filter-popover-divider">
+
+          <!-- Start Date range -->
+          <div class="filter-popover-section">
+            <div class="filter-popover-label">Start Date</div>
+            <div class="filter-price-range">
+              <input class="filter-date-input" type="date" id="fStartFrom" oninput="onFilterChange()" title="From">
+              <span class="filter-price-range-sep">—</span>
+              <input class="filter-date-input" type="date" id="fStartTo" oninput="onFilterChange()" title="To">
+            </div>
+          </div>
+
+          <hr class="filter-popover-divider">
           <div class="filter-popover-footer">
             <button class="filter-clear-btn" onclick="clearFilters()">Clear filters</button>
           </div>
@@ -2923,13 +2985,14 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
         <thead>
           <tr>
             <th class="cb-col"><input type="checkbox" class="row-cb" id="selectAll" title="Select all" onchange="toggleSelectAll(this)"></th>
-            <th class="sortable">Name <span class="sarr">↕</span></th>
-            <th>Selling Status</th>
-            <th>Purchase Model</th>
-            <th>Quantity</th>
-            <th class="sortable">Non-member Price <span class="sarr">↕</span></th>
-            <th>Member Price</th>
-            <th>Expiration</th>
+            <th class="sortable" onclick="setSort('name',this)">Name <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('status',this)">Selling Status <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('model',this)">Purchase Model <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('qty',this)">Quantity <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('stdPrice',this)">Non-member Price <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('memPrice',this)">Member Price <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('expiry',this)">Expiration <span class="sarr">↕</span></th>
+            <th class="sortable" onclick="setSort('startDate',this)">Start Date <span class="sarr">↕</span></th>
             <th style="width:80px;text-align:right;padding-right:18px;">Actions</th>
           </tr>
         </thead>
@@ -3111,10 +3174,10 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 // ── Data ──────────────────────────────────────────────────
 const plans = [
   { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, rentalType:'Court', startDate:'2026-01-01', desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
-  { id:2, name:'Drop-In Court Pass — 5 visits',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, rentalType:'Court', startDate:'',          desc:'5 drop-in visits, valid any time.', archived:false },
+  { id:2, name:'Drop-In Court Pass — 5 occurrences',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, rentalType:'Court', startDate:'',          desc:'5 drop-in occurrences, valid any time.', archived:false },
   { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:7, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-03-01', desc:'Flexible hourly pickleball court access.', archived:false },
   { id:4, name:'Field Rental Block — 8hrs',    status:'Available',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, rentalType:'Field', startDate:'',          desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
-  { id:5, name:'Room Booking Pack — 10 visits',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, rentalType:'Room',  startDate:'2026-02-01', desc:'Meeting room access pack.', archived:false },
+  { id:5, name:'Room Booking Pack — 10 occurrences',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, rentalType:'Room',  startDate:'2026-02-01', desc:'Meeting room access pack.', archived:false },
   { id:6, name:'Annual Court Pass — 100hrs',   status:'Available',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:30, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-01-15', desc:'Best value for regular court users.', archived:false },
 ];
 
@@ -3195,7 +3258,7 @@ const ALL_RENTAL_RATES = [
     stdRate: 15, memRate: 12, unit: 'visit',
     rules: [
       { name: 'Drop-In Occurrence Rule', ruleType: 'Special Rate', desc: '1 occurrence deducted per booking regardless of duration' },
-      { name: 'Off-Peak Discount',       ruleType: 'Discount',     desc: '20% off drop-in visits booked during off-peak hours' },
+      { name: 'Off-Peak Discount',       ruleType: 'Discount',     desc: '20% off drop-in occurrences booked during off-peak hours' },
       { text: 'Valid for any available court or field type' }
     ]
   },
@@ -3206,6 +3269,7 @@ let currentPlan = null;
 let selectedRow = null;
 let searchQuery  = '';
 let isDirty = false; // true only after the user has changed a field
+let pendingCreateId = null; // id of a partially-saved create plan (tab-0 saved, pricing not yet)
 let selectedIds  = new Set(); // ids of checked rows
 // filterStatus / filterModel: Sets of selected values; empty = "all"
 let filterStatus = new Set();
@@ -3213,6 +3277,8 @@ let filterModel  = new Set();
 // Price range filters — null means "no bound set"
 let filterStdMin = null, filterStdMax = null;
 let filterMemMin = null, filterMemMax = null;
+// Date range filters — null means "no bound set"
+let filterStartFrom = null, filterStartTo = null;
 let currentTab = 'active'; // 'active' | 'archived'
 let openMenuId = null;     // id of the plan whose row menu is open
 
@@ -3222,11 +3288,13 @@ let openMenuId = null;     // id of the plan whose row menu is open
 //   danger:true styles the confirm button red (for destructive actions)
 let _confirmCallback = null;
 
-function showConfirm({ title, body, ok = 'Confirm', danger = false, onConfirm }) {
+function showConfirm({ title, body, ok = 'Confirm', cancel = 'Cancel', danger = false, onConfirm }) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmBody').textContent  = body;
-  const okBtn = document.getElementById('confirmOk');
-  okBtn.textContent = ok;
+  const okBtn     = document.getElementById('confirmOk');
+  const cancelBtn = document.getElementById('confirmCancel');
+  okBtn.textContent     = ok;
+  cancelBtn.textContent = cancel;
   okBtn.className   = 'panel-btn ' + (danger ? 'panel-btn-destructive-filled' : 'panel-btn-primary');
   _confirmCallback  = onConfirm;
   document.getElementById('confirmBackdrop').classList.add('open');
@@ -3465,8 +3533,9 @@ function closeFilterPopover() {
   syncFilterBtnState();
 }
 function syncFilterBtnState() {
-  const priceActive = filterStdMin !== null || filterStdMax !== null || filterMemMin !== null || filterMemMax !== null;
-  const total = filterStatus.size + filterModel.size + (priceActive ? 1 : 0);
+  const priceActive  = filterStdMin  !== null || filterStdMax  !== null || filterMemMin  !== null || filterMemMax  !== null;
+  const startActive  = filterStartFrom !== null || filterStartTo !== null;
+  const total = filterStatus.size + filterModel.size + (priceActive ? 1 : 0) + (startActive ? 1 : 0);
   const btn   = document.getElementById('filterBtn');
   const badge = document.getElementById('filterBadge');
   btn.classList.toggle('active', total > 0);
@@ -3479,20 +3548,22 @@ function onFilterChange() {
   // ≤3 options: read by individual IDs
   ['Available','Unavailable'].forEach(v => { if (document.getElementById('fStatus-'+v)?.checked) filterStatus.add(v); });
   ['Hours','Occurrences'].forEach(v => { if (document.getElementById('fModel-'+v)?.checked) filterModel.add(v); });
-  const toNum = id => { const v = document.getElementById(id)?.value; return (v !== '' && v != null) ? parseFloat(v) : null; };
+  const toNum  = id => { const v = document.getElementById(id)?.value; return (v !== '' && v != null) ? parseFloat(v) : null; };
+  const toDate = id => { const v = document.getElementById(id)?.value; return v || null; };
   filterStdMin = toNum('fStdMin'); filterStdMax = toNum('fStdMax');
   filterMemMin = toNum('fMemMin'); filterMemMax = toNum('fMemMax');
+  filterStartFrom = toDate('fStartFrom'); filterStartTo = toDate('fStartTo');
   syncFilterBtnState();
   renderTable();
 }
 function clearFilters(skipRender) {
   filterStatus.clear(); filterModel.clear();
   filterStdMin = null; filterStdMax = null; filterMemMin = null; filterMemMax = null;
-  // ≤3 options
+  filterStartFrom = null; filterStartTo = null;
   ['fStatus-Available','fStatus-Unavailable','fModel-Hours','fModel-Occurrences'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
-  ['fStdMin','fStdMax','fMemMin','fMemMax'].forEach(id => {
+  ['fStdMin','fStdMax','fMemMin','fMemMax','fStartFrom','fStartTo'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   syncFilterBtnState();
@@ -3575,7 +3646,65 @@ function planMatchesFilters(p) {
   const memVal = parsePrice(p.memPrice);
   if (filterMemMin !== null && (memVal === null || memVal < filterMemMin)) return false;
   if (filterMemMax !== null && (memVal === null || memVal > filterMemMax)) return false;
+  // Start date range
+  if (filterStartFrom !== null && (!p.startDate || p.startDate < filterStartFrom)) return false;
+  if (filterStartTo   !== null && (!p.startDate || p.startDate > filterStartTo))   return false;
   return true;
+}
+
+// ── Sorting ───────────────────────────────────────────────
+let sortCol = null;   // null = default (data) order
+let sortDir = 'asc';
+
+function setSort(col, thEl) {
+  if (sortCol === col) {
+    if (sortDir === 'asc') {
+      sortDir = 'desc';
+    } else {
+      // Third click — revert to default order
+      sortCol = null;
+      sortDir = 'asc';
+    }
+  } else {
+    sortCol = col;
+    sortDir = 'asc';
+  }
+  document.querySelectorAll('thead th.sortable .sarr').forEach(a => { a.textContent = '↕'; a.style.opacity = '0.45'; });
+  if (sortCol) {
+    const sarr = thEl.querySelector('.sarr');
+    if (sarr) { sarr.textContent = sortDir === 'asc' ? '↑' : '↓'; sarr.style.opacity = '1'; }
+  }
+  renderTable();
+}
+
+function comparePlans(a, b) {
+  if (!sortCol) return 0;
+  let av, bv;
+  switch (sortCol) {
+    case 'name':      av = a.name.toLowerCase();         bv = b.name.toLowerCase();         break;
+    case 'status':    av = a.status;                     bv = b.status;                     break;
+    case 'model':     av = a.model;                      bv = b.model;                      break;
+    case 'qty':       av = a.qty==='Unlimited'?Infinity:Number(a.qty); bv = b.qty==='Unlimited'?Infinity:Number(b.qty); break;
+    case 'stdPrice':  av = parsePrice(a.stdPrice)??0;    bv = parsePrice(b.stdPrice)??0;    break;
+    case 'memPrice':  av = parsePrice(a.memPrice)??0;    bv = parsePrice(b.memPrice)??0;    break;
+    case 'expiry':    av = expiryToDays(a.expiry)??Infinity; bv = expiryToDays(b.expiry)??Infinity; break;
+    case 'startDate': av = a.startDate||'';              bv = b.startDate||'';              break;
+    default: return 0;
+  }
+  if (av < bv) return sortDir === 'asc' ? -1 : 1;
+  if (av > bv) return sortDir === 'asc' ?  1 : -1;
+  return 0;
+}
+
+// Normalize expiry duration string to a number of days (used for sorting).
+function expiryToDays(expiry) {
+  if (!expiry || expiry === 'None') return null;
+  const num = parseInt(expiry);
+  if (isNaN(num)) return null;
+  if (/year/i.test(expiry))  return num * 365;
+  if (/month/i.test(expiry)) return num * 30;
+  if (/week/i.test(expiry))  return num * 7;
+  return num;
 }
 
 // ── Bulk selection ────────────────────────────────────────
@@ -3768,10 +3897,10 @@ function clearMainSearch() {
 
 // ── Render table ──────────────────────────────────────────
 function renderTable() {
-  const visible = plans.filter(planMatchesFilters);
+  const visible = plans.filter(planMatchesFilters).sort(comparePlans);
 
   document.getElementById('tableBody').innerHTML = visible.length === 0
-    ? `<tr><td colspan="9" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
+    ? `<tr><td colspan="10" style="text-align:center;padding:32px 16px;color:var(--color-text-muted);font-style:italic;">
         ${currentTab === 'active' ? 'No active rental plans.' : 'No archived rental plans.'}
        </td></tr>`
     : visible.map(p => `
@@ -3786,6 +3915,7 @@ function renderTable() {
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
       <td class="${p.expiry === 'None' ? 'td-muted' : ''}">${p.expiry === 'None' ? 'No expiration' : p.expiry}</td>
+      <td class="${p.startDate ? '' : 'td-muted'}">${p.startDate ? new Date(p.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
       <td style="text-align:right;padding-right:14px;">
         <div class="row-menu-wrap">
           <button class="menu-btn" id="menu-btn-${p.id}" title="Actions" onclick="toggleMenu(${p.id},event)">&#8942;</button>
@@ -3808,17 +3938,28 @@ function closePanel() {
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('sidePanel').classList.remove('open');
   if (selectedRow) { selectedRow.classList.remove('selected'); selectedRow = null; }
-  currentMode = null; currentPlan = null; isDirty = false;
+  currentMode = null; currentPlan = null; isDirty = false; pendingCreateId = null;
   closeAllRateFilterPopovers();
   // Panel-layer annotation bubbles must be hidden when panel closes
   if (typeof renderAnnBubbles === 'function') renderAnnBubbles();
 }
 function closePanelSafe() {
-  if (isDirty) {
+  // User has auto-saved plan details but hasn't completed pricing yet
+  if (pendingCreateId !== null) {
     showConfirm({
-      title: 'Discard changes?',
-      body: 'You have unsaved changes. Leaving now will discard them.',
-      ok: 'Discard',
+      title: 'Exit without completing pricing?',
+      body: 'Your plan has been saved but will remain unavailable for sale until you add pricing. You can edit it any time.',
+      ok: 'Exit',
+      cancel: 'Return to form',
+      danger: false,
+      onConfirm: closePanel
+    });
+  } else if (isDirty) {
+    showConfirm({
+      title: 'Exit without saving?',
+      body: 'Your changes won\'t be saved if you exit now.',
+      ok: 'Exit',
+      cancel: 'Return to form',
       danger: true,
       onConfirm: closePanel
     });
@@ -3971,6 +4112,169 @@ function switchTab(el, idx) {
   document.querySelectorAll('[id^="'+prefix+'-"]').forEach(t => t.style.display='none');
   const tab = document.getElementById(prefix+'-'+idx);
   if (tab) tab.style.display='block';
+  // Swap create footer between Plan Details and Pricing states
+  if (currentMode === 'create') updateCreateFooter(idx);
+}
+
+function updateCreateFooter(idx) {
+  const f = document.getElementById('panelFooter');
+  if (!f) return;
+  if (idx === 0) {
+    f.innerHTML = `
+      <div class="footer-left">
+        <button class="panel-btn panel-btn-cancel" onclick="closePanelSafe()">Cancel</button>
+      </div>
+      <div class="footer-right">
+        <button class="panel-btn panel-btn-primary" onclick="goToCreatePricing()">Pricing <span style="font-size:12px;margin-left:2px;">›</span></button>
+      </div>`;
+  } else {
+    f.innerHTML = `
+      <div class="footer-left">
+        <button class="panel-btn panel-btn-cancel" onclick="closePanelSafe()">Cancel</button>
+      </div>
+      <div class="footer-right">
+        <button class="panel-btn panel-btn-secondary" onclick="goToCreateDetails()"><span style="font-size:12px;margin-right:2px;">‹</span> Plan Details</button>
+        <button class="panel-btn panel-btn-primary" onclick="validateAndSave('create')">Save Plan</button>
+      </div>`;
+  }
+}
+
+// Validates only the Plan Details tab (ctab-0) for the create flow.
+// Returns true if valid; shows inline errors and returns false otherwise.
+function validateCreateDetails() {
+  const tab0 = document.getElementById('ctab-0');
+  if (!tab0) return true;
+  clearFieldErrors(tab0);
+  let hasError = false;
+
+  // Plan Name
+  const nameInput = tab0.querySelector('input[type="text"]');
+  if (nameInput && !nameInput.value.trim()) {
+    showFieldError(nameInput, 'Plan name is required.');
+    hasError = true;
+  }
+
+  // Rental Type
+  const rentalTypeEl = document.getElementById('create-rental-type');
+  if (rentalTypeEl && !rentalTypeEl.value) {
+    showFieldError(rentalTypeEl, 'Select a rental type.');
+    hasError = true;
+  }
+
+  // Description
+  const descEl = tab0.querySelector('textarea');
+  if (descEl && !descEl.value.trim()) {
+    showFieldError(descEl, 'Description is required.');
+    hasError = true;
+  }
+
+  // Expiry duration — required only when the expiry toggle is ON
+  const expiryToggle = document.getElementById('expiryToggle');
+  if (expiryToggle && !expiryToggle.classList.contains('off')) {
+    const expiryFields   = document.getElementById('expiryFields');
+    const expiryNum      = expiryFields?.querySelector('input[type="number"]');
+    const expiryInlineRow = expiryFields?.querySelector('.inline-row');
+    if (expiryNum && (!expiryNum.value.trim() || parseInt(expiryNum.value) < 1)) {
+      showFieldError(expiryNum, 'Enter a duration for the expiration period.', expiryInlineRow || expiryNum);
+      hasError = true;
+    }
+  }
+
+  if (hasError) {
+    const firstErr = tab0.querySelector('.has-error, .field-error-msg');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  return !hasError;
+}
+
+// Reads tab-0 fields and pushes a partial plan (status: Unavailable) to plans[].
+// Called once when the user advances from Plan Details → Pricing.
+function commitPartialCreate() {
+  const tab0 = document.getElementById('ctab-0');
+
+  // Plan Name
+  const nameInput = tab0?.querySelector('input[type="text"]');
+  const name = nameInput ? nameInput.value.trim() : 'New Plan';
+
+  // Rental Type
+  const rentalTypeEl = document.getElementById('create-rental-type');
+  const rentalType = rentalTypeEl ? rentalTypeEl.value : '';
+
+  // Description
+  const descEl = tab0?.querySelector('textarea');
+  const desc = descEl ? descEl.value.trim() : '';
+
+  // Plan Start Date
+  const startDateEl = document.getElementById('create-start-date');
+  const startDate = startDateEl ? startDateEl.value : '';
+
+  // Selling Status — first .toggle in ctab-0
+  const toggles = tab0?.querySelectorAll('.toggle') || [];
+  // Status: always Unavailable until pricing is saved — keep it that way regardless of toggle
+  const statusFromToggle = (toggles[0] && !toggles[0].classList.contains('off')) ? 'Available' : 'Unavailable';
+
+  // Expiration
+  let expiry = 'None';
+  const expiryToggle = document.getElementById('expiryToggle');
+  if (expiryToggle && !expiryToggle.classList.contains('off')) {
+    const expiryNum  = document.querySelector('#expiryFields input[type="number"]');
+    const expiryUnit = document.querySelector('#expiryFields select');
+    const num  = expiryNum  ? expiryNum.value.trim()  : '';
+    const unit = expiryUnit ? expiryUnit.value.toLowerCase() : 'days';
+    if (num) expiry = `${num} ${unit}`;
+  }
+
+  // Auto-Renew — third toggle
+  let autoRenew = false, autoRenewTrigger = null, autoRenewTriggerNum = null,
+      autoRenewTriggerUnit = null, autoRenewAs = null, autoRenewAsLabel = null;
+  const arToggle = toggles[2];
+  if (arToggle && !arToggle.classList.contains('off')) {
+    autoRenew = true;
+    const triggerBefore = document.getElementById('renew-before');
+    autoRenewTrigger = (triggerBefore && triggerBefore.checked) ? 'before-expiration' : 'threshold';
+    if (autoRenewTrigger === 'before-expiration') {
+      const numEl  = document.querySelector('#autoRenewFields .renew-trigger-label input[type="number"]');
+      const unitEl = document.querySelector('#autoRenewFields .renew-trigger-label select');
+      autoRenewTriggerNum  = parseInt(numEl?.value) || 7;
+      autoRenewTriggerUnit = unitEl?.value || 'Days';
+    }
+    const selectedOpt = document.querySelector('#renewAsDropdown .csel-opt.selected');
+    const renewAsLabel = document.getElementById('renewAsLabel');
+    if (selectedOpt) {
+      const val = selectedOpt.dataset.value;
+      autoRenewAs      = val === 'self' ? 'self' : parseInt(val);
+      autoRenewAsLabel = renewAsLabel ? renewAsLabel.textContent.trim() : 'A copy of itself';
+    }
+  }
+
+  // Generate new ID
+  const newId = Math.max(0, ...plans.map(p => p.id)) + 1;
+  const newPlan = {
+    id: newId, name, status: 'Unavailable', model: 'Hours', qty: 'Unlimited',
+    pricingModel: 'Flat', stdPrice: null, memPrice: null,
+    expiry, autoRenew, autoRenewTrigger, autoRenewTriggerNum, autoRenewTriggerUnit,
+    autoRenewAs, autoRenewAsLabel, rentalType, startDate, desc, archived: false,
+    _pendingStatus: statusFromToggle  // remember the user's selling-status choice
+  };
+  plans.push(newPlan);
+  pendingCreateId = newId;
+  isDirty = false;
+  renderTable();
+}
+
+function goToCreatePricing() {
+  // Only validate + partial-save if we haven't done so already
+  if (pendingCreateId === null) {
+    if (!validateCreateDetails()) return; // stop if tab-0 is invalid
+    commitPartialCreate();
+  }
+  const tabs = document.querySelectorAll('.panel-tab');
+  if (tabs[1]) switchTab(tabs[1], 1);
+}
+
+function goToCreateDetails() {
+  const tabs = document.querySelectorAll('.panel-tab');
+  if (tabs[0]) switchTab(tabs[0], 0);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -4014,7 +4318,7 @@ function openView(id) {
         <div class="view-field">
           <div class="view-label">Expiration</div>
           <div class="view-value ${p.expiry==='None'?'empty':''}">
-            ${p.expiry==='None'?'No expiration':p.expiry+' from purchase'}
+            ${p.expiry==='None'?'No expiration':p.expiry+' from the plan\'s start date'}
           </div>
         </div>
         <div class="view-field" ${p.autoRenew?'':'style="margin-bottom:0;"'}>
@@ -4127,11 +4431,11 @@ function openEdit(id) {
           <div class="toggle-row" style="margin-bottom:12px;">
             <div class="toggle-info">
               <span class="toggle-label">${p.expiry!=='None'?'Enabled':'No expiration'}</span>
-              <span class="toggle-label-hint">${p.expiry!=='None'?'Plan expires after a set period from purchase':'Plan stays active until the balance is fully depleted'}</span>
+              <span class="toggle-label-hint">${p.expiry!=='None'?'Plan expires after a set period from the plan\'s start date':'Plan stays active until the balance is fully depleted'}</span>
             </div>
             <div class="toggle ${p.expiry!=='None'?'':'off'}" id="expiryToggle"
                  data-on-label='Enabled'   data-off-label='No expiration'
-                 data-on-hint='Plan expires after a set period from purchase' data-off-hint='Plan stays active until the balance is fully depleted'
+                 data-on-hint="Plan expires after a set period from the plan's start date" data-off-hint='Plan stays active until the balance is fully depleted'
                  onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
           </div>
           <div id="expiryFields" style="${p.expiry!=='None'?'':'display:none;'}">
@@ -4143,7 +4447,6 @@ function openEdit(id) {
                 <option ${/month/i.test(p.expiry)?'selected':''}>Months</option>
                 <option ${/year/i.test(p.expiry)?'selected':''}>Years</option>
               </select>
-              <span class="inline-label">from purchase</span>
             </div>
           </div>
         </div>
@@ -4192,7 +4495,12 @@ function openEdit(id) {
                     <div class="csel-divider">
                       <div class="csel-group-header">As another plan</div>
                       <div class="csel-group-desc">Useful for rolling one plan into another</div>
+                      <div class="csel-search-wrap">
+                        <input class="csel-search" type="text" placeholder="Search plans…"
+                               oninput="filterRenewSearch(this)" onclick="event.stopPropagation()">
+                      </div>
                     </div>
+                    <div class="csel-no-results">No plans match your search.</div>
                     ${plans.filter(p2=>p2.id!==p.id&&!p2.archived).map(p2=>`
                     <div class="csel-opt" data-value="${p2.id}" onclick="selectRenewAs(${p2.id},'${p2.name.replace(/'/g,"\\'")}')">
                       <div class="csel-opt-label">${p2.name}</div>
@@ -4242,17 +4550,15 @@ function openEdit(id) {
               <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Non-member</label>
               <div class="input-with-prefix">
                 <span class="input-prefix">$</span>
-                <input class="form-input" type="number" value="${p.stdPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
+                <input class="form-input" type="number" value="${p.stdPrice ? p.stdPrice.replace(/[^0-9.]/g,'') : ''}" autocomplete="off" oninput="markDirty()">
               </div>
-              <div class="field-hint">Standard non-member price</div>
             </div>
             <div class="form-field" style="margin-bottom:0;">
               <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
               <div class="input-with-prefix">
                 <span class="input-prefix">$</span>
-                <input class="form-input" type="number" value="${p.memPrice.replace(/[^0-9.]/g,'')}" autocomplete="off">
+                <input class="form-input" type="number" value="${p.memPrice ? p.memPrice.replace(/[^0-9.]/g,'') : ''}" autocomplete="off" oninput="markDirty()">
               </div>
-              <div class="field-hint">Discounted member price</div>
             </div>
           </div>
         </div>
@@ -4343,7 +4649,7 @@ function openCreate() {
             </div>
             <div class="toggle off" id="expiryToggle"
                  data-on-label='Enabled'   data-off-label='No expiration'
-                 data-on-hint='Plan expires after a set period from purchase' data-off-hint='Plan stays active until the balance is fully depleted'
+                 data-on-hint="Plan expires after a set period from the plan's start date" data-off-hint='Plan stays active until the balance is fully depleted'
                  onclick="toggleExpiry();markDirty()"><div class="toggle-knob"></div></div>
           </div>
           <div id="expiryFields" style="display:none;">
@@ -4355,7 +4661,6 @@ function openCreate() {
                 <option>Months</option>
                 <option>Years</option>
               </select>
-              <span class="inline-label">from purchase</span>
             </div>
           </div>
         </div>
@@ -4404,7 +4709,12 @@ function openCreate() {
                     <div class="csel-divider">
                       <div class="csel-group-header">As another plan</div>
                       <div class="csel-group-desc">Useful for rolling one plan into another</div>
+                      <div class="csel-search-wrap">
+                        <input class="csel-search" type="text" placeholder="Search plans…"
+                               oninput="filterRenewSearch(this)" onclick="event.stopPropagation()">
+                      </div>
                     </div>
+                    <div class="csel-no-results">No plans match your search.</div>
                     ${plans.filter(p2=>!p2.archived).map(p2=>`
                     <div class="csel-opt" data-value="${p2.id}" onclick="selectRenewAs(${p2.id},'${p2.name.replace(/'/g,"\\'")}')">
                       <div class="csel-opt-label">${p2.name}</div>
@@ -4454,7 +4764,6 @@ function openCreate() {
                 <span class="input-prefix">$</span>
                 <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
               </div>
-              <div class="field-hint">Standard non-member price</div>
             </div>
             <div class="form-field" style="margin-bottom:0;">
               <label class="field-label" style="font-size:12px;font-weight:400;color:var(--color-text-muted);margin-bottom:4px;">Member</label>
@@ -4462,21 +4771,13 @@ function openCreate() {
                 <span class="input-prefix">$</span>
                 <input class="form-input" type="number" placeholder="0.00" autocomplete="off">
               </div>
-              <div class="field-hint">Discounted member price</div>
             </div>
           </div>
         </div>
       </div>
     </div>
   `;
-  document.getElementById('panelFooter').innerHTML = `
-    <div class="footer-left">
-      <button class="panel-btn panel-btn-cancel" onclick="closePanel()">Cancel</button>
-    </div>
-    <div class="footer-right">
-      <button class="panel-btn panel-btn-primary" onclick="validateAndSave('create')">Save Plan</button>
-    </div>
-  `;
+  updateCreateFooter(0);
   attachDirtyListeners();
   openPanel();
 }
@@ -4516,7 +4817,28 @@ function toggleAutoRenewFields() {
 function toggleRenewAs(e) {
   e.stopPropagation();
   const dropdown = document.getElementById('renewAsDropdown');
-  if (dropdown) dropdown.classList.toggle('open');
+  if (!dropdown) return;
+  const opening = !dropdown.classList.contains('open');
+  dropdown.classList.toggle('open');
+  if (opening) {
+    const s = dropdown.querySelector('.csel-search');
+    if (s) { s.value = ''; filterRenewSearch(s); s.focus(); }
+  }
+}
+
+function filterRenewSearch(input) {
+  const query = input.value.toLowerCase().trim();
+  const dropdown = document.getElementById('renewAsDropdown');
+  if (!dropdown) return;
+  let visible = 0;
+  dropdown.querySelectorAll('.csel-opt[data-value]:not([data-value="self"])').forEach(opt => {
+    const name = opt.querySelector('.csel-opt-label')?.textContent.toLowerCase() || '';
+    const show = !query || name.includes(query);
+    opt.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const noRes = dropdown.querySelector('.csel-no-results');
+  if (noRes) noRes.style.display = (visible === 0 && query) ? 'block' : 'none';
 }
 
 function selectRenewAs(value, label) {
@@ -4855,9 +5177,10 @@ function validateAndSave(context) {
 
   let tab0HasError = false;
   let tab1HasError = false;
+  let feesEmpty    = false; // true when both price fields are left blank (prompts instead of blocking)
 
-  // ── Tab 0: Plan Details ───────────────────────────────────
-  if (tab0) {
+  // ── Tab 0: Plan Details (skipped for create — already validated on "Pricing ›") ─
+  if (tab0 && context !== 'create') {
     // Plan Name
     const nameInput = tab0.querySelector('input[type="text"]');
     if (nameInput && !nameInput.value.trim()) {
@@ -4905,22 +5228,27 @@ function validateAndSave(context) {
       }
     }
 
-    const priceInputs = [...tab1.querySelectorAll('input[type="number"]')].filter(i => i !== qtyInput);
-    const anyFilled   = priceInputs.some(i => i.value.trim() !== '' && parseFloat(i.value) > 0);
-    if (!anyFilled) {
-      // Highlight both inputs
+    const priceInputs    = [...tab1.querySelectorAll('input[type="number"]')].filter(i => i !== qtyInput);
+    const anyFilled      = priceInputs.some(i => i.value.trim() !== '' && parseFloat(i.value) > 0);
+    const anyPartialEntry = priceInputs.some(i => i.value.trim() !== '');
+    if (!anyFilled && anyPartialEntry) {
+      // User entered something but it's zero or invalid — show inline error
       priceInputs.forEach(i => i.classList.add('has-error'));
-      // Single error message after the last form-field in the pricing section
-      const formFields = tab1.querySelectorAll('.form-field');
-      const lastField  = formFields[formFields.length - 1];
-      if (lastField) {
-        const err = document.createElement('div');
-        err.className = 'field-error-msg';
-        err.textContent = 'Enter at least a Non-member or Member price.';
-        lastField.insertAdjacentElement('afterend', err);
+      const err = document.createElement('div');
+      err.className = 'field-error-msg';
+      err.textContent = 'Enter a non-member or member price.';
+      const priceRow = priceInputs[0]?.closest('.form-row');
+      if (priceRow) {
+        priceRow.insertAdjacentElement('afterend', err);
+      } else {
+        const formFields = tab1.querySelectorAll('.form-field');
+        const lastField  = formFields[formFields.length - 1];
+        if (lastField) lastField.insertAdjacentElement('afterend', err);
       }
       tab1HasError = true;
     }
+    // Flag that fees are completely empty — will prompt after other errors are resolved
+    feesEmpty = !anyFilled && !anyPartialEntry;
   }
 
   // ── Switch to the first tab containing errors ─────────────
@@ -4931,6 +5259,19 @@ function validateAndSave(context) {
     // Scroll first error into view
     const firstErr = (tab0HasError ? tab0 : tab1)?.querySelector('.has-error, .field-error-msg');
     if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+
+  // Fees left completely empty — prompt before saving rather than blocking
+  if (feesEmpty) {
+    showConfirm({
+      title: 'Save without pricing?',
+      body: 'Your plan has been saved but will remain unavailable for sale until you add pricing. You can edit it any time.',
+      ok: 'Save anyway',
+      cancel: 'Return to form',
+      danger: false,
+      onConfirm: () => commitSave(context)
+    });
     return;
   }
 
@@ -5024,6 +5365,36 @@ function commitSave(context) {
     if (priceInputs[0] && priceInputs[0].value) p.stdPrice = fmt(priceInputs[0].value, perUnit) || p.stdPrice;
     if (priceInputs[1] && priceInputs[1].value) p.memPrice = fmt(priceInputs[1].value, perUnit) || p.memPrice;
   }
+
+  // ── Create: update the partial plan with pricing data ────
+  if (context === 'create' && pendingCreateId !== null) {
+    const p = plans.find(pl => pl.id === pendingCreateId);
+    if (p) {
+      const tab1 = document.getElementById('ctab-1');
+
+      // Purchase Model
+      const selectedRadioLabel = tab1?.querySelector('.radio-option.selected .radio-option-label');
+      if (selectedRadioLabel) {
+        p.pricingModel = selectedRadioLabel.textContent.trim() === 'Per Occurrence' ? 'Flat' : 'Per Unit';
+      }
+
+      // Quantity
+      const qtyInput = document.getElementById('create-qty');
+      const qtyCb    = qtyInput?.closest('.qty-row')?.querySelector('input[type="checkbox"]');
+      if (qtyInput) p.qty = (qtyCb && qtyCb.checked) ? 'Unlimited' : (parseInt(qtyInput.value) || p.qty);
+
+      // Non-member & Member prices
+      const cPriceInputs = [...(tab1?.querySelectorAll('input[type="number"]') || [])].filter(i => i !== qtyInput);
+      const fmt2 = (val, isPerUnit) => val ? (isPerUnit ? `$${parseFloat(val).toFixed(2)}/hr` : `$${parseFloat(val).toFixed(2)}`) : null;
+      const cPerUnit = p.pricingModel === 'Per Unit';
+      if (cPriceInputs[0] && cPriceInputs[0].value) p.stdPrice = fmt2(cPriceInputs[0].value, cPerUnit);
+      if (cPriceInputs[1] && cPriceInputs[1].value) p.memPrice = fmt2(cPriceInputs[1].value, cPerUnit);
+
+      // Apply the user's original selling-status choice (stored on the partial plan)
+      if (p._pendingStatus) { p.status = p._pendingStatus; delete p._pendingStatus; }
+    }
+  }
+
   isDirty = false;
   closePanel();
   renderTable();
