@@ -445,7 +445,8 @@
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Grid Columns &amp; Actions <span class="card-chevron">▶</span></div>
       <div class="card-body">
         <ul class="item-list">
-          <li>Checkbox · Name · Status badge · Purchase Model · Non-member Price · Member Price · Expiration</li>
+          <li>Checkbox · Name · Status badge · Purchase Model · Non-member Price · Member Price · Expiration · Start Date</li>
+          <li><strong>Expiration column</strong> — shows the calculated calendar date (e.g. "Apr 1, 2026") when a plan has both a Plan Start Date and an expiration period and is not set to "Default to plan sale date". Falls back to the duration string ("90 days", "6 months") when a specific date can't be computed, or "No expiration" when the toggle is off.</li>
           <li>Row actions (⋯): View, Edit, Archive — or Restore / Delete on Archived tab</li>
           <li>Add Rental Plan button in page header opens the Add Rental Plan side panel</li>
         </ul>
@@ -477,12 +478,29 @@
     <div class="card open">
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Tab 1 — Plan Details <span class="card-chevron">▶</span></div>
       <div class="card-body">
-        <div class="field-grid">
-          <div class="field-item"><span class="field-name">Plan Name</span><span class="field-note">Text input, required</span></div>
-          <div class="field-item"><span class="field-name">Description</span><span class="field-note">Textarea</span></div>
-          <div class="field-item"><span class="field-name">Status</span><span class="field-note">Available / Unavailable toggle</span></div>
-          <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Toggle on/off; duration input when enabled — Story 11 ✓</span></div>
-          <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Toggle on/off — Story 14 ✓</span></div>
+        <div class="subsection">
+          <div class="subsection-label">Plan Info</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Plan Name</span><span class="field-note">Text input, required</span></div>
+            <div class="field-item"><span class="field-name">Rental Type</span><span class="field-note">Dropdown (Court, Field, Lane, Pool, Room, Track), required</span></div>
+            <div class="field-item"><span class="field-name">Description</span><span class="field-note">Textarea, optional</span></div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-label">Plan Settings</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Selling Status</span><span class="field-note">Available / Unavailable toggle</span></div>
+            <div class="field-item"><span class="field-name">Plan Start Date</span><span class="field-note">Date input, defaults to today. A <strong>"Default to plan sale date"</strong> checkbox sits above the field; when checked, the date input is disabled and the plan inherits its start date from the client's purchase date.</span></div>
+            <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Toggle on/off. When on: duration input (number + Days / Weeks / Months / Years). A highlighted <strong>"Expires on [calculated date]"</strong> chip appears under the inputs, updating live as the user changes the start date or duration. Hidden when "Default to plan sale date" is checked (a specific date doesn't exist until the sale happens). An <strong>"Allow booking out of range"</strong> checkbox sits at the bottom of this section and is hidden when the toggle is off. — Story 11 ✓</span></div>
+            <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Toggle on/off; when on, Renewal Trigger and "Renews As" fields appear — Story 14 ✓</span></div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-label">Sharing ✦ new</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Share with</span><span class="field-note">Single-select dropdown listing 14 client-group options (All child clients, All coach clients, All employee clients, All employer clients, All grandchild clients, All grandparent clients, All other clients, All parent clients, All player clients, All sibling clients, All spouse clients, All team clients, All team manager clients, All related clients). Optional — defaults to no selection.</span></div>
+          </div>
+          <div class="note design"><strong>Location-aware dropdown:</strong> Because the Sharing section sits at the bottom of the Plan Details panel, the Share with menu opens <strong>upward</strong> from the trigger button rather than down. This avoids forcing the user to scroll within the side panel to see the options. Internally implemented as a custom dropdown (reusing the same component family as "Renews As") rather than a native &lt;select&gt;.</div>
         </div>
         <div class="note design"><strong>Naming note:</strong> Plan status values use <em>Available</em> and <em>Unavailable</em> rather than Active / Inactive to avoid confusion with the Active / Archived tab names. "Active" at the tab level describes whether a plan has been archived; "Available" at the status level describes whether the plan is currently offered for sale. Using distinct terminology prevents ambiguity for both staff and future development.</div>
       </div>
@@ -536,17 +554,37 @@
     <div class="card open">
       <div class="card-head" onclick="this.parentElement.classList.toggle('open')">Plan Summary (read-only) <span class="card-chevron">▶</span></div>
       <div class="card-body">
-        <div class="field-grid">
-          <div class="field-item"><span class="field-name">Name</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Status</span><span class="field-note">Available / Unavailable badge</span></div>
-          <div class="field-item"><span class="field-name">Description</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Pricing Model</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Non-member Price</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Read-only</span></div>
-          <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">Duration from purchase date, or "No expiration" — read-only</span></div>
-          <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Enabled / Disabled — read-only</span></div>
+        <div class="subsection">
+          <div class="subsection-label">Plan Info</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Plan Name</span><span class="field-note">Read-only</span></div>
+            <div class="field-item"><span class="field-name">Rental Type</span><span class="field-note">Read-only</span></div>
+            <div class="field-item"><span class="field-name">Description</span><span class="field-note">Read-only; shows "No description added" when blank</span></div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-label">Plan Settings</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Selling Status</span><span class="field-note">Available / Unavailable badge</span></div>
+            <div class="field-item"><span class="field-name">Plan Start Date</span><span class="field-note">Reads <strong>"Plan sale date"</strong> when the plan defaults to sale date; otherwise shows the configured calendar date or "Not set".</span></div>
+            <div class="field-item"><span class="field-name">Expiration</span><span class="field-note">"No expiration" when the toggle is off. Otherwise: a bolded <strong>"Expires on [date]"</strong> header followed by the duration line ("[n] [unit] from the plan's start date"). The "Expires on" line is suppressed when the plan defaults to sale date (no specific date exists yet). When <strong>"Allow booking out of range"</strong> is also set, the duration line and "Booking out of range allowed" render as bullets; otherwise the duration shows as a single line of text.</span></div>
+            <div class="field-item"><span class="field-name">Auto-Renew</span><span class="field-note">Enabled / Disabled; when Enabled, shows Renewal Trigger and "Renews as" value</span></div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-label">Sharing ✦ new</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Share with</span><span class="field-note">Displays the selected client group. The entire Sharing section is hidden when no group is selected.</span></div>
+          </div>
+        </div>
+        <div class="subsection">
+          <div class="subsection-label">Pricing</div>
+          <div class="field-grid">
+            <div class="field-item"><span class="field-name">Purchase Model</span><span class="field-note">Per Occurrence / Per Hour — read-only</span></div>
+            <div class="field-item"><span class="field-name">Quantity</span><span class="field-note">Read-only</span></div>
+            <div class="field-item"><span class="field-name">Non-member Price</span><span class="field-note">Read-only</span></div>
+            <div class="field-item"><span class="field-name">Member Price</span><span class="field-note">Read-only</span></div>
+          </div>
         </div>
       </div>
     </div>
@@ -578,6 +616,9 @@
       <div class="card-body">
         <ul class="item-list">
           <li>Same fields as Add Rental Plan — Plan Details tab, pre-populated with saved values — all fields editable</li>
+          <li>"Default to plan sale date" checkbox reflects the saved value; toggling it on disables the date input. The live "Expires on …" hint under the Expiration period inputs reflects whatever the user has entered, and is suppressed while "Default to plan sale date" is checked.</li>
+          <li>"Allow booking out of range" appears only when the Expiration toggle is on; pre-checked when the plan was saved with this flag.</li>
+          <li>The Sharing panel-section sits below Auto-Renew; the "Share with" dropdown is pre-selected to the saved group (or shows the "— Select a group —" placeholder).</li>
         </ul>
       </div>
     </div>
@@ -713,6 +754,30 @@
       <div class="decision-label">Decision 3 · Story 1</div>
       <div class="decision-title">Member vs. Non-member Pricing Only</div>
       <div class="decision-body">The Pricing tab uses Member and Non-member pricing only — no Rental Rates integration, Applied Rates, Custom Rates, or Pricing Rules. Confirm this is the correct scope before handoff.</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 4 · Story 11</div>
+      <div class="decision-title">"Default to plan sale date" + Calculated Expiration Date</div>
+      <div class="decision-body">Two new affordances were added to the Expiration setup:
+        <ul style="margin:6px 0 6px 18px;">
+          <li>A <strong>"Default to plan sale date"</strong> checkbox above Plan Start Date. When checked, the plan inherits its start date from the client's purchase moment (instead of a fixed calendar date). In summary views, Plan Start Date reads "Plan sale date" and the calculated "Expires on …" date is suppressed because no specific date exists until the sale.</li>
+          <li>When both a Plan Start Date and an expiration period are set, the system surfaces the <strong>calculated calendar expiration date</strong> — as a highlighted "Expires on [date]" chip under the duration inputs in Plan Details, as a bolded "Expires on [date]" line in Plan Summary, and as the value in the Expiration column on the list grid. The duration line ("90 days from the plan's start date") remains as secondary context.</li>
+        </ul>
+        Confirm both behaviors are desired, and confirm what should happen when a "Default to plan sale date" plan is sold (do staff see a confirmation date at the point of sale, or only afterward?).
+      </div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 5 · Story 11</div>
+      <div class="decision-title">"Allow booking out of range" Flag</div>
+      <div class="decision-body">A new <strong>"Allow booking out of range"</strong> checkbox was added at the bottom of the Expiration section (only visible when an expiration period is set). When enabled, the Plan Summary lists the period and "Booking out of range allowed" as bullet points so the relationship between the two flags is visually clear. <strong>Open question:</strong> The PRD doesn't currently define enforcement behavior for this flag — does "out of range" mean booking a date past the expiration window, booking before the plan start date, or both? Needs PO clarification before Schedule integration (Story 5).</div>
+    </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 6 · Story 15</div>
+      <div class="decision-title">Sharing — "Share with" Single-Select</div>
+      <div class="decision-body">A new Sharing panel-section was added under Auto-Renew with a single-select "Share with" dropdown listing 14 client-relationship groups (parents, children, spouses, team managers, etc.). The dropdown opens <strong>upward</strong> because the section sits at the bottom of Plan Details and a downward dropdown would be obscured by the panel footer. <strong>Open questions for PO:</strong> Is single-select correct, or should multiple groups be selectable (e.g. spouses <em>and</em> children)? And should this admin field be the same configuration used by Story 15 (client-side family package sharing), or is this a separate concept?</div>
     </div>
   </div>
 

@@ -1676,6 +1676,25 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 .field-label .req { color: var(--color-red); margin-left: 1px; }
 .field-label .opt { color: var(--color-text-muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
 
+/* Share with — custom dropdown that opens upward (location-aware via .csel-dropdown) */
+.share-with-wrap { display: block; }
+.share-with-trigger { width: 100%; max-width: 280px; justify-content: space-between; }
+.share-with-trigger.is-placeholder span:first-child { color: var(--color-text-muted); }
+.share-with-dropdown { min-width: 240px; max-height: 280px; overflow-y: auto; }
+
+/* Highlighted "Expires on …" hint under expiry period inputs */
+.expiry-date-hint {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: var(--color-badge-active-bg);
+  color: var(--color-badge-active-text);
+  font-size: 13px;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.expiry-date-hint strong { font-weight: 600; }
+
 /* Text Input — Form inputs/Text Inputs */
 .form-input {
   width: 100%;
@@ -3173,9 +3192,9 @@ tbody td { padding: 12px 16px; font-size: 13px; color: var(--color-text); vertic
 <script>
 // ── Data ──────────────────────────────────────────────────
 const plans = [
-  { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  autoRenew:false, rentalType:'Court', startDate:'2026-01-01', desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
+  { id:1, name:'Court Time Bundle — 10hrs',    status:'Available',   model:'Hours',       qty:10,  pricingModel:'Flat',     stdPrice:'$100.00',   memPrice:'$80.00',   expiry:'90 days',  allowBookingOutOfRange:true, autoRenew:false, rentalType:'Court', startDate:'2026-01-01', desc:'Pre-purchase 10 hours of court time at a discounted flat rate.', archived:false },
   { id:2, name:'Drop-In Court Pass — 5 occurrences',status:'Available',   model:'Occurrences', qty:5,   pricingModel:'Flat',     stdPrice:'$60.00',    memPrice:'$50.00',   expiry:'None',     autoRenew:false, rentalType:'Court', startDate:'',          desc:'5 drop-in occurrences, valid any time.', archived:false },
-  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:7, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-03-01', desc:'Flexible hourly pickleball court access.', archived:false },
+  { id:3, name:'Pickleball Flex Pack — 20hrs', status:'Available',   model:'Hours',       qty:20,  pricingModel:'Per Unit', stdPrice:'$12.00/hr', memPrice:'$10.00/hr',expiry:'6 months', autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:7, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-03-01', defaultToSaleDate:true, desc:'Flexible hourly pickleball court access.', archived:false },
   { id:4, name:'Field Rental Block — 8hrs',    status:'Available',   model:'Hours',       qty:8,   pricingModel:'Flat',     stdPrice:'$200.00',   memPrice:'$175.00',  expiry:'None',     autoRenew:false, rentalType:'Field', startDate:'',          desc:'Pre-purchase 8 hours of field time at a fixed rate. No expiration — use any time.', archived:false },
   { id:5, name:'Room Booking Pack — 10 occurrences',status:'Unavailable', model:'Occurrences', qty:10,  pricingModel:'Flat',     stdPrice:'$25.00',    memPrice:'$20.00',   expiry:'60 days',  autoRenew:false, rentalType:'Room',  startDate:'2026-02-01', desc:'Meeting room access pack.', archived:false },
   { id:6, name:'Annual Court Pass — 100hrs',   status:'Available',   model:'Hours',       qty:100, pricingModel:'Flat',     stdPrice:'$800.00',   memPrice:'$650.00',  expiry:'1 year',   autoRenew:true,  autoRenewTrigger:'before-expiration', autoRenewTriggerNum:30, autoRenewTriggerUnit:'Days', autoRenewAs:'self', rentalType:'Court', startDate:'2026-01-15', desc:'Best value for regular court users.', archived:false },
@@ -3707,6 +3726,24 @@ function expiryToDays(expiry) {
   return num;
 }
 
+// Compute the calendar expiration date from a plan start date + expiry duration string.
+// Returns a formatted string like "Apr 1, 2026", or null when inputs are missing/invalid.
+function computeExpirationDate(startDate, expiry) {
+  if (!startDate || !expiry || expiry === 'None') return null;
+  const m = String(expiry).match(/^\s*(\d+)\s*(day|week|month|year)s?/i);
+  if (!m) return null;
+  const num = parseInt(m[1], 10);
+  if (!num) return null;
+  const unit = m[2].toLowerCase();
+  const d = new Date(startDate + 'T00:00:00');
+  if (isNaN(d.getTime())) return null;
+  if (unit === 'day')   d.setDate(d.getDate() + num);
+  if (unit === 'week')  d.setDate(d.getDate() + num * 7);
+  if (unit === 'month') d.setMonth(d.getMonth() + num);
+  if (unit === 'year')  d.setFullYear(d.getFullYear() + num);
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+
 // ── Bulk selection ────────────────────────────────────────
 function visibleIds() {
   return plans.filter(planMatchesFilters).map(p => p.id);
@@ -3914,7 +3951,11 @@ function renderTable() {
       <td>${p.qty==='Unlimited'?'Unlimited':p.qty}</td>
       <td>${p.stdPrice}</td>
       <td>${p.memPrice}</td>
-      <td class="${p.expiry === 'None' ? 'td-muted' : ''}">${p.expiry === 'None' ? 'No expiration' : p.expiry}</td>
+      <td class="${p.expiry === 'None' ? 'td-muted' : ''}">${(() => {
+        if (p.expiry === 'None') return 'No expiration';
+        const specificDate = p.defaultToSaleDate ? null : computeExpirationDate(p.startDate, p.expiry);
+        return specificDate || p.expiry;
+      })()}</td>
       <td class="${p.startDate ? '' : 'td-muted'}">${p.startDate ? new Date(p.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—'}</td>
       <td style="text-align:right;padding-right:14px;">
         <div class="row-menu-wrap">
@@ -4161,13 +4202,6 @@ function validateCreateDetails() {
     hasError = true;
   }
 
-  // Description
-  const descEl = tab0.querySelector('textarea');
-  if (descEl && !descEl.value.trim()) {
-    showFieldError(descEl, 'Description is required.');
-    hasError = true;
-  }
-
   // Expiry duration — required only when the expiry toggle is ON
   const expiryToggle = document.getElementById('expiryToggle');
   if (expiryToggle && !expiryToggle.classList.contains('off')) {
@@ -4207,6 +4241,8 @@ function commitPartialCreate() {
   // Plan Start Date
   const startDateEl = document.getElementById('create-start-date');
   const startDate = startDateEl ? startDateEl.value : '';
+  const defaultToSaleDateEl = document.getElementById('create-default-sale-date');
+  const defaultToSaleDate = !!(defaultToSaleDateEl && defaultToSaleDateEl.checked);
 
   // Selling Status — first .toggle in ctab-0
   const toggles = tab0?.querySelectorAll('.toggle') || [];
@@ -4215,6 +4251,7 @@ function commitPartialCreate() {
 
   // Expiration
   let expiry = 'None';
+  let allowBookingOutOfRange = false;
   const expiryToggle = document.getElementById('expiryToggle');
   if (expiryToggle && !expiryToggle.classList.contains('off')) {
     const expiryNum  = document.querySelector('#expiryFields input[type="number"]');
@@ -4222,6 +4259,8 @@ function commitPartialCreate() {
     const num  = expiryNum  ? expiryNum.value.trim()  : '';
     const unit = expiryUnit ? expiryUnit.value.toLowerCase() : 'days';
     if (num) expiry = `${num} ${unit}`;
+    const oorEl = document.getElementById('create-allow-booking-oor');
+    allowBookingOutOfRange = !!(oorEl && oorEl.checked);
   }
 
   // Auto-Renew — third toggle
@@ -4253,7 +4292,9 @@ function commitPartialCreate() {
     id: newId, name, status: 'Unavailable', model: 'Hours', qty: 'Unlimited',
     pricingModel: 'Flat', stdPrice: null, memPrice: null,
     expiry, autoRenew, autoRenewTrigger, autoRenewTriggerNum, autoRenewTriggerUnit,
-    autoRenewAs, autoRenewAsLabel, rentalType, startDate, desc, archived: false,
+    autoRenewAs, autoRenewAsLabel, rentalType, startDate, defaultToSaleDate, allowBookingOutOfRange,
+    shareWith: (document.getElementById('create-share-with-wrap')?.dataset.value || ''),
+    desc, archived: false,
     _pendingStatus: statusFromToggle  // remember the user's selling-status choice
   };
   plans.push(newPlan);
@@ -4313,12 +4354,30 @@ function openView(id) {
         </div>
         <div class="view-field">
           <div class="view-label">Plan Start Date</div>
-          <div class="view-value ${p.startDate?'':'empty'}">${p.startDate ? new Date(p.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Not set'}</div>
+          <div class="view-value ${(p.defaultToSaleDate||p.startDate)?'':'empty'}">${
+            p.defaultToSaleDate
+              ? 'Plan sale date'
+              : (p.startDate ? new Date(p.startDate+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : 'Not set')
+          }</div>
         </div>
         <div class="view-field">
           <div class="view-label">Expiration</div>
           <div class="view-value ${p.expiry==='None'?'empty':''}">
-            ${p.expiry==='None'?'No expiration':p.expiry+' from the plan\'s start date'}
+            ${(() => {
+              if (p.expiry === 'None') return 'No expiration';
+              const dateStr = p.defaultToSaleDate ? null : computeExpirationDate(p.startDate, p.expiry);
+              const dateLine = dateStr
+                ? `<div style="font-weight:500;color:var(--color-text);margin-bottom:2px;">Expires on ${dateStr}</div>`
+                : '';
+              const periodText = `${p.expiry} from the plan's start date`;
+              const detailsHtml = p.allowBookingOutOfRange
+                ? `<ul style="color:var(--color-text-secondary);font-size:13px;margin:0;padding-left:18px;list-style:disc;">
+                     <li>${periodText}</li>
+                     <li>Booking out of range allowed</li>
+                   </ul>`
+                : `<div style="color:var(--color-text-secondary);font-size:13px;">${periodText}</div>`;
+              return `${dateLine}${detailsHtml}`;
+            })()}
           </div>
         </div>
         <div class="view-field" ${p.autoRenew?'':'style="margin-bottom:0;"'}>
@@ -4335,6 +4394,14 @@ function openView(id) {
           <div class="view-value">${p.autoRenewAs==='self'||!p.autoRenewAs ? 'A copy of itself' : (p.autoRenewAsLabel || plans.find(x=>x.id===p.autoRenewAs)?.name || 'Unknown plan')}</div>
         </div>` : ''}
       </div>
+      ${p.shareWith ? `
+      <div class="panel-section">
+        <div class="panel-section-title">Sharing</div>
+        <div class="view-field" style="margin-bottom:0;">
+          <div class="view-label">Share with</div>
+          <div class="view-value">${p.shareWith}</div>
+        </div>
+      </div>` : ''}
       <div class="panel-section" style="margin-bottom:0;">
         <div class="panel-section-title">Pricing</div>
         <div class="view-field">
@@ -4404,7 +4471,7 @@ function openEdit(id) {
           </select>
         </div>
         <div class="form-field">
-          <label class="field-label">Description<span class="req">*</span></label>
+          <label class="field-label">Description<span class="opt">(Optional)</span></label>
           <textarea class="form-textarea" autocomplete="off">${p.desc}</textarea>
         </div>
       </div>
@@ -4423,8 +4490,13 @@ function openEdit(id) {
         </div>
         <div class="form-field">
           <label class="field-label">Plan Start Date</label>
+          <label class="qty-unlimited-label" style="margin-bottom:8px;">
+            <input type="checkbox" id="edit-default-sale-date" ${p.defaultToSaleDate?'checked':''}
+                   onchange="toggleDefaultToSaleDate(this,'edit-start-date')"> Default to plan sale date
+          </label>
           <input class="form-input" type="date" id="edit-start-date" style="width:180px;"
-                 value="${p.startDate||''}" onchange="markDirty()">
+                 value="${p.startDate||''}" ${p.defaultToSaleDate?'disabled':''}
+                 onchange="markDirty();updateExpiryDateHint()">
         </div>
         <div class="form-field">
           <label class="field-label">Expiration</label>
@@ -4440,14 +4512,18 @@ function openEdit(id) {
           </div>
           <div id="expiryFields" style="${p.expiry!=='None'?'':'display:none;'}">
             <div class="inline-row" style="margin-bottom:8px;">
-              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}">
-              <select class="form-select" style="width:110px;">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off" value="${p.expiry!=='None'?p.expiry.replace(/\D/g,''):''}" oninput="updateExpiryDateHint();markDirty()">
+              <select class="form-select" style="width:110px;" onchange="updateExpiryDateHint();markDirty()">
                 <option ${!/week|month|year/i.test(p.expiry)?'selected':''}>Days</option>
                 <option ${/week/i.test(p.expiry)?'selected':''}>Weeks</option>
                 <option ${/month/i.test(p.expiry)?'selected':''}>Months</option>
                 <option ${/year/i.test(p.expiry)?'selected':''}>Years</option>
               </select>
             </div>
+            <div id="expiryDateHint" class="expiry-date-hint" style="display:none;"></div>
+            <label class="qty-unlimited-label" style="margin-top:12px;">
+              <input type="checkbox" id="edit-allow-booking-oor" ${p.allowBookingOutOfRange?'checked':''} onchange="markDirty()"> Allow booking out of range
+            </label>
           </div>
         </div>
         <div class="form-field">
@@ -4508,6 +4584,28 @@ function openEdit(id) {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Sharing</div>
+        <div class="form-field" style="margin-bottom:0;">
+          <label class="field-label">Share with</label>
+          <div class="csel-wrap share-with-wrap" id="edit-share-with-wrap" data-value="${p.shareWith||''}">
+            <button type="button" class="csel-trigger share-with-trigger ${!p.shareWith?'is-placeholder':''}" onclick="toggleShareWith(event,'edit')">
+              <span id="edit-share-with-label">${p.shareWith || '— Select a group —'}</span>
+              <span class="csel-arrow">▾</span>
+            </button>
+            <div class="csel-dropdown share-with-dropdown" id="edit-share-with-dropdown">
+              ${[
+                'All child clients','All coach clients','All employee clients','All employer clients',
+                'All grandchild clients','All grandparent clients','All other clients','All parent clients',
+                'All player clients','All sibling clients','All spouse clients','All team clients',
+                'All team manager clients','All related clients'
+              ].map(opt => `<div class="csel-opt ${p.shareWith===opt?'selected':''}" data-value="${opt}" onclick="selectShareWith('edit', this)">
+                <div class="csel-opt-label">${opt}</div>
+              </div>`).join('')}
             </div>
           </div>
         </div>
@@ -4586,6 +4684,7 @@ function openEdit(id) {
   `;
   attachDirtyListeners();
   openPanel();
+  updateExpiryDateHint();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -4618,7 +4717,7 @@ function openCreate() {
           </select>
         </div>
         <div class="form-field">
-          <label class="field-label">Description<span class="req">*</span></label>
+          <label class="field-label">Description</label>
           <textarea class="form-textarea" placeholder="Brief description visible to staff when selling…" autocomplete="off"></textarea>
         </div>
       </div>
@@ -4637,8 +4736,12 @@ function openCreate() {
         </div>
         <div class="form-field">
           <label class="field-label">Plan Start Date</label>
+          <label class="qty-unlimited-label" style="margin-bottom:8px;">
+            <input type="checkbox" id="create-default-sale-date"
+                   onchange="toggleDefaultToSaleDate(this,'create-start-date')"> Default to plan sale date
+          </label>
           <input class="form-input" type="date" id="create-start-date" style="width:180px;"
-                 value="${new Date().toISOString().split('T')[0]}" onchange="markDirty()">
+                 value="${new Date().toISOString().split('T')[0]}" onchange="markDirty();updateExpiryDateHint()">
         </div>
         <div class="form-field">
           <label class="field-label">Expiration</label>
@@ -4654,14 +4757,18 @@ function openCreate() {
           </div>
           <div id="expiryFields" style="display:none;">
             <div class="inline-row" style="margin-bottom:8px;">
-              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off">
-              <select class="form-select" style="width:110px;">
+              <input class="form-input" type="number" placeholder="e.g. 90" style="width:80px;" autocomplete="off" oninput="updateExpiryDateHint();markDirty()">
+              <select class="form-select" style="width:110px;" onchange="updateExpiryDateHint();markDirty()">
                 <option>Days</option>
                 <option>Weeks</option>
                 <option>Months</option>
                 <option>Years</option>
               </select>
             </div>
+            <div id="expiryDateHint" class="expiry-date-hint" style="display:none;"></div>
+            <label class="qty-unlimited-label" style="margin-top:12px;">
+              <input type="checkbox" id="create-allow-booking-oor" onchange="markDirty()"> Allow booking out of range
+            </label>
           </div>
         </div>
         <div class="form-field">
@@ -4722,6 +4829,28 @@ function openCreate() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-section-title">Sharing</div>
+        <div class="form-field" style="margin-bottom:0;">
+          <label class="field-label">Share with</label>
+          <div class="csel-wrap share-with-wrap" id="create-share-with-wrap" data-value="">
+            <button type="button" class="csel-trigger share-with-trigger is-placeholder" onclick="toggleShareWith(event,'create')">
+              <span id="create-share-with-label">— Select a group —</span>
+              <span class="csel-arrow">▾</span>
+            </button>
+            <div class="csel-dropdown share-with-dropdown" id="create-share-with-dropdown">
+              ${[
+                'All child clients','All coach clients','All employee clients','All employer clients',
+                'All grandchild clients','All grandparent clients','All other clients','All parent clients',
+                'All player clients','All sibling clients','All spouse clients','All team clients',
+                'All team manager clients','All related clients'
+              ].map(opt => `<div class="csel-opt" data-value="${opt}" onclick="selectShareWith('create', this)">
+                <div class="csel-opt-label">${opt}</div>
+              </div>`).join('')}
             </div>
           </div>
         </div>
@@ -4854,13 +4983,42 @@ function selectRenewAs(value, label) {
   markDirty();
 }
 
-// Close the renew-as dropdown when clicking outside
+// Close any open csel-dropdowns when clicking outside a .csel-wrap
 document.addEventListener('click', function(e) {
   if (!e.target.closest('.csel-wrap')) {
-    const d = document.getElementById('renewAsDropdown');
-    if (d) d.classList.remove('open');
+    document.querySelectorAll('.csel-dropdown.open').forEach(d => d.classList.remove('open'));
   }
 });
+
+// Share with — custom dropdown that opens upward via .csel-dropdown positioning.
+// mode is 'edit' or 'create' so the same handlers work for both panels.
+function toggleShareWith(e, mode) {
+  e.stopPropagation();
+  const targetId = `${mode}-share-with-dropdown`;
+  // Close other open dropdowns first
+  document.querySelectorAll('.csel-dropdown.open').forEach(d => {
+    if (d.id !== targetId) d.classList.remove('open');
+  });
+  const dd = document.getElementById(targetId);
+  if (dd) dd.classList.toggle('open');
+}
+function selectShareWith(mode, optEl) {
+  const value = optEl.dataset.value || '';
+  const label = optEl.querySelector('.csel-opt-label')?.textContent || value;
+  const wrap   = document.getElementById(`${mode}-share-with-wrap`);
+  const lblEl  = document.getElementById(`${mode}-share-with-label`);
+  const trigger= wrap?.querySelector('.share-with-trigger');
+  const dd     = document.getElementById(`${mode}-share-with-dropdown`);
+  if (wrap)    wrap.dataset.value = value;
+  if (lblEl)   lblEl.textContent = label;
+  if (trigger) trigger.classList.toggle('is-placeholder', !value);
+  if (dd) {
+    dd.querySelectorAll('.csel-opt').forEach(o => o.classList.remove('selected'));
+    optEl.classList.add('selected');
+    dd.classList.remove('open');
+  }
+  markDirty();
+}
 
 function toggleExpiry() {
   const t = document.getElementById('expiryToggle');
@@ -4869,6 +5027,40 @@ function toggleExpiry() {
   const f = document.getElementById('expiryFields');
   if (f) f.style.display = t.classList.contains('off') ? 'none' : 'block';
   updateToggle(t);
+  updateExpiryDateHint();
+}
+
+// Refreshes the highlighted "Expires on …" hint under the expiration period inputs.
+// Reads current Plan Start Date + expiry duration values and hides itself if either
+// is missing or invalid, or if "Default to plan sale date" is checked.
+function updateExpiryDateHint() {
+  const hint = document.getElementById('expiryDateHint');
+  if (!hint) return;
+  const toggle = document.getElementById('expiryToggle');
+  if (toggle && toggle.classList.contains('off')) { hint.style.display = 'none'; return; }
+  const defaultSaleEl = document.getElementById('edit-default-sale-date') || document.getElementById('create-default-sale-date');
+  if (defaultSaleEl && defaultSaleEl.checked) { hint.style.display = 'none'; return; }
+  const fields = document.getElementById('expiryFields');
+  const numEl  = fields?.querySelector('input[type="number"]');
+  const unitEl = fields?.querySelector('select');
+  const startEl = document.getElementById('edit-start-date') || document.getElementById('create-start-date');
+  const num  = numEl  ? numEl.value.trim()  : '';
+  const unit = unitEl ? unitEl.value : 'Days';
+  const startDate = startEl ? startEl.value : '';
+  if (!num || !startDate) { hint.style.display = 'none'; return; }
+  const dateStr = computeExpirationDate(startDate, `${num} ${unit.toLowerCase()}`);
+  if (!dateStr) { hint.style.display = 'none'; return; }
+  hint.style.display = 'inline-block';
+  hint.innerHTML = `Expires on <strong>${dateStr}</strong>`;
+}
+
+// Toggle the "Default to plan sale date" checkbox: disable the date input and
+// refresh the expiry hint (which suppresses "Expires on …" while the box is checked).
+function toggleDefaultToSaleDate(cb, dateInputId) {
+  const dateInput = document.getElementById(dateInputId);
+  if (dateInput) dateInput.disabled = cb.checked;
+  updateExpiryDateHint();
+  markDirty();
 }
 // ── Rental Rate list helpers (retained for potential future use) ──────────
 
@@ -5195,13 +5387,6 @@ function validateAndSave(context) {
       tab0HasError = true;
     }
 
-    // Description
-    const descEl = tab0.querySelector('textarea');
-    if (descEl && !descEl.value.trim()) {
-      showFieldError(descEl, 'Description is required.');
-      tab0HasError = true;
-    }
-
     // Expiry duration — required only when the expiry toggle is ON
     const expiryToggle = document.getElementById('expiryToggle');
     if (expiryToggle && !expiryToggle.classList.contains('off')) {
@@ -5295,6 +5480,12 @@ function commitSave(context) {
     // Plan Start Date
     const startDateEl = document.getElementById('edit-start-date');
     if (startDateEl) p.startDate = startDateEl.value;
+    const defaultSaleEl = document.getElementById('edit-default-sale-date');
+    if (defaultSaleEl) p.defaultToSaleDate = !!defaultSaleEl.checked;
+
+    // Sharing
+    const shareWithWrap = document.getElementById('edit-share-with-wrap');
+    if (shareWithWrap) p.shareWith = shareWithWrap.dataset.value || '';
 
     // Description
     const descEl = document.querySelector('#etab-0 textarea');
@@ -5314,12 +5505,15 @@ function commitSave(context) {
     if (expiryToggle) {
       if (expiryToggle.classList.contains('off')) {
         p.expiry = 'None';
+        p.allowBookingOutOfRange = false;
       } else {
         const expiryNum  = document.querySelector('#expiryFields input[type="number"]');
         const expiryUnit = document.querySelector('#expiryFields select');
         const num  = expiryNum  ? expiryNum.value.trim()  : '';
         const unit = expiryUnit ? expiryUnit.value.toLowerCase() : 'days';
         if (num) p.expiry = `${num} ${unit}`;
+        const oorEl = document.getElementById('edit-allow-booking-oor');
+        p.allowBookingOutOfRange = !!(oorEl && oorEl.checked);
       }
     }
 

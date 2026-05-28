@@ -43,7 +43,7 @@ This wireframe covers the **Admin Configuration** experience only: the standalon
 - Purchase Model (Hours / Occurrences)
 - Non-member Price
 - Member Price
-- Expiry
+- Expiration — shows the calculated calendar date (e.g. "Apr 1, 2026") when the plan has both a Plan Start Date and an expiration period and is not set to "Default to plan sale date". Falls back to the duration string ("90 days", "6 months") when a specific date can't be computed, or "No expiration" when the toggle is off.
 - Start Date
 - Row actions menu (⋯): View, Edit, Archive (or Restore / Delete on archived tab)
 
@@ -74,15 +74,15 @@ Creating a plan is a two-step flow. The user completes Plan Details first, then 
 |---|---|
 | Plan Name | Text input, required |
 | Rental Type | Dropdown (Court, Field, Lane, Pool, Room, Track), required |
-| Description | Textarea, required |
+| Description | Textarea, optional |
 
 **Plan Settings section**
 
 | Field | Notes |
 |---|---|
 | Selling Status | Available / Unavailable toggle |
-| Plan Start Date | Date input, defaults to today's date |
-| Expiration | Toggle on/off; when on, duration input appears (number + unit: Days / Weeks / Months / Years); duration is required when toggle is on |
+| Plan Start Date | Date input, defaults to today's date. A **"Default to plan sale date"** checkbox sits above the field; when checked, the date input is disabled and the plan inherits its start date from the client's purchase date. |
+| Expiration | Toggle on/off; when on, duration input appears (number + unit: Days / Weeks / Months / Years); duration is required when toggle is on. A live highlighted **"Expires on [calculated date]"** chip appears under the inputs, updating as the start date or duration change. The chip is suppressed when "Default to plan sale date" is checked. An **"Allow booking out of range"** checkbox sits at the bottom of the section and is hidden when the toggle is off. |
 | Auto-Renew | Toggle on/off; when on, additional fields appear (see below) |
 
 **Auto-Renew fields (shown when Auto-Renew is enabled)**
@@ -93,6 +93,12 @@ Creating a plan is a two-step flow. The user completes Plan Details first, then 
 - **Renews As** — custom dropdown with two options:
   - A copy of itself (default)
   - As another plan — searchable list of existing active plans
+
+**Sharing section** *(new)*
+
+| Field | Notes |
+|---|---|
+| Share with | Single-select dropdown listing 14 client-group options: All child clients, All coach clients, All employee clients, All employer clients, All grandchild clients, All grandparent clients, All other clients, All parent clients, All player clients, All sibling clients, All spouse clients, All team clients, All team manager clients, All related clients. Optional — defaults to no selection. The dropdown opens **upward** because the section sits at the bottom of the panel; this is implemented as a custom dropdown rather than a native `<select>`. |
 
 ### Tab 1 Footer
 - Left: **Cancel** (calls unsaved-changes check)
@@ -116,7 +122,7 @@ Creating a plan is a two-step flow. The user completes Plan Details first, then 
 **Plan Details tab** — validated when "Pricing ›" is clicked:
 - Plan Name: required
 - Rental Type: required
-- Description: required
+- Description: optional
 - Expiration duration: required when the Expiration toggle is on
 
 If any Plan Details fields are invalid, inline error messages appear and navigation to Pricing is blocked.
@@ -161,9 +167,13 @@ Displays all configured fields in a structured read-only layout, grouped to mirr
 - Plan Name, Rental Type, Description
 
 **Plan Settings**
-- Selling Status, Plan Start Date
-- Expiration: duration displayed as `[n] [unit] from the plan's start date`, or "No expiration"
+- Selling Status
+- Plan Start Date — reads **"Plan sale date"** when the plan defaults to sale date; otherwise shows the configured calendar date or "Not set"
+- Expiration: "No expiration" when off. Otherwise: a bolded **"Expires on [date]"** line followed by the duration line (`[n] [unit] from the plan's start date`). The "Expires on" line is suppressed when the plan defaults to sale date. When **"Allow booking out of range"** is also set, the duration line and "Booking out of range allowed" render as bullet points; otherwise the duration is a single line of text.
 - Auto-Renew: Enabled or Disabled; when enabled, shows renewal trigger and "Renews as" value
+
+**Sharing** *(new)*
+- Share with — selected client group. The Sharing section is hidden entirely when no group is selected.
 
 **Pricing**
 - Purchase Model, Quantity
@@ -246,3 +256,9 @@ The following PRD stories are not covered by this wireframe and will require sep
 3. **Audit History tab (Q2)** — Added to the Edit panel as a proactive design decision to address Q2. Confirm whether this satisfies the audit trail requirement or whether a more robust solution (e.g., separate audit log page, exportable log) is needed.
 
 4. **Member vs. Non-member Pricing** — The Pricing tab uses Member and Non-member pricing only (no Rental Rates integration or Custom Rates concept). Confirm this is the correct scope before handoff.
+
+5. **"Default to plan sale date" + calculated expiration date** *(Story 11)* — A new "Default to plan sale date" checkbox lets plans inherit their start date from the client's purchase date instead of a fixed calendar date. Independently, when a Plan Start Date and expiration period are both set, the system now surfaces the calculated calendar expiration date as a highlighted chip in Plan Details, as a bolded line in Plan Summary, and as the value in the Expiration column on the list grid. Confirm both behaviors are desired, and confirm what should happen when a "Default to plan sale date" plan is sold (do staff see a confirmation date at the point of sale?).
+
+6. **"Allow booking out of range" flag** *(Story 11)* — A new checkbox at the bottom of the Expiration section lets admins explicitly allow bookings outside the expiration window. When enabled, Plan Summary lists the period and "Booking out of range allowed" as bullets. **Open question:** the PRD doesn't currently define what "out of range" means — does it cover dates past expiration, before the start date, or both? Needs PO clarification before Schedule integration (Story 5).
+
+7. **Sharing — "Share with" single-select** *(Story 15)* — A new Sharing panel-section was added with a single-select dropdown listing 14 client-relationship groups (parents, children, spouses, team managers, etc.). The dropdown opens upward because the section sits at the bottom of Plan Details. **Open questions:** Is single-select correct, or should multiple groups be selectable simultaneously? And should this admin field be the same configuration used by Story 15 (client-side family package sharing), or is it a separate concept?
