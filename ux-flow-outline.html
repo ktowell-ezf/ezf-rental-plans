@@ -779,6 +779,12 @@
       <div class="decision-title">Sharing — "Share with" Single-Select</div>
       <div class="decision-body">A new Sharing panel-section was added under Auto-Renew with a single-select "Share with" dropdown listing 14 client-relationship groups (parents, children, spouses, team managers, etc.). The dropdown opens <strong>upward</strong> because the section sits at the bottom of Plan Details and a downward dropdown would be obscured by the panel footer. <strong>Open questions for PO:</strong> Is single-select correct, or should multiple groups be selectable (e.g. spouses <em>and</em> children)? And should this admin field be the same configuration used by Story 15 (client-side family package sharing), or is this a separate concept?</div>
     </div>
+
+    <div class="decision-card">
+      <div class="decision-label">Decision 7 · Annotation layering</div>
+      <div class="decision-title">Side Panel Sits Above Main-Screen Annotations</div>
+      <div class="decision-body">When annotations (design-review pins, comments, etc.) are placed on the main Rental Plans page, the side panel must overlay <strong>on top</strong> of those annotations when it opens, not have them visually punch through. The side panel hosts its own annotations on its own surfaces, and layering them with main-screen annotations would create ambiguous targets ("which page is this comment on?") and obscure form fields beneath the pins. <br><br>Implementation note: the side panel and its scrim already render above any default page chrome (panel <code>z-index: 30</code> over scrim <code>z-index: 20</code>). Any annotation overlay layer added to the main page should explicitly sit <strong>below</strong> the side-panel scrim, and annotation overlays added <em>inside</em> the panel should sit above the panel's content but below its sticky header and footer.</div>
+    </div>
   </div>
 
 </div>

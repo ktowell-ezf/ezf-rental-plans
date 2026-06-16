@@ -255,136 +255,26 @@ screens['s-list'] = {
   group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Rental Plans — staff list (sale entry point)',
   notes:`Mirrors the <b>Membership Plans list</b> pattern: page title, primary actions top-right, filterable table, row actions, pagination. This is one of two entry points to the sell flow (the other is the Client Profile).
   <ul><li>Plan CRUD/config is out of scope (already designed) — staff use this list mainly to <b>Sell a Plan</b>.</li>
-  <li><b>Sell Plan</b> opens the sell side-panel → <i>click it to continue the flow.</i></li>
-  <li>Active tab: bulk = <b>Archive</b>; Archived tab: bulk = <b>Actions ▾</b> (Restore / Delete). Row ⋮ menu: Active → Edit / Archive; Archived → Restore / Delete.</li></ul>`,
+  <li><b>Sell Plan</b> opens the sell side-panel → <i>click it to continue the flow.</i></li></ul>`,
   render:()=> ezChrome('Rental Plans', `
-    <div class="pagehead" style="padding-top:2px;"><h3>Rental Plans</h3>
-      <div class="acts"><span class="btn">Sell Rental Plan</span><span class="btn primary" onclick="go('s-sell-select')">+ Add Rental Plan</span></div>
+    <div class="pagehead"><h3>Rental Plans</h3>
+      <div class="acts"><span class="btn">Create Plan</span><span class="btn primary" onclick="go('s-sell-select')">+ Sell Plan</span></div>
     </div>
-
-    <!-- Page tabs: Active / Archived -->
-    <div style="display:flex;border-bottom:1px solid var(--line2);margin:0 -18px;padding:0 18px;">
-      <button id="rpt-active" onclick="rpTab('active')" style="padding:10px 4px;margin-right:20px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid #7fb8a3;color:#2b2f36;font-weight:600;margin-bottom:-1px;outline:none;">Active <span id="rp-cnt-active" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#7fb8a3;color:#fff;">6</span></button>
-      <button id="rpt-archived" onclick="rpTab('archived')" style="padding:10px 4px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;color:#6b7280;font-weight:400;margin-bottom:-1px;outline:none;">Archived <span id="rp-cnt-archived" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#e5e8ea;color:#6b7280;">2</span></button>
+    <div class="filters">
+      <div class="seg"><span class="on">Active</span><span>All</span><span>Archived</span></div>
+      <div class="inp">Search plans…</div>
     </div>
-
-    <!-- Toolbar: bulk + count | search + filters -->
-    <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line2);margin:0 -18px 10px;padding:8px 18px;">
-      <div id="rp-bulk"><button class="btn sm" disabled style="opacity:.4;cursor:not-allowed;">Archive</button></div>
-      <span id="rp-count-lbl" style="font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px;">6 plans</span>
-      <button id="rp-deselect" class="btn sm" onclick="rpClearSelection()" style="display:none;font-size:11px;color:#6b7280;">&#10005; Deselect all</button>
-      <div style="flex:1;"></div>
-      <div class="inp" style="min-width:190px;position:relative;padding-left:28px;"><span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9aa1aa;font-size:14px;">&#8981;</span>Search plans&#8230;</div>
-      <button class="btn sm">&#8862; Filters</button>
-    </div>
-
-    <!-- Active grid -->
-    <div id="rp-active-grid">
-      <table class="tbl" style="font-size:12px;">
-        <thead><tr>
-          <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="rp-sa-active" style="cursor:pointer;" onchange="rpSelectAll('active',this)"></th>
-          <th>Name <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Selling Status <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Purchase Model <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Quantity <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Non-member Price <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Member Price <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Expiration <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Start Date <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th style="text-align:right;padding-right:14px;">Actions</th>
-        </tr></thead>
-        <tbody>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(1,'active',this)"></td>
-            <td><b>10-Hour Court Pack</b></td>
-            <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
-            <td><span class="tag">Hours</span></td>
-            <td>10 hrs</td><td>$100.00</td><td>$80.00</td><td>90 days</td><td>Jan 1, 2026</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(1,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(2,'active',this)"></td>
-            <td><b>Pickleball 20 Play</b></td>
-            <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
-            <td><span class="tag">Occurrences</span></td>
-            <td>20 plays</td><td>$160.00</td><td>$140.00</td><td>No expiration</td><td>Feb 15, 2026</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(2,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(3,'active',this)"></td>
-            <td><b>Field Rental 5hr</b></td>
-            <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
-            <td><span class="tag">Hours</span></td>
-            <td>5 hrs</td><td>$75.00</td><td>&#8212;</td><td>60 days</td><td>Jan 1, 2026</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(3,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(4,'active',this)"></td>
-            <td><b>Drop-in 5 Pack</b></td>
-            <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
-            <td><span class="tag">Occurrences</span></td>
-            <td>5 plays</td><td>$60.00</td><td>$50.00</td><td>30 days</td><td>Mar 1, 2026</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(4,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(5,'active',this)"></td>
-            <td><b>Members 50 Play</b></td>
-            <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
-            <td><span class="tag">Occurrences</span></td>
-            <td>50 plays</td><td>&#8212;</td><td>$200.00</td><td>No expiration</td><td>&#8212;</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(5,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(6,'active',this)"></td>
-            <td><b>Weekend Warrior Pack</b></td>
-            <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
-            <td><span class="tag">Hours</span></td>
-            <td>8 hrs</td><td>$90.00</td><td>$72.00</td><td>120 days</td><td>Apr 1, 2026</td>
-            <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(6,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Archived grid (hidden by default) -->
-    <div id="rp-archived-grid" style="display:none;">
-      <table class="tbl" style="font-size:12px;">
-        <thead><tr>
-          <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="rp-sa-archived" style="cursor:pointer;" onchange="rpSelectAll('archived',this)"></th>
-          <th>Name <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Selling Status <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Purchase Model <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Quantity <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Non-member Price <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Member Price <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Expiration <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th>Start Date <span style="opacity:.4;font-weight:400;font-size:11px;">&#8597;</span></th>
-          <th style="text-align:right;padding-right:14px;">Actions</th>
-        </tr></thead>
-        <tbody>
-          <tr style="opacity:.8;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(7,'archived',this)"></td>
-            <td><b>Summer Day Pass</b></td>
-            <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
-            <td><span class="tag">Occurrences</span></td>
-            <td>1 play</td><td>$25.00</td><td>$20.00</td><td>1 day</td><td>&#8212;</td>
-            <td style="text-align:right;padding-right:14px;"><button class="btn sm" onclick="rpMenu(7,'archived',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-          <tr style="opacity:.8;">
-            <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(8,'archived',this)"></td>
-            <td><b>Court Time 3hr</b></td>
-            <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
-            <td><span class="tag">Hours</span></td>
-            <td>3 hrs</td><td>$45.00</td><td>&#8212;</td><td>30 days</td><td>&#8212;</td>
-            <td style="text-align:right;padding-right:14px;"><button class="btn sm" onclick="rpMenu(8,'archived',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="pager"><span class="pg">&#8249;</span><span class="pg on">1</span><span class="pg">&#8250;</span></div>
-    <div id="rp-menu-portal" style="display:none;position:fixed;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:130px;overflow:hidden;"></div>
-    <div id="rp-bulk-portal" style="display:none;position:fixed;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:130px;overflow:hidden;"></div>
+    <table class="tbl"><thead><tr><th>Plan name</th><th>Type</th><th>Included</th><th>Price (non-member / member)</th><th>Status</th><th>Expiry</th><th></th></tr></thead>
+    <tbody>
+      ${[['10-Hour Court Pack','Hours','10 hrs','$100 / $80','Active','90 days'],
+         ['Pickleball 20 Play','Occurrences','20 plays','$160 / $140','Active','No expiry'],
+         ['Field Rental 5hr','Hours','5 hrs','$75 / —','Active','60 days'],
+         ['Drop-in 5 Pack','Occurrences','5 plays','$60 / $50','Active','30 days']].map(r=>`
+        <tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>
+        <td><span class="tag green">${r[4]}</span></td><td>${r[5]}</td>
+        <td><div class="rowact"><span class="i" title="Sell" onclick="go('s-sell-select')"></span><span class="i" title="Edit"></span></div></td></tr>`).join('')}
+    </tbody></table>
+    <div class="pager"><span class="pg">‹</span><span class="pg on">1</span><span class="pg">2</span><span class="pg">›</span></div>
   `)
 };
 
@@ -851,117 +741,6 @@ function go(id){
   window.scrollTo({top:0,behavior:'smooth'});
   location.hash=id;
 }
-/* ── Rental Plans list helpers ── */
-var rpCurrentTab = 'active';
-var rpMenuOpenId = null;
-function rpTab(tab){
-  rpCurrentTab = tab;
-  var ag=document.getElementById('rp-active-grid');
-  var arG=document.getElementById('rp-archived-grid');
-  if(!ag) return;
-  ag.style.display = tab==='active' ? '' : 'none';
-  arG.style.display = tab==='archived' ? '' : 'none';
-  var base = 'padding:10px 4px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;margin-bottom:-1px;outline:none;';
-  document.getElementById('rpt-active').style.cssText   = base + (tab==='active'   ? 'margin-right:20px;border-bottom:2px solid #7fb8a3;color:#2b2f36;font-weight:600;' : 'margin-right:20px;border-bottom:2px solid transparent;color:#6b7280;font-weight:400;');
-  document.getElementById('rpt-archived').style.cssText = base + (tab==='archived' ? 'border-bottom:2px solid #7fb8a3;color:#2b2f36;font-weight:600;'                  : 'border-bottom:2px solid transparent;color:#6b7280;font-weight:400;');
-  var cntA = document.getElementById('rp-cnt-active');
-  var cntB = document.getElementById('rp-cnt-archived');
-  var pip = 'display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;';
-  if(cntA) cntA.style.cssText = pip + (tab==='active'   ? 'background:#7fb8a3;color:#fff;' : 'background:#e5e8ea;color:#6b7280;');
-  if(cntB) cntB.style.cssText = pip + (tab==='archived' ? 'background:#7fb8a3;color:#fff;' : 'background:#e5e8ea;color:#6b7280;');
-  rpMenuClose();
-  rpUpdateBulk(tab);
-}
-function rpSelectAll(tab, el){
-  var grid = document.getElementById('rp-' + tab + '-grid');
-  if(!grid) return;
-  grid.querySelectorAll('.rp-row-cb').forEach(function(cb){ cb.checked = el.checked; });
-  rpUpdateBulk(tab);
-}
-function rpRowCheck(id, tab, el){
-  rpSyncSelectAll(tab);
-  rpUpdateBulk(tab);
-}
-function rpSyncSelectAll(tab){
-  var grid = document.getElementById('rp-' + tab + '-grid');
-  var sa   = document.getElementById('rp-sa-' + tab);
-  if(!grid || !sa) return;
-  var cbs     = Array.from(grid.querySelectorAll('.rp-row-cb'));
-  var checked = cbs.filter(function(cb){ return cb.checked; }).length;
-  sa.checked       = checked > 0 && checked === cbs.length;
-  sa.indeterminate = checked > 0 && checked < cbs.length;
-}
-function rpUpdateBulk(tab){
-  var grid = document.getElementById('rp-' + tab + '-grid');
-  if(!grid) return;
-  var cbs   = Array.from(grid.querySelectorAll('.rp-row-cb'));
-  var n     = cbs.filter(function(cb){ return cb.checked; }).length;
-  var total = cbs.length;
-  var lbl   = document.getElementById('rp-count-lbl');
-  var blk   = document.getElementById('rp-bulk');
-  var desel = document.getElementById('rp-deselect');
-  if(n === 0){
-    if(lbl)   lbl.textContent = total + ' plan' + (total !== 1 ? 's' : '');
-    if(desel) desel.style.display = 'none';
-    if(blk)   blk.innerHTML = tab === 'active'
-      ? '<button class="btn sm" disabled style="opacity:.4;cursor:not-allowed;">Archive</button>'
-      : '<button class="btn sm" disabled style="opacity:.4;cursor:not-allowed;">Actions ▾</button>';
-  } else {
-    if(lbl)   lbl.textContent = n + ' selected';
-    if(desel) desel.style.display = '';
-    if(blk)   blk.innerHTML = tab === 'active'
-      ? '<button class="btn sm" style="color:#27583f;border-color:#7fb8a3;" onclick="rpClearSelection()">Archive</button>'
-      : '<button class="btn sm" style="color:#27583f;border-color:#7fb8a3;" onclick="rpBulkActionsMenu(event)">Actions ▾</button>';
-  }
-}
-function rpClearSelection(){
-  ['active','archived'].forEach(function(tab){
-    var grid = document.getElementById('rp-' + tab + '-grid');
-    if(!grid) return;
-    grid.querySelectorAll('.rp-row-cb').forEach(function(cb){ cb.checked = false; });
-    var sa = document.getElementById('rp-sa-' + tab);
-    if(sa){ sa.checked = false; sa.indeterminate = false; }
-  });
-  rpUpdateBulk(rpCurrentTab);
-}
-function rpBulkActionsMenu(event){
-  event.stopPropagation();
-  var portal = document.getElementById('rp-bulk-portal');
-  if(!portal) return;
-  if(portal.style.display === 'block'){ portal.style.display = 'none'; return; }
-  portal.innerHTML = '<div class="rp-mi" onclick="document.getElementById(\'rp-bulk-portal\').style.display=\'none\';rpClearSelection()">Restore</div><div class="rp-mi" style="color:#b54a4a" onclick="document.getElementById(\'rp-bulk-portal\').style.display=\'none\';rpClearSelection()">Delete</div>';
-  portal.style.display = 'block';
-  var rect = event.currentTarget.getBoundingClientRect();
-  var ph = portal.offsetHeight || 60;
-  var top = (window.innerHeight - rect.bottom - 6 >= ph) ? rect.bottom + 4 : rect.top - ph - 4;
-  portal.style.top = top + 'px';
-  portal.style.left = rect.left + 'px';
-}
-function rpMenu(id, tab, event){
-  event.stopPropagation();
-  var portal = document.getElementById('rp-menu-portal');
-  if(!portal) return;
-  if(rpMenuOpenId === id){ rpMenuClose(); return; }
-  rpMenuOpenId = id;
-  portal.innerHTML = tab === 'active'
-    ? '<div class="rp-mi" onclick="rpMenuClose();go(\'s-edit\')">Edit</div><div class="rp-mi" style="color:#b54a4a" onclick="rpMenuClose()">Archive</div>'
-    : '<div class="rp-mi" onclick="rpMenuClose()">Restore</div><div class="rp-mi" style="color:#b54a4a" onclick="rpMenuClose()">Delete</div>';
-  portal.style.display = 'block';
-  var rect = event.currentTarget.getBoundingClientRect();
-  var ph = portal.offsetHeight || 60;
-  var top = (window.innerHeight - rect.bottom - 6 >= ph) ? rect.bottom + 4 : rect.top - ph - 4;
-  portal.style.top  = top + 'px';
-  portal.style.left = (rect.right - portal.offsetWidth - 2) + 'px';
-}
-function rpMenuClose(){
-  var portal = document.getElementById('rp-menu-portal');
-  if(portal) portal.style.display = 'none';
-  var bportal = document.getElementById('rp-bulk-portal');
-  if(bportal) bportal.style.display = 'none';
-  rpMenuOpenId = null;
-}
-document.addEventListener('click', rpMenuClose);
-
 buildNav();
 go(location.hash? location.hash.slice(1) : 's-list');
 </script>

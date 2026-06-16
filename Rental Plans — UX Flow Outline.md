@@ -1,5 +1,5 @@
 # Rental Plans — UX Flow Outline
-**Wireframe:** `index.html`
+**Wireframe:** `index.html` (formerly `Rental Plans - Wireframes v1.html`)
 **PRD:** Rental Packages — January 2026 Draft
 **Prepared by:** K. Towell
 
@@ -262,3 +262,5 @@ The following PRD stories are not covered by this wireframe and will require sep
 6. **"Allow booking out of range" flag** *(Story 11)* — A new checkbox at the bottom of the Expiration section lets admins explicitly allow bookings outside the expiration window. When enabled, Plan Summary lists the period and "Booking out of range allowed" as bullets. **Open question:** the PRD doesn't currently define what "out of range" means — does it cover dates past expiration, before the start date, or both? Needs PO clarification before Schedule integration (Story 5).
 
 7. **Sharing — "Share with" single-select** *(Story 15)* — A new Sharing panel-section was added with a single-select dropdown listing 14 client-relationship groups (parents, children, spouses, team managers, etc.). The dropdown opens upward because the section sits at the bottom of Plan Details. **Open questions:** Is single-select correct, or should multiple groups be selectable simultaneously? And should this admin field be the same configuration used by Story 15 (client-side family package sharing), or is it a separate concept?
+
+8. **Side panel sits above main-screen annotations** *(Annotation layering)* — When annotations (design-review pins, comments, etc.) are placed on the main Rental Plans page, the side panel must overlay **on top** of those annotations when it opens. The side panel hosts its own annotations on its own surfaces, and layering them with main-screen annotations would create ambiguous targets ("which page is this comment on?") and obscure form fields beneath the pins. The panel and its scrim already render above any default page chrome (panel `z-index: 30`, scrim `z-index: 20`); any annotation overlay added to the main page should explicitly sit *below* the side-panel scrim, and annotation overlays added *inside* the panel should sit above the panel's content but below its sticky header and footer.
