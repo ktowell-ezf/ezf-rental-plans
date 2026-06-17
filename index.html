@@ -79,8 +79,10 @@
   table.tbl th{text-align:left;font-weight:600;color:#5b626b;border-bottom:1px solid var(--line);padding:8px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
   table.tbl td{border-bottom:1px solid var(--line2);padding:9px 8px;color:#3c4249;vertical-align:middle}
   table.tbl tr:hover td{background:#f7f9f9}
-  .rowact{display:flex;gap:8px;color:#7a828c}
-  .rowact .i{width:15px;height:15px;background:#d7dde2;border-radius:3px;cursor:pointer}
+  .rowact{display:flex;gap:5px;align-items:center}
+  .rowact .i{display:inline-flex;align-items:center;padding:3px 9px;border:1px solid var(--line);border-radius:4px;background:#fff;color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap}
+  .rowact .i::before{content:attr(title)}
+  .rowact .i:hover{background:#f3f5f6;color:var(--ink)}
   .pager{display:flex;gap:5px;justify-content:flex-end;margin-top:12px}
   .pager .pg{width:24px;height:24px;border:1px solid var(--line);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted)}
   .pager .pg.on{background:var(--primary);color:#fff;border-color:var(--primary)}
@@ -190,6 +192,78 @@
   .hidden{display:none}
   .flowhint{position:absolute;top:8px;right:10px;font-size:10px;color:#aeb5bd;background:#fff;border:1px solid var(--line2);border-radius:20px;padding:3px 9px}
   @media print{.index{display:none}}
+
+  /* ── Rental Plans search / filter controls ── */
+  .rp-search-wrap{position:relative;display:flex;align-items:center}
+  .rp-search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9aa1aa;font-size:14px;pointer-events:none}
+  .rp-search-input{height:30px;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 28px;font-size:12px;color:var(--ink);min-width:190px;outline:none;font-family:inherit}
+  .rp-search-input:focus{border-color:#7fb8a3}
+  .rp-search-input::placeholder{color:#9aa1aa}
+  .rp-search-clear{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;background:#9aa1aa;color:#fff;border:none;cursor:pointer;font-size:9px;display:none;align-items:center;justify-content:center;padding:0;line-height:1}
+  .rp-search-wrap.has-value .rp-search-clear{display:flex}
+  .rp-search-wrap.has-value .rp-search-input{padding-right:30px}
+  .rp-filter-wrap{position:relative}
+  .rp-filter-btn{display:inline-flex;align-items:center;gap:5px;height:30px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink);padding:0 10px;font-size:12px;cursor:pointer;font-family:inherit}
+  .rp-filter-btn.active{border-color:#7fb8a3;color:#27583f;background:#f3faf6}
+  .rp-filter-btn:hover{border-color:#9aa1aa}
+  .rp-filter-badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:9px;background:#7fb8a3;color:#fff;font-size:10px;font-weight:700;padding:0 4px}
+  .rp-filter-popover{display:none;position:absolute;top:calc(100% + 6px);right:0;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 18px rgba(20,25,30,.14);z-index:9999;min-width:240px}
+  .rp-filter-popover.open{display:block}
+  .rp-filter-section{padding:10px 14px 8px}
+  .rp-filter-label{font-size:10.5px;font-weight:600;color:#5b626b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+  .rp-filter-options{display:flex;flex-direction:column;gap:2px}
+  .rp-filter-option{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink);padding:3px 0;cursor:pointer}
+  .rp-filter-option input{cursor:pointer;accent-color:#4f9a7c}
+  .rp-filter-divider{border:none;border-top:1px solid var(--line2);margin:2px 0 4px}
+  .rp-price-range{display:flex;align-items:center;gap:6px}
+  .rp-price-wrap{display:flex;align-items:center;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 8px;height:28px;gap:3px}
+  .rp-price-wrap:focus-within{border-color:#7fb8a3}
+  .rp-cur{font-size:12px;color:#9aa1aa}
+  .rp-price-input{border:none;background:none;width:58px;font-size:12px;outline:none;color:var(--ink);font-family:inherit}
+  .rp-price-input::placeholder{color:#c0c5cb}
+  .rp-date-input{height:28px;border:1px solid var(--line);border-radius:5px;background:#fff;font-size:12px;color:var(--ink);padding:0 8px;outline:none;font-family:inherit;flex:1}
+  .rp-date-input:focus{border-color:#7fb8a3}
+  .rp-range-sep{color:#9aa1aa;font-size:11px;flex-shrink:0}
+  .rp-filter-footer{padding:4px 14px 12px;display:flex;justify-content:flex-end}
+  .rp-filter-clear-btn{border:none;background:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 0;font-family:inherit}
+  .rp-filter-clear-btn:hover{color:var(--ink)}
+  /* history tab */
+  .history-list{display:flex;flex-direction:column}
+  .history-entry{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line2)}
+  .history-entry:last-child{border-bottom:none}
+  .history-av{width:26px;height:26px;border-radius:50%;background:#7fb8a3;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 26px;margin-top:1px}
+  .history-av.muted{background:#9aa1aa}
+  .history-user{font-size:12px;font-weight:600;color:var(--ink)}
+  .history-time{font-size:11px;color:var(--muted);margin-left:6px}
+  .history-field-row{display:flex;align-items:center;gap:5px;font-size:12px;flex-wrap:wrap;margin-top:4px}
+  .history-fn{color:var(--muted);min-width:90px;flex-shrink:0;font-size:11.5px}
+  .history-old{text-decoration:line-through;color:var(--muted);opacity:.75}
+  .history-arrow{color:var(--muted);font-size:10px}
+  .history-created{font-size:12px;color:var(--muted);font-style:italic;margin-top:3px}
+  /* interactive form controls inside panels */
+  .form-ctrl{height:32px;border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;font-size:12px;color:var(--ink);font-family:inherit;width:100%;box-sizing:border-box;outline:none}
+  .form-ctrl:focus{border-color:#7fb8a3}
+  .form-ctrl.area{height:60px;padding:8px 10px;resize:vertical;vertical-align:top;line-height:1.4}
+  select.form-ctrl{cursor:pointer}
+  .form-ctrl:disabled{opacity:.45;cursor:not-allowed;background:#f5f6f7}
+  .inline-row{display:flex;align-items:center;gap:8px}
+  .add-trigger-box{border:1px solid var(--line);border-radius:5px;padding:10px 12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+  .add-trigger-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#7a828c;margin-bottom:2px}
+  /* row ⋮ menu items */
+  .rp-mi{padding:8px 14px;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap}
+  .rp-mi:hover{background:#f3f5f6}
+  /* Sell flow — client search dropdown */
+  .sell-client-wrap{position:relative;display:flex;align-items:center}
+  .sell-client-wrap input{flex:1;padding-right:28px}
+  .sell-client-clear{display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9aa1aa;font-size:14px;line-height:1;padding:2px 4px}
+  .sell-client-clear:hover{color:var(--ink)}
+  .sell-client-wrap.has-client .sell-client-clear{display:flex}
+  .sell-dd{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;max-height:240px;overflow-y:auto}
+  .sell-dd-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--line2)}
+  .sell-dd-item:last-child{border-bottom:none}
+  .sell-dd-item:hover{background:#f3f5f6}
+  .sell-client-info{display:none;align-items:center;margin-top:6px;flex-wrap:wrap;gap:4px}
+  .sell-plan-price{margin-left:auto;text-align:right;font-size:12.5px}
 </style>
 </head>
 <body>
@@ -232,10 +306,11 @@ function ssChrome(active, bodyHTML, overlay='', narrow=false){
   </div>`;
 }
 function panel(opts){
-  const tabs = (opts.tabs||[]).map(t=>`<span class="${t.on?'on':''}">${t.label}</span>`).join('');
-  return `<div class="dim"></div>
-   <div class="panel ${opts.wide?'wide':''}">
-     <div class="ph-head"><h4>${opts.title}</h4><div class="x">✕</div></div>
+  const tabs = (opts.tabs||[]).map(t=>`<span class="${t.on?'on':''}" ${t.onclick?`onclick="${t.onclick}" style="cursor:pointer"`:''}>${t.label}</span>`).join('');
+  const ct = opts.closeTarget || '';
+  return `<div class="dim" onclick="panelTryClose()"></div>
+   <div class="panel ${opts.wide?'wide':''}" id="sidePanel" data-close-target="${ct}">
+     <div class="ph-head"><h4>${opts.title}</h4><div class="x" onclick="panelTryClose()" style="cursor:pointer;">✕</div></div>
      ${tabs?`<div class="ptabs">${tabs}</div>`:''}
      <div class="pbody">${opts.body}</div>
      <div class="pfoot">${opts.foot}</div>
@@ -250,36 +325,83 @@ function toast(t){return `<div class="toast"><span class="ck"></span>${t}</div>`
 /* ============ Screens ============ */
 const screens = {};
 
-/* ---------- Group: Staff Sales ---------- */
-screens['s-list'] = {
-  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Rental Plans — staff list (sale entry point)',
-  notes:`Mirrors the <b>Membership Plans list</b> pattern: page title, primary actions top-right, filterable table, row actions, pagination. This is one of two entry points to the sell flow (the other is the Client Profile).
-  <ul><li>Plan CRUD/config is out of scope (already designed) — staff use this list mainly to <b>Sell a Plan</b>.</li>
-  <li><b>Sell Plan</b> opens the sell side-panel → <i>click it to continue the flow.</i></li>
-  <li>Active tab: bulk = <b>Archive</b>; Archived tab: bulk = <b>Actions ▾</b> (Restore / Delete). Row ⋮ menu: Active → Edit / Archive; Archived → Restore / Delete.</li></ul>`,
-  render:()=> ezChrome('Rental Plans', `
+function rpListBody(tab='active'){ const arc=tab==='archived'; return `
     <div class="pagehead" style="padding-top:2px;"><h3>Rental Plans</h3>
-      <div class="acts"><span class="btn">Sell Rental Plan</span><span class="btn primary" onclick="go('s-sell-select')">+ Add Rental Plan</span></div>
+      <div class="acts"><span class="btn" onclick="rpSellInit(null)">Sell Rental Plan</span><span class="btn primary" onclick="go('s-add')">+ Add Rental Plan</span></div>
     </div>
 
     <!-- Page tabs: Active / Archived -->
     <div style="display:flex;border-bottom:1px solid var(--line2);margin:0 -18px;padding:0 18px;">
-      <button id="rpt-active" onclick="rpTab('active')" style="padding:10px 4px;margin-right:20px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid #7fb8a3;color:#2b2f36;font-weight:600;margin-bottom:-1px;outline:none;">Active <span id="rp-cnt-active" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#7fb8a3;color:#fff;">6</span></button>
-      <button id="rpt-archived" onclick="rpTab('archived')" style="padding:10px 4px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;color:#6b7280;font-weight:400;margin-bottom:-1px;outline:none;">Archived <span id="rp-cnt-archived" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#e5e8ea;color:#6b7280;">2</span></button>
+      <button id="rpt-active" onclick="rpTab('active')" style="padding:10px 4px;margin-right:20px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid ${arc?'transparent':'#7fb8a3'};color:${arc?'#6b7280':'#2b2f36'};font-weight:${arc?400:600};margin-bottom:-1px;outline:none;">Active <span id="rp-cnt-active" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#7fb8a3;color:#fff;">6</span></button>
+      <button id="rpt-archived" onclick="rpTab('archived')" style="padding:10px 4px;border:none;background:none;font-size:12px;font-family:inherit;cursor:pointer;border-bottom:2px solid ${arc?'#7fb8a3':'transparent'};color:${arc?'#2b2f36':'#6b7280'};font-weight:${arc?600:400};margin-bottom:-1px;outline:none;">Archived <span id="rp-cnt-archived" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:16px;padding:0 5px;border-radius:9px;font-size:10px;font-weight:700;margin-left:4px;background:#e5e8ea;color:#6b7280;">2</span></button>
     </div>
 
     <!-- Toolbar: bulk + count | search + filters -->
     <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line2);margin:0 -18px 10px;padding:8px 18px;">
-      <div id="rp-bulk"><button class="btn sm" disabled style="opacity:.4;cursor:not-allowed;">Archive</button></div>
-      <span id="rp-count-lbl" style="font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px;">6 plans</span>
+      <div id="rp-bulk"><button class="btn sm" disabled style="opacity:.4;cursor:not-allowed;">${arc?'Actions ▾':'Archive'}</button></div>
+      <span id="rp-count-lbl" style="font-size:12px;color:var(--muted);white-space:nowrap;margin-left:2px;">${arc?'2 plans':'6 plans'}</span>
       <button id="rp-deselect" class="btn sm" onclick="rpClearSelection()" style="display:none;font-size:11px;color:#6b7280;">&#10005; Deselect all</button>
       <div style="flex:1;"></div>
-      <div class="inp" style="min-width:190px;position:relative;padding-left:28px;"><span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:#9aa1aa;font-size:14px;">&#8981;</span>Search plans&#8230;</div>
-      <button class="btn sm">&#8862; Filters</button>
+      <div class="rp-search-wrap" id="rpSearchWrap">
+        <span class="rp-search-icon">&#8981;</span>
+        <input class="rp-search-input" id="rpSearchInput" type="text" placeholder="Search plans&#8230;" oninput="rpOnSearch(this.value)">
+        <button class="rp-search-clear" onclick="rpClearMainSearch()" title="Clear">&#10005;</button>
+      </div>
+      <div class="rp-filter-wrap" id="rpFilterWrap">
+        <button class="rp-filter-btn" id="rpFilterBtn" onclick="rpToggleFilterPopover(event)">&#8862; Filters <span class="rp-filter-badge" id="rpFilterBadge" style="display:none"></span></button>
+        <div class="rp-filter-popover" id="rpFilterPopover">
+          <div class="rp-filter-section" id="rpFilterStatusSection">
+            <div class="rp-filter-label">Selling Status</div>
+            <div class="rp-filter-options">
+              <label class="rp-filter-option"><input type="checkbox" id="rpF-Available" onchange="rpOnFilterChange()"> Available</label>
+              <label class="rp-filter-option"><input type="checkbox" id="rpF-Unavailable" onchange="rpOnFilterChange()"> Unavailable</label>
+            </div>
+          </div>
+          <hr class="rp-filter-divider" id="rpFilterStatusDivider">
+          <div class="rp-filter-section">
+            <div class="rp-filter-label">Purchase Model</div>
+            <div class="rp-filter-options">
+              <label class="rp-filter-option"><input type="checkbox" id="rpF-Hours" onchange="rpOnFilterChange()"> Hours</label>
+              <label class="rp-filter-option"><input type="checkbox" id="rpF-Occurrences" onchange="rpOnFilterChange()"> Occurrences</label>
+            </div>
+          </div>
+          <hr class="rp-filter-divider">
+          <div class="rp-filter-section">
+            <div class="rp-filter-label">Non-member Price</div>
+            <div class="rp-price-range">
+              <div class="rp-price-wrap"><span class="rp-cur">$</span><input class="rp-price-input" type="number" id="rpFStdMin" placeholder="Min" min="0" oninput="rpOnFilterChange()"></div>
+              <span class="rp-range-sep">&#8212;</span>
+              <div class="rp-price-wrap"><span class="rp-cur">$</span><input class="rp-price-input" type="number" id="rpFStdMax" placeholder="Max" min="0" oninput="rpOnFilterChange()"></div>
+            </div>
+          </div>
+          <hr class="rp-filter-divider">
+          <div class="rp-filter-section">
+            <div class="rp-filter-label">Member Price</div>
+            <div class="rp-price-range">
+              <div class="rp-price-wrap"><span class="rp-cur">$</span><input class="rp-price-input" type="number" id="rpFMemMin" placeholder="Min" min="0" oninput="rpOnFilterChange()"></div>
+              <span class="rp-range-sep">&#8212;</span>
+              <div class="rp-price-wrap"><span class="rp-cur">$</span><input class="rp-price-input" type="number" id="rpFMemMax" placeholder="Max" min="0" oninput="rpOnFilterChange()"></div>
+            </div>
+          </div>
+          <hr class="rp-filter-divider">
+          <div class="rp-filter-section">
+            <div class="rp-filter-label">Start Date</div>
+            <div class="rp-price-range">
+              <input class="rp-date-input" type="date" id="rpFStartFrom" oninput="rpOnFilterChange()" title="From">
+              <span class="rp-range-sep">&#8212;</span>
+              <input class="rp-date-input" type="date" id="rpFStartTo" oninput="rpOnFilterChange()" title="To">
+            </div>
+          </div>
+          <hr class="rp-filter-divider">
+          <div class="rp-filter-footer">
+            <button class="rp-filter-clear-btn" onclick="rpClearFilters()">Clear filters</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Active grid -->
-    <div id="rp-active-grid">
+    <div id="rp-active-grid" style="${arc?'display:none':''}">
       <table class="tbl" style="font-size:12px;">
         <thead><tr>
           <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="rp-sa-active" style="cursor:pointer;" onchange="rpSelectAll('active',this)"></th>
@@ -294,7 +416,7 @@ screens['s-list'] = {
           <th style="text-align:right;padding-right:14px;">Actions</th>
         </tr></thead>
         <tbody>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(1)" style="cursor:pointer;" data-name="10-hour court pack" data-status="Available" data-model="Hours" data-std="100" data-mem="80" data-start="2026-01-01">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(1,'active',this)"></td>
             <td><b>10-Hour Court Pack</b></td>
             <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
@@ -302,7 +424,7 @@ screens['s-list'] = {
             <td>10 hrs</td><td>$100.00</td><td>$80.00</td><td>90 days</td><td>Jan 1, 2026</td>
             <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(1,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(2)" style="cursor:pointer;" data-name="pickleball 20 play" data-status="Available" data-model="Occurrences" data-std="160" data-mem="140" data-start="2026-02-15">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(2,'active',this)"></td>
             <td><b>Pickleball 20 Play</b></td>
             <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
@@ -310,7 +432,7 @@ screens['s-list'] = {
             <td>20 plays</td><td>$160.00</td><td>$140.00</td><td>No expiration</td><td>Feb 15, 2026</td>
             <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(2,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(3)" style="cursor:pointer;" data-name="field rental 5hr" data-status="Available" data-model="Hours" data-std="75" data-mem="" data-start="2026-01-01">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(3,'active',this)"></td>
             <td><b>Field Rental 5hr</b></td>
             <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
@@ -318,7 +440,7 @@ screens['s-list'] = {
             <td>5 hrs</td><td>$75.00</td><td>&#8212;</td><td>60 days</td><td>Jan 1, 2026</td>
             <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(3,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(4)" style="cursor:pointer;" data-name="drop-in 5 pack" data-status="Available" data-model="Occurrences" data-std="60" data-mem="50" data-start="2026-03-01">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(4,'active',this)"></td>
             <td><b>Drop-in 5 Pack</b></td>
             <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
@@ -326,7 +448,7 @@ screens['s-list'] = {
             <td>5 plays</td><td>$60.00</td><td>$50.00</td><td>30 days</td><td>Mar 1, 2026</td>
             <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(4,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(5)" style="cursor:pointer;" data-name="members 50 play" data-status="Unavailable" data-model="Occurrences" data-std="" data-mem="200" data-start="">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(5,'active',this)"></td>
             <td><b>Members 50 Play</b></td>
             <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
@@ -334,7 +456,7 @@ screens['s-list'] = {
             <td>50 plays</td><td>&#8212;</td><td>$200.00</td><td>No expiration</td><td>&#8212;</td>
             <td style="text-align:right;padding-right:14px;" onclick="event.stopPropagation()"><button class="btn sm" onclick="rpMenu(5,'active',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr onclick="go('s-sell-select')" style="cursor:pointer;">
+          <tr onclick="rpOpenView(6)" style="cursor:pointer;" data-name="weekend warrior pack" data-status="Available" data-model="Hours" data-std="90" data-mem="72" data-start="2026-04-01">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(6,'active',this)"></td>
             <td><b>Weekend Warrior Pack</b></td>
             <td><span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span></td>
@@ -347,7 +469,7 @@ screens['s-list'] = {
     </div>
 
     <!-- Archived grid (hidden by default) -->
-    <div id="rp-archived-grid" style="display:none;">
+    <div id="rp-archived-grid" style="${arc?'':`display:none;`}">
       <table class="tbl" style="font-size:12px;">
         <thead><tr>
           <th style="width:28px;padding:8px 6px;"><input type="checkbox" id="rp-sa-archived" style="cursor:pointer;" onchange="rpSelectAll('archived',this)"></th>
@@ -362,7 +484,7 @@ screens['s-list'] = {
           <th style="text-align:right;padding-right:14px;">Actions</th>
         </tr></thead>
         <tbody>
-          <tr style="opacity:.8;">
+          <tr onclick="rpOpenView(7)" style="opacity:.8;cursor:pointer;" data-name="summer day pass" data-status="Unavailable" data-model="Occurrences" data-std="25" data-mem="20" data-start="">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(7,'archived',this)"></td>
             <td><b>Summer Day Pass</b></td>
             <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
@@ -370,7 +492,7 @@ screens['s-list'] = {
             <td>1 play</td><td>$25.00</td><td>$20.00</td><td>1 day</td><td>&#8212;</td>
             <td style="text-align:right;padding-right:14px;"><button class="btn sm" onclick="rpMenu(7,'archived',event)" style="padding:3px 8px;letter-spacing:1px;">&#8942;</button></td>
           </tr>
-          <tr style="opacity:.8;">
+          <tr onclick="rpOpenView(8)" style="opacity:.8;cursor:pointer;" data-name="court time 3hr" data-status="Unavailable" data-model="Hours" data-std="45" data-mem="" data-start="">
             <td style="padding:9px 6px;" onclick="event.stopPropagation()"><input type="checkbox" class="rp-row-cb" style="cursor:pointer;" onchange="rpRowCheck(8,'archived',this)"></td>
             <td><b>Court Time 3hr</b></td>
             <td><span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span></td>
@@ -385,75 +507,654 @@ screens['s-list'] = {
     <div class="pager"><span class="pg">&#8249;</span><span class="pg on">1</span><span class="pg">&#8250;</span></div>
     <div id="rp-menu-portal" style="display:none;position:fixed;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:130px;overflow:hidden;"></div>
     <div id="rp-bulk-portal" style="display:none;position:fixed;background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:130px;overflow:hidden;"></div>
-  `)
+`; }
+
+/* ---------- Group: Staff Sales ---------- */
+screens['s-list'] = {
+  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Rental Plans — staff list (sale entry point)',
+  notes:`Mirrors the <b>Membership Plans list</b> pattern: page title, primary actions top-right, filterable table, row actions, pagination. This is one of two entry points to the sell flow (the other is the Client Profile).
+  <ul><li>Plan CRUD/config is out of scope (already designed) — staff use this list mainly to <b>Sell a Plan</b>.</li>
+  <li><b>Sell Plan</b> opens the sell side-panel → <i>click it to continue the flow.</i></li>
+  <li>Active tab: bulk = <b>Archive</b>; Archived tab: bulk = <b>Actions ▾</b> (Restore / Delete). Row ⋮ menu: Active → Edit / Archive; Archived → Restore / Delete.</li></ul>`,
+  render:()=> ezChrome('Rental Plans', rpListBody())
+};
+
+screens['s-view'] = {
+  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Plan Summary',
+  hideNav:true,
+  notes:`Read-only plan summary. Footer has <b>Sell Plan</b> (primary), <b>Edit Plan</b>, and <b>Archive Plan</b>.`,
+  render:()=>{
+    const p = rpCurrentPlan || {};
+    const statusTag = p.status==='Available'
+      ? `<span class="tag green" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#4f9a7c;flex:0 0 6px;"></i>Available</span>`
+      : `<span class="tag gray" style="display:inline-flex;align-items:center;gap:4px;"><i style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#9aa1aa;flex:0 0 6px;"></i>Unavailable</span>`;
+    const arSection = p.autoRenew ? `
+      <div class="kv"><span class="k">Renewal trigger</span><span>${p.renewTrigger||'7 days before expiration'}</span></div>
+      <div class="kv"><span class="k">Renews as</span><span>${p.renewAs||'A copy of itself'}</span></div>` : '';
+    return ezChrome('Rental Plans',
+      rpListBody(p.archived ? 'archived' : 'active'),
+      panel({closeTarget:'s-list', title: p.name||'Plan Summary', body:`
+        <div class="sech">Plan Info</div>
+        <div class="kv"><span class="k">Plan name</span><span>${p.name||'—'}</span></div>
+        <div class="kv"><span class="k">Rental type</span><span>${p.rentalType||'—'}</span></div>
+        <div style="padding:7px 0;border-bottom:none"><div style="color:var(--muted);font-size:12.5px;margin-bottom:4px">Description</div><div style="font-size:12.5px;color:${p.desc?'var(--ink)':'#9aa1aa'}">${p.desc||'No description added'}</div></div>
+        <div class="sech" style="margin-top:14px">Plan Settings</div>
+        <div class="kv"><span class="k">Selling status</span><span>${statusTag}</span></div>
+        <div class="kv"><span class="k">Start date</span><span>${p.start||'—'}</span></div>
+        <div class="kv"><span class="k">Expiration</span><span style="color:${p.expiry==='No expiration'?'#9aa1aa':'var(--ink)'}">${p.expiry||'—'}</span></div>
+        <div class="kv"><span class="k">Auto-renew</span><span>${p.autoRenew?'Enabled':'Disabled'}</span></div>
+        ${arSection}
+        <div class="sech" style="margin-top:14px">Pricing</div>
+        <div class="kv"><span class="k">Purchase model</span><span>${p.model||'—'}</span></div>
+        <div class="kv"><span class="k">Quantity</span><span>${p.qty||'—'}</span></div>
+        <div class="kv"><span class="k">Non-member fee</span><span>${p.stdPrice||'—'}</span></div>
+        <div class="kv" style="border-bottom:none"><span class="k">Member fee</span><span>${p.memPrice||'—'}</span></div>
+      `, foot:`
+        <span class="btn sm" onclick="panelTryClose()">Close</span>
+        <span class="sp"></span>
+        ${p.archived
+          ? `<span style="font-size:11.5px;color:#b54a4a;cursor:pointer;opacity:.75" onclick="go('s-list')" title="Delete">⊗ Delete</span>
+             <span class="btn primary sm" onclick="go('s-list')">Restore</span>`
+          : `<span style="font-size:11.5px;color:#b54a4a;cursor:pointer;opacity:.75" title="Archive">⊘ Archive</span>
+             <span class="btn sm" onclick="go('s-plan-edit')">Edit Plan</span>
+             <span class="btn primary sm" onclick="rpSellInit(rpCurrentPlanId)">Sell Plan</span>`
+        }
+      `})
+    );
+  }
+};
+
+screens['s-plan-edit'] = {
+  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Edit Plan — Plan Details',
+  hideNav:true,
+  render:()=>{
+    const p = rpCurrentPlan || {};
+    const hasExpiry = p.expiry && p.expiry !== 'No expiration';
+    const sellingOn = p.status === 'Available';
+    const rtOpts = ['Court','Field','Lane','Pool','Room','Track'].map(v=>`<option${p.rentalType===v?' selected':''}>${v}</option>`).join('');
+    return ezChrome('Rental Plans',
+      rpListBody(),
+      panel({closeTarget:'s-list', title: p.name||'Edit Plan',
+        tabs:[
+          {label:'Plan Details', on:true},
+          {label:'Pricing', onclick:"go('s-plan-edit-pricing')"},
+          {label:'History', onclick:"go('s-plan-edit-history')"}
+        ],
+        body:`
+        <div class="sech">Plan Info</div>
+        <div class="field">
+          <label>Plan Name <span style="color:#b54a4a">*</span></label>
+          <input type="text" class="form-ctrl" value="${p.name||''}" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>Rental Type <span style="color:#b54a4a">*</span></label>
+          <select class="form-ctrl"><option value="">— Select a type —</option>${rtOpts}</select>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea class="form-ctrl area">${p.desc||''}</textarea>
+        </div>
+        <div class="sech" style="margin-top:4px">Plan Settings</div>
+        <div class="field">
+          <label>Selling Status</label>
+          <div class="rowflex">
+            <span class="toggle${sellingOn?' on':''}" id="edit-selling-toggle" onclick="editToggleSelling()" style="cursor:pointer"></span>
+            <span id="edit-selling-label" style="font-size:12px;color:${sellingOn?'var(--ink)':'#6b7280'}">${sellingOn?'Available':'Unavailable'}</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Plan Start Date</label>
+          <input type="date" class="form-ctrl" id="edit-start-date" style="width:180px" value="${p.startISO||''}">
+          <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280">
+            <input type="checkbox" id="edit-default-sale-date" onchange="editToggleDefaultSaleDate(this)" style="cursor:pointer;accent-color:#4f9a7c">
+            Default to plan sale date
+          </div>
+        </div>
+        <div class="field">
+          <label>Expiration</label>
+          <div class="rowflex" style="margin-bottom:8px">
+            <span class="toggle${hasExpiry?' on':''}" id="edit-expiry-toggle" onclick="editToggleExpiry()" style="cursor:pointer"></span>
+            <span id="edit-expiry-label" style="font-size:12px;color:#6b7280">${hasExpiry?'Enabled — expires after a set period from the plan\'s start date':'No expiration — plan stays active until balance is depleted'}</span>
+          </div>
+          <div id="edit-expiry-fields" style="${hasExpiry?'':'display:none'}">
+            <div class="inline-row" style="margin-bottom:8px">
+              <input type="number" class="form-ctrl" id="edit-expiry-num" placeholder="e.g. 90" style="width:80px" min="1" value="${p.expiryNum||''}">
+              <select class="form-ctrl" id="edit-expiry-unit" style="width:110px">
+                ${['Days','Weeks','Months','Years'].map(u=>`<option${(p.expiryUnit||'Days')===u?' selected':''}>${u}</option>`).join('')}
+              </select>
+              <span style="font-size:12px;color:#6b7280">after start date</span>
+            </div>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;cursor:pointer">
+              <input type="checkbox" style="cursor:pointer;accent-color:#4f9a7c"> Allow booking out of range
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Auto-Renew</label>
+          <div class="rowflex" style="margin-bottom:8px">
+            <span class="toggle${p.autoRenew?' on':''}" id="edit-autorenew-toggle" onclick="editToggleAutoRenew()" style="cursor:pointer"></span>
+            <span id="edit-autorenew-label" style="font-size:12px;color:#6b7280">${p.autoRenew?'Enabled — clients can opt in at purchase time':'Disabled — clients cannot opt in at purchase time'}</span>
+          </div>
+          <div id="edit-autorenew-fields" style="${p.autoRenew?'':'display:none'}">
+            <div class="add-trigger-box">
+              <div class="add-trigger-lbl">Renew trigger</div>
+              <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+                <input type="radio" name="edit-renew-trigger" value="before" checked style="accent-color:#4f9a7c;flex:0 0 auto">
+                <input type="number" class="form-ctrl" placeholder="e.g. 7" style="width:64px" min="1">
+                <select class="form-ctrl" style="width:90px"><option>Days</option><option>Weeks</option><option>Months</option><option>Years</option></select>
+                <span>before expiration</span>
+              </label>
+              <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+                <input type="radio" name="edit-renew-trigger" value="threshold" style="accent-color:#4f9a7c;flex:0 0 auto">
+                <span>when the renewal threshold is reached</span>
+              </label>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label>Renews as</label>
+              <select class="form-ctrl">
+                <option>A copy of itself</option>
+                <option>10-Hour Court Pack</option><option>Pickleball 20 Play</option>
+                <option>Field Rental 5hr</option><option>Drop-in 5 Pack</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Share with</label>
+          <select class="form-ctrl">
+            <option value="">— Select a group —</option>
+            <option>All child clients</option><option>All coach clients</option>
+            <option>All employee clients</option><option>All employer clients</option>
+            <option>All grandchild clients</option><option>All grandparent clients</option>
+            <option>All other clients</option><option>All parent clients</option>
+            <option>All player clients</option><option>All sibling clients</option>
+            <option>All spouse clients</option><option>All team clients</option>
+            <option>All team manager clients</option><option>All related clients</option>
+          </select>
+        </div>
+      `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-list')">Save Changes</span>`})
+    );
+  }
+};
+
+screens['s-plan-edit-pricing'] = {
+  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Edit Plan — Pricing',
+  hideNav:true,
+  render:()=>{
+    const p = rpCurrentPlan || {};
+    const isHour = p.model === 'Per Hour';
+    const isUnlimited = !p.qtyNum;
+    return ezChrome('Rental Plans',
+      rpListBody(),
+      panel({closeTarget:'s-list', title: p.name||'Edit Plan',
+        tabs:[
+          {label:'Plan Details', onclick:"go('s-plan-edit')"},
+          {label:'Pricing', on:true},
+          {label:'History', onclick:"go('s-plan-edit-history')"}
+        ],
+        body:`
+        <div class="sech">Pricing</div>
+        <div class="field">
+          <label>Purchase Model <span style="color:#b54a4a">*</span></label>
+          <div class="radio${isHour?'':' on'}" id="edit-model-occ" style="margin-bottom:8px;cursor:pointer" onclick="addSelectModel('occ')">
+            <span class="dot"></span><div class="t"><b>Per Occurrence</b><span>One fixed price per rental</span></div>
+          </div>
+          <div class="radio${isHour?' on':''}" id="edit-model-hr" style="cursor:pointer" onclick="addSelectModel('hr')">
+            <span class="dot"></span><div class="t"><b>Per Hour</b><span>Time-based pricing</span></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Quantity <span style="color:#b54a4a">*</span></label>
+          <div class="inline-row">
+            <input type="number" class="form-ctrl" id="edit-qty" placeholder="${isUnlimited?'Unlimited':'e.g. 10'}" style="width:100px" min="1" value="${p.qtyNum||''}" ${isUnlimited?'disabled':''}>
+            <label class="inline-row" style="font-size:12px;color:#6b7280;cursor:pointer;gap:5px">
+              <input type="checkbox" id="edit-unlimited" ${isUnlimited?'checked':''} onchange="editToggleUnlimited(this)" style="cursor:pointer;accent-color:#4f9a7c"> Unlimited
+            </label>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Fees <span style="color:#b54a4a">*</span></label>
+          <div class="field row2" style="margin-bottom:0">
+            <div class="field" style="margin-bottom:0">
+              <label style="font-size:11px;color:#6b7280;font-weight:400">Non-member</label>
+              <div class="inline-row" style="border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;height:32px;gap:3px">
+                <span style="font-size:12px;color:#9aa1aa">$</span>
+                <input type="number" style="border:none;background:none;width:70px;font-size:12px;outline:none;color:var(--ink);font-family:inherit" placeholder="0.00" min="0" step="0.01" value="${p.stdPriceNum||''}">
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:0">
+              <label style="font-size:11px;color:#6b7280;font-weight:400">Member</label>
+              <div class="inline-row" style="border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;height:32px;gap:3px">
+                <span style="font-size:12px;color:#9aa1aa">$</span>
+                <input type="number" style="border:none;background:none;width:70px;font-size:12px;outline:none;color:var(--ink);font-family:inherit" placeholder="0.00" min="0" step="0.01" value="${p.memPriceNum||''}">
+              </div>
+            </div>
+          </div>
+        </div>
+      `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-list')">Save Changes</span>`})
+    );
+  }
+};
+
+screens['s-plan-edit-history'] = {
+  group:'1 · Staff Sales', n:'1.1', crumb:'EZUI Admin · Staff', title:'Edit Plan — History',
+  hideNav:true,
+  render:()=>{
+    const p = rpCurrentPlan || {};
+    const entries = [
+      {initials:'KT', user:'K. Towell', time:'May 9, 2026 · 3:42 PM',
+        changes:[{field:'Status', old:'Unavailable', val:'Available'},{field:'Auto-Renew', old:'Disabled', val:'Enabled'}]},
+      {initials:'MR', user:'M. Rodriguez', time:'Apr 22, 2026 · 10:15 AM',
+        changes:[{field:'Std. Price', old:'$14 / hr', val:'$18 / hr'},{field:'Mbr. Price', old:'$10 / hr', val:'$14 / hr'}]},
+      {initials:'KT', user:'K. Towell', time:'Mar 5, 2026 · 9:00 AM',
+        changes:[{field:'Expiration', old:'90 days', val:'None'}]},
+      {initials:'KT', user:'K. Towell', time:'Jan 14, 2026 · 2:30 PM', created:true}
+    ];
+    const historyHTML = entries.map(e=>{
+      if(e.created) return `<div class="history-entry"><div class="history-av muted">${e.initials}</div><div><div><span class="history-user">${e.user}</span><span class="history-time">${e.time}</span></div><div class="history-created">Plan created</div></div></div>`;
+      const changes = e.changes.map(c=>`<div class="history-field-row"><span class="history-fn">${c.field}</span><span class="history-old">${c.old}</span><span class="history-arrow">→</span><span>${c.val}</span></div>`).join('');
+      return `<div class="history-entry"><div class="history-av">${e.initials}</div><div><div><span class="history-user">${e.user}</span><span class="history-time">${e.time}</span></div>${changes}</div></div>`;
+    }).join('');
+    return ezChrome('Rental Plans',
+      rpListBody(),
+      panel({closeTarget:'s-list', title: p.name||'Edit Plan',
+        tabs:[
+          {label:'Plan Details', onclick:"go('s-plan-edit')"},
+          {label:'Pricing', onclick:"go('s-plan-edit-pricing')"},
+          {label:'History', on:true}
+        ],
+        body:`<div class="sech">Change History</div><div class="history-list">${historyHTML}</div>`,
+        foot:`<span class="sp"></span><span class="btn" onclick="panelTryClose()">Close</span>`})
+    );
+  }
+};
+
+screens['s-add'] = {
+  group:'1 · Staff Sales', n:'1.2', crumb:'EZUI Admin · Staff', title:'Add Rental Plan',
+  notes:`Creates a new plan configuration. Two tabs: <b>Plan Details</b> (name, type, settings) and <b>Pricing</b> (purchase model, quantity, fees). All fields are interactive.`,
+  render:()=> ezChrome('Rental Plans',
+    rpListBody(),
+    panel({closeTarget:'s-list', title:'Add Rental Plan', tabs:[{label:'Plan Details',on:true},{label:'Pricing'}], body:`
+      <div class="sech">Plan Info</div>
+      <div class="field">
+        <label>Plan Name <span style="color:#b54a4a">*</span></label>
+        <input type="text" class="form-ctrl" placeholder="e.g. Court Time Bundle — 10hrs" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Rental Type <span style="color:#b54a4a">*</span></label>
+        <select class="form-ctrl">
+          <option value="">— Select a type —</option>
+          <option>Court</option><option>Field</option><option>Lane</option>
+          <option>Pool</option><option>Room</option><option>Track</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea class="form-ctrl area" placeholder="Brief description visible to staff when selling…"></textarea>
+      </div>
+      <div class="sech" style="margin-top:4px">Plan Settings</div>
+      <div class="field">
+        <label>Selling Status</label>
+        <div class="rowflex">
+          <span class="toggle on" id="add-selling-toggle" onclick="addToggleSelling()" style="cursor:pointer"></span>
+          <span id="add-selling-label" style="font-size:12px;color:var(--ink)">Available</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Plan Start Date</label>
+        <input type="date" class="form-ctrl" id="add-start-date" style="width:180px" value="${new Date().toISOString().split('T')[0]}">
+        <div style="margin-top:6px;display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280">
+          <input type="checkbox" id="add-default-sale-date" onchange="addToggleDefaultSaleDate(this)" style="cursor:pointer;accent-color:#4f9a7c">
+          Default to plan sale date
+        </div>
+      </div>
+      <div class="field">
+        <label>Expiration</label>
+        <div class="rowflex" style="margin-bottom:8px">
+          <span class="toggle" id="add-expiry-toggle" onclick="addToggleExpiry()" style="cursor:pointer"></span>
+          <span id="add-expiry-label" style="font-size:12px;color:#6b7280">No expiration — plan stays active until balance is depleted</span>
+        </div>
+        <div id="add-expiry-fields" style="display:none">
+          <div class="inline-row" style="margin-bottom:8px">
+            <input type="number" class="form-ctrl" placeholder="e.g. 90" style="width:80px" min="1">
+            <select class="form-ctrl" style="width:110px">
+              <option>Days</option><option>Weeks</option><option>Months</option><option>Years</option>
+            </select>
+            <span style="font-size:12px;color:#6b7280">after start date</span>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;cursor:pointer">
+            <input type="checkbox" style="cursor:pointer;accent-color:#4f9a7c"> Allow booking out of range
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <label>Auto-Renew</label>
+        <div class="rowflex" style="margin-bottom:8px">
+          <span class="toggle" id="add-autorenew-toggle" onclick="addToggleAutoRenew()" style="cursor:pointer"></span>
+          <span id="add-autorenew-label" style="font-size:12px;color:#6b7280">Disabled — clients cannot opt in at purchase time</span>
+        </div>
+        <div id="add-autorenew-fields" style="display:none">
+          <div class="add-trigger-box">
+            <div class="add-trigger-lbl">Renew trigger</div>
+            <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+              <input type="radio" name="add-renew-trigger" value="before" checked style="accent-color:#4f9a7c;flex:0 0 auto">
+              <input type="number" class="form-ctrl" placeholder="e.g. 7" style="width:64px" min="1">
+              <select class="form-ctrl" style="width:90px"><option>Days</option><option>Weeks</option><option>Months</option><option>Years</option></select>
+              <span>before expiration</span>
+            </label>
+            <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+              <input type="radio" name="add-renew-trigger" value="threshold" style="accent-color:#4f9a7c;flex:0 0 auto">
+              <span>when the renewal threshold is reached</span>
+            </label>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label>Renews as</label>
+            <select class="form-ctrl">
+              <option>A copy of itself</option>
+              <option>10-Hour Court Pack</option>
+              <option>Pickleball 20 Play</option>
+              <option>Field Rental 5hr</option>
+              <option>Drop-in 5 Pack</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Share with</label>
+        <select class="form-ctrl">
+          <option value="">— Select a group —</option>
+          <option>All child clients</option><option>All coach clients</option>
+          <option>All employee clients</option><option>All employer clients</option>
+          <option>All grandchild clients</option><option>All grandparent clients</option>
+          <option>All other clients</option><option>All parent clients</option>
+          <option>All player clients</option><option>All sibling clients</option>
+          <option>All spouse clients</option><option>All team clients</option>
+          <option>All team manager clients</option><option>All related clients</option>
+        </select>
+      </div>
+    `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-add-pricing')">Next: Pricing</span>`})
+  )
+};
+
+screens['s-add-pricing'] = {
+  group:'1 · Staff Sales', n:'1.2', crumb:'EZUI Admin · Staff', title:'Add Rental Plan — Pricing',
+  hideNav:true,
+  notes:`Step 2 of adding a plan. Sets purchase model, quantity, and fees. All fields are interactive.`,
+  render:()=> ezChrome('Rental Plans',
+    rpListBody(),
+    panel({closeTarget:'s-list', title:'Add Rental Plan', tabs:[{label:'Plan Details'},{label:'Pricing',on:true}], body:`
+      <div class="sech">Pricing</div>
+      <div class="field">
+        <label>Purchase Model <span style="color:#b54a4a">*</span></label>
+        <div class="radio on" id="add-model-occ" style="margin-bottom:8px;cursor:pointer" onclick="addSelectModel('occ')">
+          <span class="dot"></span><div class="t"><b>Per Occurrence</b><span>One fixed price per rental</span></div>
+        </div>
+        <div class="radio" id="add-model-hr" style="cursor:pointer" onclick="addSelectModel('hr')">
+          <span class="dot"></span><div class="t"><b>Per Hour</b><span>Time-based pricing</span></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Quantity <span style="color:#b54a4a">*</span></label>
+        <div class="inline-row">
+          <input type="number" class="form-ctrl" id="add-qty" placeholder="Unlimited" style="width:100px" min="1" disabled>
+          <label class="inline-row" style="font-size:12px;color:#6b7280;cursor:pointer;gap:5px">
+            <input type="checkbox" id="add-unlimited" checked onchange="addToggleUnlimited(this)" style="cursor:pointer;accent-color:#4f9a7c"> Unlimited
+          </label>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Fees <span style="color:#b54a4a">*</span></label>
+        <div class="field row2" style="margin-bottom:0">
+          <div class="field" style="margin-bottom:0">
+            <label style="font-size:11px;color:#6b7280;font-weight:400">Non-member</label>
+            <div class="inline-row" style="border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;height:32px;gap:3px">
+              <span style="font-size:12px;color:#9aa1aa">$</span>
+              <input type="number" style="border:none;background:none;width:70px;font-size:12px;outline:none;color:var(--ink);font-family:inherit" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0">
+            <label style="font-size:11px;color:#6b7280;font-weight:400">Member</label>
+            <div class="inline-row" style="border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;height:32px;gap:3px">
+              <span style="font-size:12px;color:#9aa1aa">$</span>
+              <input type="number" style="border:none;background:none;width:70px;font-size:12px;outline:none;color:var(--ink);font-family:inherit" placeholder="0.00" min="0" step="0.01">
+            </div>
+          </div>
+        </div>
+      </div>
+    `, foot:`<span class="btn" onclick="go('s-add')">Back</span><span class="sp"></span><span class="btn primary" onclick="go('s-list')">Add Plan</span>`})
+  )
 };
 
 screens['s-sell-select'] = {
-  group:'1 · Staff Sales', n:'1.2', crumb:'EZUI Admin · Sell flow — step 1', title:'Sell a Plan — select client & plan',
+  group:'1 · Staff Sales', n:'1.3', crumb:'EZUI Admin · Sell flow — step 1', title:'Sell a Plan — select client & plan',
   notes:`Right side-panel (same chrome as Create Membership Plan). Step 1 of the sell flow.
   <ul><li>Pick the client first, then choose from <b>eligible plans only</b> — ineligible (e.g. member-only) plans are filtered out.</li>
   <li>Member vs. non-member price resolves automatically from the selected client.</li>
   <li><b>Continue to payment</b> → next step.</li></ul>`,
-  render:()=> ezChrome('Rental Plans',
-    `<div class="pagehead"><h3>Rental Plans</h3></div><table class="tbl"><thead><tr><th>Plan name</th><th>Type</th><th>Price</th></tr></thead><tbody><tr><td>10-Hour Court Pack</td><td>Hours</td><td>$100</td></tr><tr><td>Pickleball 20 Play</td><td>Occurrences</td><td>$160</td></tr></tbody></table>`,
-    panel({title:'Sell Rental Plan', tabs:[{label:'Select',on:true},{label:'Payment'},{label:'Confirm'}], body:`
-      <div class="field"><label>Client</label><div class="ctl">Jordan Lee · Member ✓</div></div>
-      <div class="note-anchor">Eligible plans shown for this client. Member-only plans are hidden when the client is a non-member (see open question on catalog filtering).</div>
-      <div class="sech">Select a plan</div>
-      <div class="radio on"><span class="dot"></span><div class="t"><b>10-Hour Court Pack</b><span>10 hours · expires 90 days after purchase</span></div><div style="margin-left:auto;text-align:right"><b>$80</b><div style="font-size:10.5px;color:#7a828c">member price</div></div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Pickleball 20 Play</b><span>20 occurrences · no expiry</span></div><div style="margin-left:auto;text-align:right"><b>$140</b><div style="font-size:10.5px;color:#7a828c">member price</div></div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Drop-in 5 Pack</b><span>5 occurrences · expires 30 days</span></div><div style="margin-left:auto;text-align:right"><b>$50</b></div></div>
-      <div class="field" style="margin-top:14px"><label>Auto-renew</label><div class="rowflex"><span class="toggle"></span><span style="color:#6b7280;font-size:12px">Renew automatically when balance is depleted</span></div></div>
-    `, foot:`<span class="btn" onclick="go('s-list')">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-sell-pay')">Continue to payment</span>`})
-  )
+  render:()=>{
+    const isMem = sellClient && sellClient.type==='Member';
+    const hasClient = !!sellClient;
+
+    /* ---- Client section ---- */
+    const clientSection = sellNewClient ? `
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:12px;font-weight:600;color:var(--ink)">New client</span>
+        <a href="#" onclick="sellCancelNewClient();return false" style="font-size:11.5px;color:#4f9a7c;text-decoration:none">← Back to search</a>
+      </div>
+      <div class="field row2" style="margin-bottom:10px">
+        <div class="field" style="margin-bottom:0">
+          <label>First name <span style="color:#b54a4a">*</span></label>
+          <input class="form-ctrl" id="snc-first" type="text" placeholder="First" autocomplete="given-name">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Last name</label>
+          <input class="form-ctrl" id="snc-last" type="text" placeholder="Last" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field row2" style="margin-bottom:10px">
+        <div class="field" style="margin-bottom:0">
+          <label>Birth date</label>
+          <input class="form-ctrl" id="snc-dob" type="date">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Phone</label>
+          <input class="form-ctrl" id="snc-phone" type="tel" placeholder="(555) 000-0000" autocomplete="tel">
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:12px">
+        <label>Client type</label>
+        <div style="display:flex;gap:16px;margin-top:4px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+            <input type="radio" name="snc-type" value="Non-member" checked style="accent-color:#4f9a7c"> Non-member
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">
+            <input type="radio" name="snc-type" value="Member" style="accent-color:#4f9a7c"> Member
+          </label>
+        </div>
+      </div>
+      <button class="btn primary sm" onclick="sellConfirmNewClient()" style="margin-bottom:4px">Save client</button>
+    ` : `
+      <div class="sell-client-wrap${sellClient?' has-client':''}">
+        <input class="form-ctrl" id="sell-client-input" type="text" placeholder="Search by name or phone…" autocomplete="off"
+          value="${sellClient?sellClient.name:sellSearchQuery}"
+          oninput="sellSearchClient(this.value)"
+          onfocus="sellSearchClient(this.value)"
+          onblur="setTimeout(()=>{const d=document.getElementById('sell-client-dd');if(d)d.style.display='none';},150)">
+        <button class="sell-client-clear" onclick="sellClearClient()" title="Clear">&#10005;</button>
+        <div class="sell-dd" id="sell-client-dd"></div>
+      </div>
+      ${hasClient ? `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+          <span style="font-size:11.5px;color:#6b7280">${sellClient.dob||''}${sellClient.dob&&sellClient.phone?' · ':''}${sellClient.phone||''}</span>
+          <span class="tag ${isMem?'green':'gray'}" style="font-size:10px;padding:1px 5px">${sellClient.type}${sellClient.isNew?' · New':''}</span>
+        </div>
+      ` : `
+        <div style="margin-top:7px;font-size:12px;color:#6b7280">
+          Can't find them? <a href="#" onclick="sellShowNewClientForm();return false" style="color:#4f9a7c;text-decoration:none;font-weight:500">+ Create new client</a>
+        </div>
+      `}
+    `;
+
+    /* ---- Plan cards ---- */
+    const planCards = Object.entries(rpPlanData).map(([id,p])=>{
+      if(p.archived) return '';
+      const eligible = hasClient ? sellEligible(p, isMem) : true;
+      const pr = sellGetPrice(p);
+      const qtyStr = p.model==='Per Hour' ? `${p.qtyNum} hrs` : `${p.qtyNum} occurrences`;
+      const expStr = p.expiry==='No expiration' ? 'no expiry' : `expires ${p.expiry} from purchase`;
+      const isSelected = hasClient && parseInt(id)===sellPlanId;
+      return `<div class="radio${isSelected?' on':''}" id="sell-plan-${id}"
+          style="${eligible?'':'display:none'}"
+          ${hasClient?`onclick="sellPickPlan(${id})" style="cursor:pointer"`:''}>
+        <span class="dot"></span>
+        <div class="t"><b>${p.name}</b><span>${qtyStr} · ${expStr}</span></div>
+        <div class="sell-plan-price"><b>${hasClient?pr.price:'—'}</b>${hasClient&&pr.isMember?'<div style="font-size:10.5px;color:#7a828c">member price</div>':''}</div>
+      </div>`;
+    }).join('');
+
+    const canContinue = !!(hasClient && sellPlanId);
+    return ezChrome('Rental Plans',
+      rpListBody(),
+      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select',on:true},{label:'Payment'},{label:'Confirm'}], body:`
+        <div class="field" style="margin-bottom:${sellNewClient?'4px':'10px'}">
+          <label>Client <span style="color:#b54a4a">*</span></label>
+          ${clientSection}
+        </div>
+        <div class="sech" style="margin-top:4px">Select a plan</div>
+        <div style="position:relative">
+          <div style="${hasClient?'':'pointer-events:none;opacity:.45'}">
+            ${planCards}
+          </div>
+          ${!hasClient?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+            <span style="font-size:11.5px;color:#6b7280;background:#f3f5f6;padding:5px 12px;border-radius:20px;border:1px solid var(--line2);white-space:nowrap">Select or add a client first</span>
+          </div>`:''}
+        </div>
+        <div class="field" style="margin-top:14px;margin-bottom:0">
+          <label>Auto-renew</label>
+          <div class="rowflex" style="margin-bottom:${sellAutoRenew?'10px':'0'}">
+            <span class="toggle${sellAutoRenew?' on':''}" onclick="sellToggleAutoRenew()" style="cursor:pointer"></span>
+            <span style="color:#6b7280;font-size:12px">${sellAutoRenew?'Renew automatically when balance is depleted':'Off — client can opt in later'}</span>
+          </div>
+          ${sellAutoRenew ? `
+          <div style="margin-bottom:8px">
+            <label style="display:inline-flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;font-weight:400">
+              <input type="checkbox" ${sellArUseDefault?'checked':''} onchange="sellArToggleUseDefault(this)" style="cursor:pointer;accent-color:#4f9a7c">
+              Use plan default
+            </label>
+          </div>
+          <div class="add-trigger-box">
+            <div class="add-trigger-lbl">Renew trigger</div>
+            <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+              <input type="radio" name="sell-renew-trigger" value="before" ${sellArTriggerType==='before'?'checked':''}
+                onchange="sellArSetTriggerType('before')" ${sellArUseDefault?'disabled':''} style="accent-color:#4f9a7c;flex:0 0 auto">
+              <input type="number" id="sell-ar-num" class="form-ctrl" placeholder="e.g. 7" style="width:64px" min="1"
+                value="${sellArTriggerNum}" oninput="sellArSetNum(this.value)"
+                ${sellArUseDefault||sellArTriggerType!=='before'?'disabled':''}>
+              <select class="form-ctrl" id="sell-ar-unit" style="width:90px" onchange="sellArSetUnit(this.value)"
+                ${sellArUseDefault||sellArTriggerType!=='before'?'disabled':''}>
+                ${['Days','Weeks','Months','Years'].map(u=>`<option${sellArTriggerUnit===u?' selected':''}>${u}</option>`).join('')}
+              </select>
+              <span style="color:${sellArUseDefault||sellArTriggerType!=='before'?'#9aa1aa':'inherit'}">before expiration</span>
+            </label>
+            <label class="inline-row" style="font-size:12px;color:var(--ink);cursor:pointer">
+              <input type="radio" name="sell-renew-trigger" value="threshold" ${sellArTriggerType==='threshold'?'checked':''}
+                onchange="sellArSetTriggerType('threshold')" ${sellArUseDefault?'disabled':''} style="accent-color:#4f9a7c;flex:0 0 auto">
+              <span style="color:${sellArUseDefault?'#9aa1aa':'inherit'}">when the renewal threshold is reached</span>
+            </label>
+          </div>
+          <div class="field" style="margin-top:8px;margin-bottom:0">
+            <label>Renews as</label>
+            <select class="form-ctrl" id="sell-ar-renewas" onchange="sellArSetRenewAs(this.value)" ${sellArUseDefault?'disabled':''}>
+              <option value="copy"${sellArRenewAs==='copy'?' selected':''}>A copy of itself</option>
+              ${Object.entries(rpPlanData).filter(([id,p])=>!p.archived).map(([id,p])=>`<option value="${id}"${sellArRenewAs===String(id)?' selected':''}>${p.name}</option>`).join('')}
+            </select>
+          </div>
+          ` : ''}
+        </div>
+      `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" style="opacity:${canContinue?1:.4};${canContinue?'':'pointer-events:none'}" onclick="go('s-sell-pay')">Continue to payment</span>`})
+    );
+  }
 };
 
 screens['s-sell-pay'] = {
-  group:'1 · Staff Sales', n:'1.3', crumb:'EZUI Admin · Sell flow — step 2', title:'Sell a Plan — payment (existing iframe)',
+  group:'1 · Staff Sales', n:'1.4', crumb:'EZUI Admin · Sell flow — step 2', title:'Sell a Plan — payment (existing iframe)',
   notes:`Payment is handled by the <b>existing EZUI payment iframe</b> — no new payment UI is designed. The wireframe just shows where it plugs into the panel.
   <ul><li>Order summary above the embedded payment frame for context.</li></ul>`,
-  render:()=> ezChrome('Rental Plans',`<div class="pagehead"><h3>Rental Plans</h3></div>`,
-    panel({title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment',on:true},{label:'Confirm'}], body:`
-      <div class="sech">Order summary</div>
-      <div class="kv"><span class="k">Client</span><span>Jordan Lee</span></div>
-      <div class="kv"><span class="k">Plan</span><span>10-Hour Court Pack (10 hrs)</span></div>
-      <div class="kv"><span class="k">Member price</span><span>$80.00</span></div>
-      <div class="kv"><span class="k">Tax</span><span>$6.40</span></div>
-      <div class="kv"><span style="font-weight:600">Total</span><span style="font-weight:700">$86.40</span></div>
-      <div class="sech" style="margin-top:16px">Payment</div>
-      <div class="iframe-stub"><div class="ph" style="width:120px;height:14px"></div><div>Existing EZUI payment iframe<br/>(card / saved method / terminal)</div></div>
-    `, foot:`<span class="btn" onclick="go('s-sell-select')">Back</span><span class="sp"></span><span class="btn primary" onclick="go('s-sell-confirm')">Charge $86.40</span>`})
-  )
+  render:()=>{
+    const p = sellPlanId ? rpPlanData[sellPlanId] : null;
+    const isMem = sellClient && sellClient.type==='Member';
+    const pr = p ? sellGetPrice(p) : {price:'—', isMember:false};
+    const clientName = sellClient ? sellClient.name : '—';
+    const planName = p ? `${p.name} (${p.qty})` : '—';
+    const priceLbl = pr.isMember ? 'Member price' : 'Non-member price';
+    // Mock tax: 8%
+    const priceNum = p ? (isMem && p.memPriceNum ? parseFloat(p.memPriceNum) : parseFloat(p.stdPriceNum||0)) : 0;
+    const tax = (priceNum * 0.08).toFixed(2);
+    const total = (priceNum + parseFloat(tax)).toFixed(2);
+    return ezChrome('Rental Plans',rpListBody(),
+      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select',onclick:"go('s-sell-select')"},{label:'Payment',on:true},{label:'Confirm'}], body:`
+        <div class="sech">Order summary</div>
+        <div class="kv"><span class="k">Client</span><span>${clientName}${isMem?' <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>':''}</span></div>
+        <div class="kv"><span class="k">Plan</span><span>${planName}</span></div>
+        <div class="kv"><span class="k">${priceLbl}</span><span>${pr.price}</span></div>
+        <div class="kv"><span class="k">Tax (8%)</span><span>$${tax}</span></div>
+        <div class="kv" style="border-bottom:none"><span style="font-weight:600">Total</span><span style="font-weight:700">$${total}</span></div>
+        ${sellAutoRenew?'<div class="kv" style="border-bottom:none"><span class="k">Auto-renew</span><span><span class="tag green" style="font-size:10px">On</span></span></div>':''}
+        <div class="sech" style="margin-top:16px">Payment</div>
+        <div class="iframe-stub"><div class="ph" style="width:120px;height:14px"></div><div>Existing EZUI payment iframe<br/>(card / saved method / terminal)</div></div>
+      `, foot:`<span class="btn" onclick="go('s-sell-select')">Back</span><span class="sp"></span><span class="btn primary" onclick="go('s-sell-confirm')">Charge $${total}</span>`})
+    );
+  }
 };
 
 screens['s-sell-confirm'] = {
-  group:'1 · Staff Sales', n:'1.4', crumb:'EZUI Admin · Sell flow — step 3', title:'Sale confirmation — balance visible',
+  group:'1 · Staff Sales', n:'1.5', crumb:'EZUI Admin · Sell flow — step 3', title:'Sale confirmation — balance visible',
   notes:`Success state. The new plan and its <b>starting balance are immediately visible</b>. From here staff can view the client profile or sell another.
   <ul><li>Confirmation mirrors the post-sale state used for Membership Plans.</li></ul>`,
-  render:()=> ezChrome('Rental Plans',`<div class="pagehead"><h3>Rental Plans</h3></div>`,
-    panel({title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment'},{label:'Confirm',on:true}], body:`
-      <div class="banner ok"><span class="bi"></span><div><b>Plan sold to Jordan Lee.</b> Balance is available now.</div></div>
-      <div class="plancard-lg" style="border-radius:8px;padding:16px">
-        <div style="font-weight:600;font-size:14px;margin-bottom:8px">10-Hour Court Pack</div>
-        <div class="kv"><span class="k">Balance</span><span><b>10.0 / 10 hours</b></span></div>
-        <div class="kv"><span class="k">Status</span><span><span class="tag green">Active</span></span></div>
-        <div class="kv"><span class="k">Expires</span><span>Sep 9, 2026 (90 days)</span></div>
-        <div class="kv"><span class="k">Auto-renew</span><span>Off</span></div>
-        <div class="kv"><span class="k">Paid</span><span>$86.40 · Visa ••42</span></div>
-      </div>
-    `, foot:`<span class="btn" onclick="go('s-profile')">View client profile</span><span class="sp"></span><span class="btn primary" onclick="go('s-list')">Done</span>`})
-  )
+  render:()=>{
+    const p = sellPlanId ? rpPlanData[sellPlanId] : null;
+    const isMem = sellClient && sellClient.type==='Member';
+    const pr = p ? sellGetPrice(p) : {price:'—', isMember:false};
+    const clientName = sellClient ? sellClient.name : '—';
+    const priceNum = p ? (isMem && p.memPriceNum ? parseFloat(p.memPriceNum) : parseFloat(p.stdPriceNum||0)) : 0;
+    const tax = (priceNum * 0.08).toFixed(2);
+    const total = (priceNum + parseFloat(tax)).toFixed(2);
+    // Compute mock expiry date
+    let expiryStr = p && p.expiry && p.expiry !== 'No expiration' ? (() => {
+      const d = new Date(2026,5,17); // today's mock date
+      const num = parseInt(p.expiryNum||0);
+      const unit = (p.expiryUnit||'Days').toLowerCase();
+      if(unit==='days') d.setDate(d.getDate()+num);
+      else if(unit==='weeks') d.setDate(d.getDate()+num*7);
+      else if(unit==='months') d.setMonth(d.getMonth()+num);
+      return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ` (${p.expiry})`;
+    })() : 'No expiration';
+    const balStr = p ? (p.model==='Per Hour' ? `${p.qtyNum}.0 / ${p.qtyNum} hrs` : `${p.qtyNum} / ${p.qtyNum} occurrences`) : '—';
+    return ezChrome('Rental Plans',rpListBody(),
+      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment'},{label:'Confirm',on:true}], body:`
+        <div class="banner ok"><span class="bi"></span><div><b>Plan sold to ${clientName}.</b> Balance is available now.</div></div>
+        <div class="plancard-lg" style="border-radius:8px;padding:16px">
+          <div style="font-weight:600;font-size:14px;margin-bottom:8px">${p?p.name:'—'}</div>
+          <div class="kv"><span class="k">Balance</span><span><b>${balStr}</b></span></div>
+          <div class="kv"><span class="k">Status</span><span><span class="tag green">Active</span></span></div>
+          <div class="kv"><span class="k">Expires</span><span>${expiryStr}</span></div>
+          <div class="kv"><span class="k">Auto-renew</span><span>${sellAutoRenew?'<span class="tag green" style="font-size:10px">On</span>':'Off'}</span></div>
+          <div class="kv"><span class="k">Paid</span><span>$${total} · Visa ••42</span></div>
+        </div>
+      `, foot:`<span class="btn" onclick="go('s-profile')">View client profile</span><span class="sp"></span><span class="btn primary" onclick="rpSellInit(null);go('s-list')">Done</span>`})
+    );
+  }
 };
 
 screens['s-profile'] = {
-  group:'1 · Staff Sales', n:'1.5', crumb:'EZUI Admin · Client Profile', title:'Client Profile — purchased plans (Rentals)',
+  group:'1 · Staff Sales', n:'1.6', crumb:'EZUI Admin · Client Profile', title:'Client Profile — purchased plans (Rentals)',
   notes:`Lives in the Client Profile alongside the existing Packages tab. <b>Design decision shown: Option A — sub-tabs (Sessions | Rentals)</b> inside the existing Packages tab (vs. a separate tab). Flag your preference.
   <ul><li>Filter: Active Only / All / Completed. Columns: plan, purchased, used, remaining, status, expiry, auto-renew.</li>
   <li>Row actions: View details / Edit / Set Active / Set Inactive. <b>Edit</b> opens the edit panel.</li>
   <li>No refund screen here — refunds use the existing Billing tab.</li></ul>`,
   render:()=> ezChrome('Clients', `
     <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3>
-      <div class="acts"><span class="btn primary" onclick="go('s-sell-select')">+ Sell Plan</span></div>
+      <div class="acts"><span class="btn primary" onclick="rpSellInit(null)">+ Sell Plan</span></div>
     </div>
     <div class="seg" style="margin-bottom:14px"><span>Overview</span><span>Schedule</span><span class="on">Packages</span><span>Billing</span><span>Family</span></div>
     <div class="ptabs" style="border:none;padding:0;margin-bottom:12px"><span>Sessions</span><span class="on">Rentals</span></div>
@@ -470,11 +1171,11 @@ screens['s-profile'] = {
 };
 
 screens['s-edit'] = {
-  group:'1 · Staff Sales', n:'1.6', crumb:'EZUI Admin · Client Profile', title:'Edit purchased plan (auto-renew / status)',
+  group:'1 · Staff Sales', n:'1.7', crumb:'EZUI Admin · Client Profile', title:'Edit purchased plan (auto-renew / status)',
   notes:`Opened from the row action. Per the brief, staff can <b>toggle auto-renew, change status, and cancel auto-renew</b> here. Plan config (price/hours) is NOT editable from this client-level panel — that's the out-of-scope admin CRUD.
   <ul><li>Auto-renew toggle clarifies it requires a saved payment method (shows a note when none exists).</li></ul>`,
   render:()=> ezChrome('Clients',`<div class="pagehead"><h3>Jordan Lee</h3></div>`,
-    panel({title:'Edit Plan — 10-Hour Court Pack', body:`
+    panel({closeTarget:'s-profile', title:'Edit Plan — 10-Hour Court Pack', body:`
       <div class="sech">Balance (read-only)</div>
       <div class="kv"><span class="k">Remaining</span><span>10.0 / 10 hours</span></div>
       <div class="kv"><span class="k">Expires</span><span>Sep 9, 2026</span></div>
@@ -484,7 +1185,7 @@ screens['s-edit'] = {
       <div class="field"><div class="rowflex"><span class="toggle on"></span><span style="font-size:12px">Renew automatically when depleted or expired</span></div></div>
       <div class="banner warn"><span class="bi"></span><div>Auto-renew uses the client's saved payment method. <b>No saved method on file</b> — add one in Billing to enable.</div></div>
       <div class="btn link">Cancel auto-renew</div>
-    `, foot:`<span class="btn" onclick="go('s-profile')">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-profile')">Save changes</span>`})
+    `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-profile')">Save changes</span>`})
   )
 };
 
@@ -496,14 +1197,14 @@ screens['sch-choice'] = {
   <li>No hybrid payments — one booking = one method.</li></ul>`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`,
-    panel({title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
+    panel({closeTarget:'sch-choice', title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
       <div class="field"><label>Client</label><div class="ctl">Jordan Lee</div></div>
       <div class="field row2"><div class="field"><label>Date</label><div class="ctl">Jun 14, 2026</div></div><div class="field"><label>Time</label><div class="ctl">5:00–7:00 PM (2 hrs)</div></div></div>
       <div class="sech">Payment method</div>
       <div class="note-anchor">Client has an active plan — staff must choose plan or rate before saving.</div>
       <div class="radio on"><span class="dot"></span><div class="t"><b>Use plan — 10-Hour Court Pack</b><span>10.0 hrs available · this booking deducts <b>2.0 hrs</b> → 8.0 hrs left</span></div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$60.00 (2 hrs × $30/hr) · standard rate billing</span></div></div>
-    `, foot:`<span class="btn">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('sch-confirm')">Book &amp; deduct</span>`})
+    `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('sch-confirm')">Book &amp; deduct</span>`})
   )
 };
 
@@ -512,14 +1213,14 @@ screens['sch-insufficient'] = {
   notes:`Client's plan doesn't cover the booking. Booking is blocked with a clear message and options. No partial coverage in MVP.
   <ul><li>Options: <b>purchase more for the client</b>, <b>charge the rental rate</b>, or <b>cancel</b>. Uses the existing inline red-banner pattern seen in the rental booking panels.</li></ul>`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>`,
-    panel({title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
+    panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
       <div class="field"><label>Client</label><div class="ctl">Jordan Lee</div></div>
       <div class="field row2"><div class="field"><label>Duration</label><div class="ctl">3 hrs</div></div><div class="field"><label>Plan balance</label><div class="ctl">1.5 hrs</div></div></div>
       <div class="banner danger"><span class="bi"></span><div><b>Not enough plan balance.</b> 1.5 hours remaining, but this rental requires 3.0 hours. Choose an option below to continue.</div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Purchase more for the client</b><span>Add hours/occurrences, then apply to this booking</span></div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Charge the rental rate instead</b><span>$90.00 (3 hrs × $30/hr) · bypass plan</span></div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Cancel booking</b><span>Don't book at this time</span></div></div>
-    `, foot:`<span class="btn">Close</span><span class="sp"></span><span class="btn primary">Continue</span>`})
+    `, foot:`<span class="btn" onclick="panelTryClose()">Close</span><span class="sp"></span><span class="btn primary">Continue</span>`})
   )
 };
 
@@ -529,7 +1230,7 @@ screens['sch-confirm'] = {
   <ul><li>Restoration is unconditional on cancel/delete (before OR after start time) — see 2.5.</li></ul>`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'background:#cfe8df;outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`,
-    panel({title:'Rental booked · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
+    panel({closeTarget:'sch-choice', title:'Rental booked · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
       <div class="banner ok"><span class="bi"></span><div><b>Rental booked.</b> 2.0 hours deducted from 10-Hour Court Pack.</div></div>
       <div class="kv"><span class="k">Client</span><span>Jordan Lee</span></div>
       <div class="kv"><span class="k">When</span><span>Jun 14, 5:00–7:00 PM</span></div>
@@ -827,7 +1528,7 @@ screens['about'] = {
 };
 
 /* ============ Nav + routing ============ */
-const order = ['s-list','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
+const order = ['s-list','s-view','s-plan-edit','s-plan-edit-pricing','s-plan-edit-history','s-add','s-add-pricing','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
   'sch-choice','sch-insufficient','sch-confirm','sch-family','sch-restore','sch-restore-done',
   'ss-catalog','ss-detail','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-choice','ss-book-confirm','ss-insufficient',
   'ar-notice','ar-success','ar-fail','ar-cancel','ar-cancel-done'];
@@ -847,6 +1548,7 @@ function go(id){
   const cap=document.getElementById('caption');
   if(s.standalone){ cap.innerHTML=''; }
   else cap.innerHTML=`<div class="crumb">${s.crumb}</div><h2>${s.n} · ${s.title}</h2><div class="notes">${s.notes||''}</div>`;
+  panelDirty = false;
   document.getElementById('stage').innerHTML=s.render();
   window.scrollTo({top:0,behavior:'smooth'});
   location.hash=id;
@@ -871,6 +1573,21 @@ function rpTab(tab){
   if(cntB) cntB.style.cssText = pip + (tab==='archived' ? 'background:#7fb8a3;color:#fff;' : 'background:#e5e8ea;color:#6b7280;');
   rpMenuClose();
   rpUpdateBulk(tab);
+  // Show/hide Selling Status filter (not relevant for Archived — always Unavailable)
+  var statusSection = document.getElementById('rpFilterStatusSection');
+  var statusDivider = document.getElementById('rpFilterStatusDivider');
+  var hide = tab === 'archived';
+  if (statusSection) statusSection.style.display = hide ? 'none' : '';
+  if (statusDivider) statusDivider.style.display = hide ? 'none' : '';
+  if (hide) {
+    rpFilterStatus.clear();
+    var avEl = document.getElementById('rpF-Available');
+    var unavEl = document.getElementById('rpF-Unavailable');
+    if (avEl) avEl.checked = false;
+    if (unavEl) unavEl.checked = false;
+    rpSyncFilterBtn();
+    rpApplyFilters();
+  }
 }
 function rpSelectAll(tab, el){
   var grid = document.getElementById('rp-' + tab + '-grid');
@@ -961,6 +1678,441 @@ function rpMenuClose(){
   rpMenuOpenId = null;
 }
 document.addEventListener('click', rpMenuClose);
+
+/* ── Side panel close / dirty-state guard ── */
+var panelDirty = false;
+
+// Mark the panel dirty on any user interaction with form elements
+document.addEventListener('input', function(e){
+  if (e.target.closest && e.target.closest('.panel')) panelDirty = true;
+});
+document.addEventListener('change', function(e){
+  if (e.target.closest && e.target.closest('.panel')) panelDirty = true;
+});
+document.addEventListener('click', function(e){
+  if (!e.target.closest) return;
+  // radio cards, seg pills, toggles, editable fields inside the panel body
+  if (e.target.closest('.panel .pbody .radio') ||
+      e.target.closest('.panel .pbody .toggle') ||
+      e.target.closest('.panel .pbody .seg span') ||
+      e.target.closest('.panel .pbody .field .ctl')) {
+    panelDirty = true;
+  }
+});
+
+function panelTryClose() {
+  var sp = document.getElementById('sidePanel');
+  var target = sp ? sp.dataset.closeTarget : '';
+  if (!panelDirty) { panelDoClose(target); return; }
+  _showPanelCloseConfirm(target);
+}
+
+function panelDoClose(target) {
+  panelDirty = false;
+  var overlay = document.getElementById('panelCloseConfirm');
+  if (overlay) overlay.remove();
+  if (target) go(target);
+}
+
+function _showPanelCloseConfirm(target) {
+  var existing = document.getElementById('panelCloseConfirm');
+  if (existing) existing.remove();
+  var ez = document.querySelector('.ez');
+  if (!ez) { panelDoClose(target); return; }
+  var el = document.createElement('div');
+  el.id = 'panelCloseConfirm';
+  el.style.cssText = 'position:absolute;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(30,34,40,.34)';
+  el.innerHTML =
+    '<div style="width:360px;background:#fff;border-radius:10px;box-shadow:0 16px 50px rgba(20,25,30,.3);padding:20px 22px;">' +
+      '<h4 style="margin:0 0 8px;font-size:15px;">Discard changes?</h4>' +
+      '<p style="margin:0 0 18px;color:#4b5159;font-size:12.5px;">You have unsaved changes. If you close now, they\'ll be lost.</p>' +
+      '<div style="display:flex;gap:8px;justify-content:flex-end;">' +
+        '<button class="btn" onclick="document.getElementById(\'panelCloseConfirm\').remove()">Keep editing</button>' +
+        '<button class="btn" style="background:#b54a4a;border-color:#b54a4a;color:#fff;" onclick="panelDoClose(\'' + target + '\')">Discard changes</button>' +
+      '</div>' +
+    '</div>';
+  ez.appendChild(el);
+}
+
+/* ── Rental Plans search / filter ── */
+var rpSearchQuery = '';
+var rpFilterStatus = new Set();
+var rpFilterModel = new Set();
+var rpFilterStdMin = null, rpFilterStdMax = null;
+var rpFilterMemMin = null, rpFilterMemMax = null;
+var rpFilterStartFrom = null, rpFilterStartTo = null;
+
+function rpOnSearch(val) {
+  rpSearchQuery = val.trim().toLowerCase();
+  document.getElementById('rpSearchWrap')?.classList.toggle('has-value', val.length > 0);
+  rpApplyFilters();
+}
+function rpClearMainSearch() {
+  var si = document.getElementById('rpSearchInput');
+  if (si) { si.value = ''; }
+  rpOnSearch('');
+  if (si) si.focus();
+}
+function rpToggleFilterPopover(e) {
+  e.stopPropagation();
+  var pop = document.getElementById('rpFilterPopover');
+  if (!pop) return;
+  if (pop.classList.contains('open')) { rpCloseFilterPopover(); }
+  else { pop.classList.add('open'); rpSyncFilterBtn(); }
+}
+function rpCloseFilterPopover() {
+  var pop = document.getElementById('rpFilterPopover');
+  if (pop) pop.classList.remove('open');
+  rpSyncFilterBtn();
+}
+function rpSyncFilterBtn() {
+  var priceActive = rpFilterStdMin !== null || rpFilterStdMax !== null || rpFilterMemMin !== null || rpFilterMemMax !== null;
+  var startActive = rpFilterStartFrom !== null || rpFilterStartTo !== null;
+  var total = rpFilterStatus.size + rpFilterModel.size + (priceActive ? 1 : 0) + (startActive ? 1 : 0);
+  var btn = document.getElementById('rpFilterBtn');
+  var badge = document.getElementById('rpFilterBadge');
+  if (!btn || !badge) return;
+  btn.classList.toggle('active', total > 0);
+  if (total > 0) { badge.style.display = 'inline-flex'; badge.textContent = total; }
+  else { badge.style.display = 'none'; }
+}
+function rpOnFilterChange() {
+  rpFilterStatus.clear(); rpFilterModel.clear();
+  ['Available','Unavailable'].forEach(function(v) { if (document.getElementById('rpF-'+v)?.checked) rpFilterStatus.add(v); });
+  ['Hours','Occurrences'].forEach(function(v) { if (document.getElementById('rpF-'+v)?.checked) rpFilterModel.add(v); });
+  var toNum = function(id) { var el = document.getElementById(id); var v = el ? el.value : ''; return (v !== '') ? parseFloat(v) : null; };
+  var toDate = function(id) { var el = document.getElementById(id); return (el && el.value) ? el.value : null; };
+  rpFilterStdMin = toNum('rpFStdMin'); rpFilterStdMax = toNum('rpFStdMax');
+  rpFilterMemMin = toNum('rpFMemMin'); rpFilterMemMax = toNum('rpFMemMax');
+  rpFilterStartFrom = toDate('rpFStartFrom'); rpFilterStartTo = toDate('rpFStartTo');
+  rpSyncFilterBtn();
+  rpApplyFilters();
+}
+function rpClearFilters() {
+  rpFilterStatus.clear(); rpFilterModel.clear();
+  rpFilterStdMin = null; rpFilterStdMax = null; rpFilterMemMin = null; rpFilterMemMax = null;
+  rpFilterStartFrom = null; rpFilterStartTo = null;
+  ['rpF-Available','rpF-Unavailable','rpF-Hours','rpF-Occurrences'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.checked = false;
+  });
+  ['rpFStdMin','rpFStdMax','rpFMemMin','rpFMemMax','rpFStartFrom','rpFStartTo'].forEach(function(id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  rpSyncFilterBtn();
+  rpApplyFilters();
+}
+function rpRowMatchesFilters(row) {
+  var name   = (row.dataset.name   || '');
+  var status = (row.dataset.status || '');
+  var model  = (row.dataset.model  || '');
+  var stdRaw = row.dataset.std;
+  var memRaw = row.dataset.mem;
+  var start  = (row.dataset.start  || '');
+  var std = (stdRaw !== '' && stdRaw != null) ? parseFloat(stdRaw) : null;
+  var mem = (memRaw !== '' && memRaw != null) ? parseFloat(memRaw) : null;
+
+  if (rpSearchQuery && name.indexOf(rpSearchQuery) === -1) return false;
+  if (rpFilterStatus.size > 0 && !rpFilterStatus.has(status)) return false;
+  if (rpFilterModel.size  > 0 && !rpFilterModel.has(model))   return false;
+  if (rpFilterStdMin  !== null && (std === null || std < rpFilterStdMin))  return false;
+  if (rpFilterStdMax  !== null && (std === null || std > rpFilterStdMax))  return false;
+  if (rpFilterMemMin  !== null && (mem === null || mem < rpFilterMemMin))  return false;
+  if (rpFilterMemMax  !== null && (mem === null || mem > rpFilterMemMax))  return false;
+  if (rpFilterStartFrom !== null && (start === '' || start < rpFilterStartFrom)) return false;
+  if (rpFilterStartTo   !== null && (start === '' || start > rpFilterStartTo))   return false;
+  return true;
+}
+function rpApplyFilters() {
+  var grids = [
+    { id: 'rp-active-grid',   tab: 'active'   },
+    { id: 'rp-archived-grid', tab: 'archived' }
+  ];
+  grids.forEach(function(g) {
+    var grid = document.getElementById(g.id);
+    if (!grid) return;
+    var rows = Array.from(grid.querySelectorAll('tbody tr'));
+    var visible = 0;
+    rows.forEach(function(row) {
+      var show = rpRowMatchesFilters(row);
+      row.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (g.tab === rpCurrentTab) {
+      var lbl = document.getElementById('rp-count-lbl');
+      var sel = rows.filter(function(r){ return r.querySelector('.rp-row-cb')?.checked; }).length;
+      if (lbl && sel === 0) lbl.textContent = visible + ' plan' + (visible !== 1 ? 's' : '');
+    }
+  });
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('rpFilterWrap')?.contains(e.target)) rpCloseFilterPopover();
+});
+
+/* ── Plan data & view ── */
+var rpPlanData = {
+  1:{name:'10-Hour Court Pack', rentalType:'Court', desc:'Prepaid court time in 10-hour increments. Balance deducted automatically at booking.', status:'Available', start:'Jan 1, 2026', startISO:'2026-01-01', expiry:'90 days', expiryNum:'90', expiryUnit:'Days', autoRenew:true, renewTrigger:'14 days before expiration', arTriggerType:'before', arTriggerNum:'14', arTriggerUnit:'Days', renewAs:'copy', model:'Per Occurrence', qty:'10 hrs', qtyNum:'10', stdPriceNum:'100', memPriceNum:'80', stdPrice:'$100.00', memPrice:'$80.00'},
+  2:{name:'Pickleball 20 Play', rentalType:'Court', desc:'', status:'Available', start:'Feb 15, 2026', startISO:'2026-02-15', expiry:'No expiration', expiryNum:'', expiryUnit:'Days', autoRenew:false, model:'Per Occurrence', qty:'20 plays', qtyNum:'20', stdPriceNum:'160', memPriceNum:'140', stdPrice:'$160.00', memPrice:'$140.00'},
+  3:{name:'Field Rental 5hr', rentalType:'Field', desc:'', status:'Available', start:'Jan 1, 2026', startISO:'2026-01-01', expiry:'60 days', expiryNum:'60', expiryUnit:'Days', autoRenew:false, model:'Per Hour', qty:'5 hrs', qtyNum:'5', stdPriceNum:'75', memPriceNum:'', stdPrice:'$75.00', memPrice:'—'},
+  4:{name:'Drop-in 5 Pack', rentalType:'Court', desc:'', status:'Available', start:'Mar 1, 2026', startISO:'2026-03-01', expiry:'30 days', expiryNum:'30', expiryUnit:'Days', autoRenew:false, model:'Per Occurrence', qty:'5 plays', qtyNum:'5', stdPriceNum:'60', memPriceNum:'50', stdPrice:'$60.00', memPrice:'$50.00'},
+  5:{name:'Members 50 Play', rentalType:'Court', desc:'Member-only discounted plan.', status:'Unavailable', start:'', startISO:'', expiry:'No expiration', expiryNum:'', expiryUnit:'Days', autoRenew:false, model:'Per Occurrence', qty:'50 plays', qtyNum:'50', stdPriceNum:'', memPriceNum:'200', stdPrice:'—', memPrice:'$200.00'},
+  6:{name:'Weekend Warrior Pack', rentalType:'Court', desc:'', status:'Available', start:'Apr 1, 2026', startISO:'2026-04-01', expiry:'120 days', expiryNum:'120', expiryUnit:'Days', autoRenew:true, renewTrigger:'30 days before expiration', arTriggerType:'before', arTriggerNum:'30', arTriggerUnit:'Days', renewAs:'copy', model:'Per Hour', qty:'8 hrs', qtyNum:'8', stdPriceNum:'90', memPriceNum:'72', stdPrice:'$90.00', memPrice:'$72.00'},
+  7:{name:'Summer Day Pass', rentalType:'Court', desc:'Single-day drop-in pass for summer use.', status:'Unavailable', start:'', startISO:'', expiry:'1 day', expiryNum:'1', expiryUnit:'Days', autoRenew:false, model:'Per Occurrence', qty:'1 play', qtyNum:'1', stdPriceNum:'25', memPriceNum:'20', stdPrice:'$25.00', memPrice:'$20.00', archived:true},
+  8:{name:'Court Time 3hr', rentalType:'Court', desc:'', status:'Unavailable', start:'', startISO:'', expiry:'30 days', expiryNum:'30', expiryUnit:'Days', autoRenew:false, model:'Per Hour', qty:'3 hrs', qtyNum:'3', stdPriceNum:'45', memPriceNum:'', stdPrice:'$45.00', memPrice:'—', archived:true},
+};
+var rpCurrentPlan = null;
+var rpCurrentPlanId = null;
+function rpOpenView(id){
+  rpMenuClose();
+  rpCurrentPlan = rpPlanData[id];
+  rpCurrentPlanId = id;
+  go('s-view');
+}
+
+/* ---- Sell flow state ---- */
+var sellClients = [
+  {name:'Jordan Lee',    dob:'Jan 12, 1990', phone:'(555) 201-4832', type:'Member'},
+  {name:'Alex Rivera',   dob:'Mar 8, 1985',  phone:'(555) 348-9201', type:'Non-member'},
+  {name:'Sam Chen',      dob:'Jul 22, 1995', phone:'(555) 467-3012', type:'Member'},
+  {name:'Morgan Davis',  dob:'Nov 3, 1988',  phone:'(555) 589-7743', type:'Non-member'},
+  {name:'Taylor Brooks', dob:'Apr 15, 1992', phone:'(555) 612-0984', type:'Member'},
+  {name:'Casey Wright',  dob:'Sep 27, 1993', phone:'(555) 723-5561', type:'Non-member'},
+];
+var sellClient      = null;
+var sellPlanId      = null;
+var sellAutoRenew   = false;
+var sellNewClient   = false;   // true = show inline create-client form
+var sellSearchQuery = '';      // preserves typed text across re-renders
+/* AR options state */
+var sellArUseDefault  = true;
+var sellArTriggerType = 'before';
+var sellArTriggerNum  = '7';
+var sellArTriggerUnit = 'Days';
+var sellArRenewAs     = 'copy';
+
+function rpSellInit(planId){
+  sellClient = null; sellPlanId = planId||null;
+  sellAutoRenew = false; sellNewClient = false; sellSearchQuery = '';
+  sellArUseDefault = true; sellArTriggerType = 'before';
+  sellArTriggerNum = '7'; sellArTriggerUnit = 'Days'; sellArRenewAs = 'copy';
+  go('s-sell-select');
+}
+
+function sellArLoadDefaults(){
+  const p = sellPlanId ? rpPlanData[sellPlanId] : null;
+  sellArTriggerType = (p && p.arTriggerType) ? p.arTriggerType : 'before';
+  sellArTriggerNum  = (p && p.arTriggerNum)  ? p.arTriggerNum  : '7';
+  sellArTriggerUnit = (p && p.arTriggerUnit) ? p.arTriggerUnit : 'Days';
+  sellArRenewAs     = (p && p.renewAs)       ? p.renewAs       : 'copy';
+}
+
+function sellEligible(p, isMember){
+  if(p.archived) return false;
+  if(!p.stdPriceNum && !isMember) return false;
+  return true;
+}
+
+function sellGetPrice(p){
+  const isMem = sellClient && sellClient.type==='Member';
+  if(isMem && p.memPriceNum) return {price:p.memPrice, isMember:true};
+  return {price:p.stdPrice||'—', isMember:false};
+}
+
+function sellAutoSelectPlan(){
+  const isMem = sellClient && sellClient.type==='Member';
+  if(sellPlanId && !sellEligible(rpPlanData[sellPlanId], isMem)) sellPlanId = null;
+  if(!sellPlanId){
+    const first = Object.entries(rpPlanData).find(([id,p])=>sellEligible(p, isMem));
+    if(first) sellPlanId = parseInt(first[0]);
+  }
+}
+
+/* ---- Existing client search (dropdown only — no re-render) ---- */
+function sellSearchClient(val){
+  sellSearchQuery = val||'';
+  const q = sellSearchQuery.toLowerCase().trim();
+  if(!q){
+    // Field cleared while a client was selected → deselect and re-render
+    if(sellClient){ sellClient = null; sellPlanId = null; go('s-sell-select'); return; }
+    // Field empty with no client → just show all clients in dropdown (no re-render)
+  }
+  const dd = document.getElementById('sell-client-dd');
+  if(!dd) return;
+  const matches = q ? sellClients.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)) : sellClients;
+  if(!matches.length){ dd.style.display='none'; return; }
+  dd.innerHTML = matches.map(c=>{
+    const idx = sellClients.indexOf(c);
+    return `<div class="sell-dd-item" onmousedown="sellPickClient(${idx})">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-weight:600;font-size:12.5px">${c.name}</span>
+        <span class="tag ${c.type==='Member'?'green':'gray'}" style="font-size:10px;padding:1px 6px">${c.type}</span>
+      </div>
+      <div style="font-size:11px;color:#6b7280;margin-top:2px">${c.dob}${c.phone?' · '+c.phone:''}</div>
+    </div>`;
+  }).join('');
+  dd.style.display='block';
+}
+
+function sellPickClient(idx){
+  sellClient = sellClients[idx];
+  sellSearchQuery = '';
+  sellAutoSelectPlan();
+  go('s-sell-select');
+}
+
+function sellClearClient(){
+  sellClient = null; sellPlanId = null; sellSearchQuery = '';
+  go('s-sell-select');
+}
+
+function sellPickPlan(id){
+  if(!sellClient) return;
+  sellPlanId = id;
+  if(sellAutoRenew){ sellArLoadDefaults(); sellArUseDefault = true; }
+  go('s-sell-select');
+}
+
+function sellToggleAutoRenew(){
+  sellAutoRenew = !sellAutoRenew;
+  if(sellAutoRenew){ sellArLoadDefaults(); sellArUseDefault = true; }
+  go('s-sell-select');
+}
+
+function sellArToggleUseDefault(cb){
+  // Capture any edited values before switching modes
+  const numEl  = document.getElementById('sell-ar-num');
+  const unitEl = document.getElementById('sell-ar-unit');
+  const asEl   = document.getElementById('sell-ar-renewas');
+  if(numEl)  sellArTriggerNum  = numEl.value;
+  if(unitEl) sellArTriggerUnit = unitEl.value;
+  if(asEl)   sellArRenewAs     = asEl.value;
+  sellArUseDefault = cb.checked;
+  if(sellArUseDefault) sellArLoadDefaults(); // restore plan defaults
+  go('s-sell-select');
+}
+
+function sellArSetTriggerType(type){
+  // Capture current input values before re-render
+  const numEl  = document.getElementById('sell-ar-num');
+  const unitEl = document.getElementById('sell-ar-unit');
+  if(numEl)  sellArTriggerNum  = numEl.value;
+  if(unitEl) sellArTriggerUnit = unitEl.value;
+  sellArTriggerType = type;
+  go('s-sell-select');
+}
+
+function sellArSetNum(v)    { sellArTriggerNum  = v; }
+function sellArSetUnit(v)   { sellArTriggerUnit = v; }
+function sellArSetRenewAs(v){ sellArRenewAs     = v; }
+
+/* ---- New client form ---- */
+function sellShowNewClientForm(){
+  sellNewClient = true;
+  go('s-sell-select');
+}
+
+function sellCancelNewClient(){
+  sellNewClient = false;
+  go('s-sell-select');
+}
+
+function sellFormatDob(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-').map(Number);
+  return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]+' '+d+', '+y;
+}
+
+function sellConfirmNewClient(){
+  const first = (document.getElementById('snc-first')||{}).value||'';
+  const last  = (document.getElementById('snc-last') ||{}).value||'';
+  if(!first.trim()){ alert('First name is required.'); return; }
+  const dob   = sellFormatDob((document.getElementById('snc-dob')||{}).value||'');
+  const phone = (document.getElementById('snc-phone')||{}).value||'';
+  const typeEl = document.querySelector('input[name="snc-type"]:checked');
+  const type  = typeEl ? typeEl.value : 'Non-member';
+  sellClient = {name:(first+' '+last).trim(), dob, phone, type, isNew:true};
+  sellNewClient = false;
+  sellAutoSelectPlan();
+  go('s-sell-select');
+}
+
+/* ── Edit Plan interactive helpers ── */
+function editToggleSelling(){
+  var t=document.getElementById('edit-selling-toggle'),l=document.getElementById('edit-selling-label');
+  if(!t||!l) return; t.classList.toggle('on'); var on=t.classList.contains('on');
+  l.textContent=on?'Available':'Unavailable'; l.style.color=on?'var(--ink)':'#6b7280';
+}
+function editToggleExpiry(){
+  var t=document.getElementById('edit-expiry-toggle'),l=document.getElementById('edit-expiry-label'),f=document.getElementById('edit-expiry-fields');
+  if(!t) return; t.classList.toggle('on'); var on=t.classList.contains('on');
+  if(l) l.textContent=on?'Enabled — expires after a set period from the plan\'s start date':'No expiration — plan stays active until balance is depleted';
+  if(f) f.style.display=on?'':'none';
+}
+function editToggleAutoRenew(){
+  var t=document.getElementById('edit-autorenew-toggle'),l=document.getElementById('edit-autorenew-label'),f=document.getElementById('edit-autorenew-fields');
+  if(!t) return; t.classList.toggle('on'); var on=t.classList.contains('on');
+  if(l) l.textContent=on?'Enabled — clients can opt in at purchase time':'Disabled — clients cannot opt in at purchase time';
+  if(f) f.style.display=on?'':'none';
+}
+function editToggleDefaultSaleDate(cb){
+  var d=document.getElementById('edit-start-date'); if(!d) return; d.disabled=cb.checked;
+}
+function editToggleUnlimited(cb){
+  var q=document.getElementById('edit-qty'); if(!q) return;
+  q.disabled=cb.checked;
+  if(cb.checked){ q.value=''; q.placeholder='Unlimited'; } else { q.placeholder='e.g. 10'; q.focus(); }
+}
+
+/* ── Add Rental Plan interactive helpers ── */
+function addToggleSelling(){
+  var t=document.getElementById('add-selling-toggle');
+  var l=document.getElementById('add-selling-label');
+  if(!t||!l) return;
+  t.classList.toggle('on');
+  var on=t.classList.contains('on');
+  l.textContent=on?'Available':'Unavailable';
+  l.style.color=on?'var(--ink)':'#6b7280';
+}
+function addToggleExpiry(){
+  var t=document.getElementById('add-expiry-toggle');
+  var l=document.getElementById('add-expiry-label');
+  var f=document.getElementById('add-expiry-fields');
+  if(!t) return;
+  t.classList.toggle('on');
+  var on=t.classList.contains('on');
+  if(l){ l.textContent=on?'Enabled — expires after a set period from the plan\'s start date':'No expiration — plan stays active until balance is depleted'; }
+  if(f) f.style.display=on?'':'none';
+}
+function addToggleAutoRenew(){
+  var t=document.getElementById('add-autorenew-toggle');
+  var l=document.getElementById('add-autorenew-label');
+  var f=document.getElementById('add-autorenew-fields');
+  if(!t) return;
+  t.classList.toggle('on');
+  var on=t.classList.contains('on');
+  if(l){ l.textContent=on?'Enabled — clients can opt in at purchase time':'Disabled — clients cannot opt in at purchase time'; }
+  if(f) f.style.display=on?'':'none';
+}
+function addToggleDefaultSaleDate(cb){
+  var d=document.getElementById('add-start-date');
+  if(!d) return;
+  d.disabled=cb.checked;
+}
+function addToggleUnlimited(cb){
+  var q=document.getElementById('add-qty');
+  if(!q) return;
+  q.disabled=cb.checked;
+  if(cb.checked){ q.value=''; q.placeholder='Unlimited'; } else { q.placeholder='e.g. 10'; q.focus(); }
+}
+function addSelectModel(m){
+  var occ=document.getElementById('add-model-occ');
+  var hr=document.getElementById('add-model-hr');
+  if(!occ||!hr) return;
+  if(m==='occ'){ occ.classList.add('on'); hr.classList.remove('on'); }
+  else { hr.classList.add('on'); occ.classList.remove('on'); }
+  // sync radio dots
+  occ.querySelector('.dot').style.cssText=occ.classList.contains('on')?'border-color:#4f9a7c;background:radial-gradient(#4f9a7c 38%,#fff 42%)':'';
+  hr.querySelector('.dot').style.cssText=hr.classList.contains('on')?'border-color:#4f9a7c;background:radial-gradient(#4f9a7c 38%,#fff 42%)':'';
+}
 
 buildNav();
 go(location.hash? location.hash.slice(1) : 's-list');
