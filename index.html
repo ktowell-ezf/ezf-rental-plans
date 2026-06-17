@@ -926,7 +926,7 @@ screens['s-add-pricing'] = {
 };
 
 screens['s-sell-select'] = {
-  group:'1 · Staff Sales', n:'1.3', crumb:'EZUI Admin · Sell flow — step 1', title:'Sell a Plan — select client & plan',
+  group:'1 · Staff Sales', n:'1.3', crumb:'EZUI Admin · Sell flow — step 1', title:'Sell a Plan: Select',
   notes:`Right side-panel (same chrome as Create Membership Plan). Step 1 of the sell flow.
   <ul><li>Pick the client first, then choose from <b>eligible plans only</b> — ineligible (e.g. member-only) plans are filtered out.</li>
   <li>Member vs. non-member price resolves automatically from the selected client.</li>
@@ -1013,12 +1013,26 @@ screens['s-sell-select'] = {
     }).join('');
 
     const canContinue = !!(hasClient && sellPlanId);
-    return ezChrome('Rental Plans',
-      rpListBody(),
-      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select',on:true},{label:'Payment'},{label:'Confirm'}], body:`
+    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
+    const bgChrome    = sellFromProfile ? 'Clients' : 'Rental Plans';
+    const bgBody      = sellFromProfile ? rpProfileBody() : rpListBody();
+
+    /* Locked client display (when selling from profile) */
+    const lockedClientSection = `
+      <div style="background:#f3f5f6;border:1px solid var(--line);border-radius:5px;padding:8px 10px;">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:12.5px;font-weight:600">${sellClient?sellClient.name:''}</span>
+          <span class="tag ${isMem?'green':'gray'}" style="font-size:10px;padding:1px 5px">${sellClient?sellClient.type:''}</span>
+        </div>
+        <div style="font-size:11.5px;color:#6b7280;margin-top:3px">${sellClient&&sellClient.dob?sellClient.dob:''}${sellClient&&sellClient.dob&&sellClient.phone?' · ':''}${sellClient&&sellClient.phone?sellClient.phone:''}</div>
+      </div>`;
+
+    return ezChrome(bgChrome,
+      bgBody,
+      panel({closeTarget, title:'Sell Rental Plan', tabs:[{label:'Select',on:true},{label:'Payment'},{label:'Confirm'}], body:`
         <div class="field" style="margin-bottom:${sellNewClient?'4px':'10px'}">
           <label>Client <span style="color:#b54a4a">*</span></label>
-          ${clientSection}
+          ${sellFromProfile ? lockedClientSection : clientSection}
         </div>
         <div class="sech" style="margin-top:4px">Select a plan</div>
         <div style="position:relative">
@@ -1071,13 +1085,13 @@ screens['s-sell-select'] = {
           </div>
           ` : ''}
         </div>
-      `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" style="opacity:${canContinue?1:.4};${canContinue?'':'pointer-events:none'}" onclick="go('s-sell-pay')">Continue to payment</span>`})
+      `, foot:`<span class="btn" onclick="go('${closeTarget}')">Cancel</span><span class="sp"></span><span class="btn primary" style="opacity:${canContinue?1:.4};${canContinue?'':'pointer-events:none'}" onclick="go('s-sell-pay')">Continue to payment</span>`})
     );
   }
 };
 
 screens['s-sell-pay'] = {
-  group:'1 · Staff Sales', n:'1.4', crumb:'EZUI Admin · Sell flow — step 2', title:'Sell a Plan — payment (existing iframe)',
+  group:'1 · Staff Sales', n:'1.4', crumb:'EZUI Admin · Sell flow — step 2', title:'Sell a Plan: Payment',
   notes:`Payment is handled by the <b>existing EZUI payment iframe</b> — no new payment UI is designed. The wireframe just shows where it plugs into the panel.
   <ul><li>Order summary above the embedded payment frame for context.</li></ul>`,
   render:()=>{
@@ -1091,8 +1105,9 @@ screens['s-sell-pay'] = {
     const priceNum = p ? (isMem && p.memPriceNum ? parseFloat(p.memPriceNum) : parseFloat(p.stdPriceNum||0)) : 0;
     const tax = (priceNum * 0.08).toFixed(2);
     const total = (priceNum + parseFloat(tax)).toFixed(2);
-    return ezChrome('Rental Plans',rpListBody(),
-      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select',onclick:"go('s-sell-select')"},{label:'Payment',on:true},{label:'Confirm'}], body:`
+    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
+    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?rpProfileBody():rpListBody(),
+      panel({closeTarget, title:'Sell Rental Plan', tabs:[{label:'Select',onclick:"go('s-sell-select')"},{label:'Payment',on:true},{label:'Confirm'}], body:`
         <div class="sech">Order summary</div>
         <div class="kv"><span class="k">Client</span><span>${clientName}${isMem?' <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>':''}</span></div>
         <div class="kv"><span class="k">Plan</span><span>${planName}</span></div>
@@ -1108,7 +1123,7 @@ screens['s-sell-pay'] = {
 };
 
 screens['s-sell-confirm'] = {
-  group:'1 · Staff Sales', n:'1.5', crumb:'EZUI Admin · Sell flow — step 3', title:'Sale confirmation — balance visible',
+  group:'1 · Staff Sales', n:'1.5', crumb:'EZUI Admin · Sell flow — step 3', title:'Sell a Plan: Confirm',
   notes:`Success state. The new plan and its <b>starting balance are immediately visible</b>. From here staff can view the client profile or sell another.
   <ul><li>Confirmation mirrors the post-sale state used for Membership Plans.</li></ul>`,
   render:()=>{
@@ -1130,8 +1145,10 @@ screens['s-sell-confirm'] = {
       return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ` (${p.expiry})`;
     })() : 'No expiration';
     const balStr = p ? (p.model==='Per Hour' ? `${p.qtyNum}.0 / ${p.qtyNum} hrs` : `${p.qtyNum} / ${p.qtyNum} occurrences`) : '—';
-    return ezChrome('Rental Plans',rpListBody(),
-      panel({closeTarget:'s-list', title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment'},{label:'Confirm',on:true}], body:`
+    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
+    const doneTarget  = sellFromProfile ? 's-profile' : 's-list';
+    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?rpProfileBody():rpListBody(),
+      panel({closeTarget, title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment'},{label:'Confirm',on:true}], body:`
         <div class="banner ok"><span class="bi"></span><div><b>Plan sold to ${clientName}.</b> Balance is available now.</div></div>
         <div class="plancard-lg" style="border-radius:8px;padding:16px">
           <div style="font-weight:600;font-size:14px;margin-bottom:8px">${p?p.name:'—'}</div>
@@ -1141,23 +1158,25 @@ screens['s-sell-confirm'] = {
           <div class="kv"><span class="k">Auto-renew</span><span>${sellAutoRenew?'<span class="tag green" style="font-size:10px">On</span>':'Off'}</span></div>
           <div class="kv"><span class="k">Paid</span><span>$${total} · Visa ••42</span></div>
         </div>
-      `, foot:`<span class="btn" onclick="go('s-profile')">View client profile</span><span class="sp"></span><span class="btn primary" onclick="rpSellInit(null);go('s-list')">Done</span>`})
+      `, foot:`${sellFromProfile?'':'<span class="btn" onclick="go(\'s-profile\')">View client profile</span>'}<span class="sp"></span><span class="btn primary" onclick="rpSellInit(null);go('${doneTarget}')">Done</span>`})
     );
   }
 };
 
-screens['s-profile'] = {
-  group:'1 · Staff Sales', n:'1.6', crumb:'EZUI Admin · Client Profile', title:'Client Profile — purchased plans (Rentals)',
-  notes:`Lives in the Client Profile alongside the existing Packages tab. <b>Design decision shown: Option A — sub-tabs (Sessions | Rentals)</b> inside the existing Packages tab (vs. a separate tab). Flag your preference.
-  <ul><li>Filter: Active Only / All / Completed. Columns: plan, purchased, used, remaining, status, expiry, auto-renew.</li>
-  <li>Row actions: View details / Edit / Set Active / Set Inactive. <b>Edit</b> opens the edit panel.</li>
-  <li>No refund screen here — refunds use the existing Billing tab.</li></ul>`,
-  render:()=> ezChrome('Clients', `
+function rpProfileBody(){ return `
     <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3>
-      <div class="acts"><span class="btn primary" onclick="rpSellInit(null)">+ Sell Plan</span></div>
+      <div class="acts">
+        <div style="position:relative;display:inline-block">
+          <button class="btn primary" onclick="rpProfileSellMenuToggle(event)" style="display:inline-flex;align-items:center;gap:5px">+ Sell <span style="font-size:10px;opacity:.75">▾</span></button>
+          <div id="rp-profile-sell-dd" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:9999;min-width:180px;overflow:hidden;">
+            <div class="rp-mi" onclick="rpProfileSellMenuClose()">Sell Session Package</div>
+            <div class="rp-mi" onclick="rpProfileSellInit()">Sell Rental Plan</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="seg" style="margin-bottom:14px"><span>Overview</span><span>Schedule</span><span class="on">Packages</span><span>Billing</span><span>Family</span></div>
-    <div class="ptabs" style="border:none;padding:0;margin-bottom:12px"><span>Sessions</span><span class="on">Rentals</span></div>
+    <div class="seg" style="margin-bottom:14px"><span>Overview</span><span>Schedule</span><span class="on">Packages &amp; Plans</span><span>Billing</span><span>Family</span></div>
+    <div class="ptabs" style="border:none;padding:0;margin-bottom:12px"><span>Session Packages</span><span class="on">Rental Plans</span></div>
     <div class="filters"><div class="seg"><span class="on">Active only</span><span>All</span><span>Completed</span></div></div>
     <table class="tbl"><thead><tr><th>Plan</th><th>Purchased</th><th>Used</th><th>Remaining</th><th>Status</th><th>Expires</th><th>Auto-renew</th><th></th></tr></thead><tbody>
       <tr><td><b>10-Hour Court Pack</b></td><td>10 hrs</td><td>0 hrs</td><td><b>10.0 hrs</b></td><td><span class="tag green">Active</span></td><td>Sep 9, 2026</td><td>Off</td>
@@ -1167,24 +1186,40 @@ screens['s-profile'] = {
       <tr style="opacity:.6"><td>Drop-in 5 Pack</td><td>5 occ</td><td>5 occ</td><td>0 occ</td><td><span class="tag gray">Completed</span></td><td>—</td><td>Off</td>
         <td><div class="rowact"><span class="i"></span></div></td></tr>
     </tbody></table>
-  `)
+`; }
+
+screens['s-profile'] = {
+  group:'1 · Staff Sales', n:'1.6', crumb:'EZUI Admin · Client Profile', title:'Client Profile — purchased plans (Rentals)',
+  notes:`Lives in the Client Profile alongside the existing Packages tab. <b>Design decision shown: Option A — sub-tabs (Session Packages | Rental Plans)</b> inside the existing Packages &amp; Plans tab (vs. a separate tab). Flag your preference.
+  <ul><li>Filter: Active Only / All / Completed. Columns: plan, purchased, used, remaining, status, expiry, auto-renew.</li>
+  <li>Row actions: View details / Edit / Set Active / Set Inactive. <b>Edit</b> opens the edit panel.</li>
+  <li>No refund screen here — refunds use the existing Billing tab.</li></ul>`,
+  render:()=> ezChrome('Clients', rpProfileBody())
 };
 
 screens['s-edit'] = {
   group:'1 · Staff Sales', n:'1.7', crumb:'EZUI Admin · Client Profile', title:'Edit purchased plan (auto-renew / status)',
   notes:`Opened from the row action. Per the brief, staff can <b>toggle auto-renew, change status, and cancel auto-renew</b> here. Plan config (price/hours) is NOT editable from this client-level panel — that's the out-of-scope admin CRUD.
   <ul><li>Auto-renew toggle clarifies it requires a saved payment method (shows a note when none exists).</li></ul>`,
-  render:()=> ezChrome('Clients',`<div class="pagehead"><h3>Jordan Lee</h3></div>`,
+  render:()=> ezChrome('Clients', rpProfileBody(),
     panel({closeTarget:'s-profile', title:'Edit Plan — 10-Hour Court Pack', body:`
       <div class="sech">Balance (read-only)</div>
       <div class="kv"><span class="k">Remaining</span><span>10.0 / 10 hours</span></div>
       <div class="kv"><span class="k">Expires</span><span>Sep 9, 2026</span></div>
       <div class="sech" style="margin-top:14px">Status</div>
-      <div class="field"><div class="seg"><span class="on">Active</span><span>Inactive</span></div></div>
+      <div class="field"><div class="seg" id="edit-purch-status">
+        <span class="on" onclick="editPurchStatusPick(this)">Active</span>
+        <span onclick="editPurchStatusPick(this)">Inactive</span>
+      </div></div>
       <div class="sech" style="margin-top:6px">Auto-renew</div>
-      <div class="field"><div class="rowflex"><span class="toggle on"></span><span style="font-size:12px">Renew automatically when depleted or expired</span></div></div>
+      <div class="field"><div class="rowflex"><span class="toggle on" id="edit-purch-ar-toggle" onclick="this.classList.toggle('on')" style="cursor:pointer"></span><span style="font-size:12px">Renew automatically when depleted or expired</span></div></div>
       <div class="banner warn"><span class="bi"></span><div>Auto-renew uses the client's saved payment method. <b>No saved method on file</b> — add one in Billing to enable.</div></div>
-      <div class="btn link">Cancel auto-renew</div>
+      <div class="banner" style="background:#fff8ec;border:1px solid #f0c96a;border-radius:6px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px;font-size:12px;margin-top:8px">
+        <span style="color:#b07d1a;font-size:13px">⏳</span>
+        <div><b>Renewal pending payment</b> — a charge attempt is in progress for the next renewal cycle.
+          <div style="margin-top:6px"><span style="color:#b54a4a;cursor:pointer;font-size:11.5px;text-decoration:underline" onclick="">Cancel pending renewal</span></div>
+        </div>
+      </div>
     `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('s-profile')">Save changes</span>`})
   )
 };
@@ -1536,7 +1571,12 @@ function buildNav(){
   let html='', lastGroup=null;
   order.forEach(id=>{
     const s=screens[id]; if(s.hideNav) return;
-    if(s.group!==lastGroup){ html+=`<div class="grp">${s.group}</div>`; lastGroup=s.group; }
+    if(s.group!==lastGroup){
+      const statusTag = s.group==='1 · Staff Sales'
+        ? `<span class="tag green" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Ready for Review</span>`
+        : `<span class="tag amber" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Pending</span>`;
+      html+=`<div class="grp">${s.group}${statusTag}</div>`; lastGroup=s.group;
+    }
     html+=`<a id="nav-${id}" onclick="go('${id}')"><span class="n">${s.n}</span>${s.title.replace(/—.*$/,'').replace(/&amp;/g,'&')}</a>`;
   });
   document.getElementById('navlist').innerHTML=html;
@@ -1888,12 +1928,34 @@ var sellArTriggerType = 'before';
 var sellArTriggerNum  = '7';
 var sellArTriggerUnit = 'Days';
 var sellArRenewAs     = 'copy';
+var sellFromProfile   = false;  // true = initiated from client profile
+
+function rpProfileSellMenuToggle(e){
+  e.stopPropagation();
+  const m = document.getElementById('rp-profile-sell-dd');
+  if(m) m.style.display = m.style.display==='none' ? 'block' : 'none';
+}
+function rpProfileSellMenuClose(){
+  const m = document.getElementById('rp-profile-sell-dd');
+  if(m) m.style.display = 'none';
+}
+function rpProfileSellInit(){
+  rpProfileSellMenuClose();
+  sellClient = {name:'Jordan Lee', dob:'Jan 12, 1990', phone:'(555) 201-4832', type:'Member', locked:true};
+  sellPlanId = null; sellAutoRenew = false; sellNewClient = false; sellSearchQuery = '';
+  sellFromProfile = true;
+  sellArUseDefault = true; sellArTriggerType = 'before';
+  sellArTriggerNum = '7'; sellArTriggerUnit = 'Days'; sellArRenewAs = 'copy';
+  sellAutoSelectPlan();
+  go('s-sell-select');
+}
 
 function rpSellInit(planId){
   sellClient = null; sellPlanId = planId||null;
   sellAutoRenew = false; sellNewClient = false; sellSearchQuery = '';
   sellArUseDefault = true; sellArTriggerType = 'before';
   sellArTriggerNum = '7'; sellArTriggerUnit = 'Days'; sellArRenewAs = 'copy';
+  sellFromProfile = false;
   go('s-sell-select');
 }
 
@@ -2033,6 +2095,11 @@ function sellConfirmNewClient(){
   sellNewClient = false;
   sellAutoSelectPlan();
   go('s-sell-select');
+}
+
+function editPurchStatusPick(el){
+  el.parentElement.querySelectorAll('span').forEach(s=>s.classList.remove('on'));
+  el.classList.add('on');
 }
 
 /* ── Edit Plan interactive helpers ── */
