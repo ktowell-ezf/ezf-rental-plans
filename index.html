@@ -1231,36 +1231,109 @@ screens['s-edit'] = {
 /* ---------- Group: Schedule Integration ---------- */
 screens['sch-choice'] = {
   group:'2 · Schedule', n:'2.1', crumb:'EZUI Schedule · Booking', title:'Booking — plan or rate choice (staff)',
-  notes:`When booking a rental for a client who has an <b>active eligible plan</b>, staff see a required choice: use the plan or pay the rental rate. This is the staff equivalent of the Self-Service decision point.
-  <ul><li><b>Open question for you:</b> choice UI — inline toggle (shown here) vs. modal vs. a dedicated step. Same decision applies in Self Service (2.x mirrors 3.x).</li>
-  <li>No hybrid payments — one booking = one method.</li></ul>`,
-  render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`,
-    panel({closeTarget:'sch-choice', title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
-      <div class="field"><label>Client</label><div class="ctl">Jordan Lee</div></div>
-      <div class="field row2"><div class="field"><label>Date</label><div class="ctl">Jun 14, 2026</div></div><div class="field"><label>Time</label><div class="ctl">5:00–7:00 PM (2 hrs)</div></div></div>
-      <div class="sech">Payment method</div>
-      <div class="note-anchor">Client has an active plan — staff must choose plan or rate before saving.</div>
-      <div class="radio on"><span class="dot"></span><div class="t"><b>Use plan — 10-Hour Court Pack</b><span>10.0 hrs available · this booking deducts <b>2.0 hrs</b> → 8.0 hrs left</span></div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$60.00 (2 hrs × $30/hr) · standard rate billing</span></div></div>
-    `, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('sch-confirm')">Book &amp; deduct</span>`})
-  )
+  notes:`The <b>New Rental</b> reservation panel with four tabs: <b>Details</b>, <b>Billing</b>, <b>Linked</b>, <b>History</b>. The plan-vs-rate decision lives on the <b>Billing</b> tab.
+  <ul><li><b>Details / Linked / History</b> reuse the existing Reservation panel sections (shown here as placeholders).</li>
+  <li><b>Billing</b> uses the same client lookup as <i>1.3 · Sell a Plan</i> ("Select client for billing"), then shows <b>Payment method</b>.</li>
+  <li>Switch the billing client to preview each state — <b>Jordan Lee</b> = multiple eligible plans; <b>Alex Rivera</b> = no eligible plan (rate only); <b>Sam Chen</b> = plan available but rental rate not configured; <b>Casey Wright</b> = neither plan nor rate.</li>
+  <li>No hybrid payments — one booking = one method. Occurrence plans deduct 1 regardless of duration.</li></ul>`,
+  render:()=>{
+    const sched = `<div class="pagehead"><h3>Schedule</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`;
+    const ph = (txt)=>`<div style="background:#eef1f3;border:1px solid var(--line2);border-radius:6px;padding:48px 18px;text-align:center;color:#8a929b;font-size:12.5px;line-height:1.5">${txt}</div>`;
+    let body='', foot='';
+    if(bk.tab==='linked'){
+      body = ph('This screen uses the existing Reservation Linked section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+    } else if(bk.tab==='history'){
+      body = ph('This screen uses the existing Reservation History section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+    } else if(bk.tab==='billing'){
+      body = `
+        <div class="kv" style="border-bottom:1px solid var(--line2);padding-bottom:8px;margin-bottom:10px"><span class="k">Reservation</span><span>Court 3 · Jun 14 · 5:00–7:00 PM (2 hrs)</span></div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Select client for billing <span style="color:#b54a4a">*</span></label>
+          ${bkClientSection()}
+        </div>
+        <div class="sech">Payment method</div>
+        ${bkPaymentMethodHTML()}
+      `;
+      const canBook = !!(bk.client && bk.method);
+      let label = 'Book &amp; deduct';
+      if(bk.method==='rate') label = 'Book &amp; charge rate';
+      else if(bk.method==='custom') label = 'Book &amp; charge';
+      else if(bk.method==='nocharge') label = 'Book (no charge)';
+      foot = `<span class="btn" onclick="bkTab('details')">Back</span><span class="sp"></span><span class="btn primary" style="opacity:${canBook?1:.4};${canBook?'':'pointer-events:none'}" onclick="go('sch-confirm')">${label}</span>`;
+    } else { // details (default)
+      body = ph('This screen uses the existing Reservation Details section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bkTab('billing')">Select client</span>`;
+    }
+    const mk = (t,lbl)=>({label:lbl, on:bk.tab===t, onclick: bk.tab===t ? null : `bkTab('${t}')`});
+    return ezChrome('Schedule', sched,
+      panel({closeTarget:'sch-choice', title:'New Rental · Court 3',
+        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+        body, foot})
+    );
+  }
 };
 
 screens['sch-insufficient'] = {
   group:'2 · Schedule', n:'2.2', crumb:'EZUI Schedule · Booking', title:'Booking — insufficient balance (staff)',
-  notes:`Client's plan doesn't cover the booking. Booking is blocked with a clear message and options. No partial coverage in MVP.
-  <ul><li>Options: <b>purchase more for the client</b>, <b>charge the rental rate</b>, or <b>cancel</b>. Uses the existing inline red-banner pattern seen in the rental booking panels.</li></ul>`,
-  render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>`,
-    panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
-      <div class="field"><label>Client</label><div class="ctl">Jordan Lee</div></div>
-      <div class="field row2"><div class="field"><label>Duration</label><div class="ctl">3 hrs</div></div><div class="field"><label>Plan balance</label><div class="ctl">1.5 hrs</div></div></div>
-      <div class="banner danger"><span class="bi"></span><div><b>Not enough plan balance.</b> 1.5 hours remaining, but this rental requires 3.0 hours. Choose an option below to continue.</div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Purchase more for the client</b><span>Add hours/occurrences, then apply to this booking</span></div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Charge the rental rate instead</b><span>$90.00 (3 hrs × $30/hr) · bypass plan</span></div></div>
-      <div class="radio"><span class="dot"></span><div class="t"><b>Cancel booking</b><span>Don't book at this time</span></div></div>
-    `, foot:`<span class="btn" onclick="panelTryClose()">Close</span><span class="sp"></span><span class="btn primary">Continue</span>`})
-  )
+  notes:`The same four-tab <b>New Rental</b> panel as 2.1, opened on the <b>Billing</b> tab with a client already selected whose plan <b>doesn't cover the booking</b>. No partial coverage in MVP.
+  <ul><li>Options: <b>purchase more for the client</b>, <b>charge the rental rate</b>, or <b>cancel</b>. Uses the existing inline red-banner pattern.</li></ul>`,
+  render:()=>{
+    const sched = `<div class="pagehead"><h3>Schedule</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #b54a4a':''}"></div>`).join('')}</div>`;
+    const ph = (txt)=>`<div style="background:#eef1f3;border:1px solid var(--line2);border-radius:6px;padding:48px 18px;text-align:center;color:#8a929b;font-size:12.5px;line-height:1.5">${txt}</div>`;
+    let body='', foot='';
+    if(bk2.tab==='details'){
+      body = ph('This screen uses the existing Reservation Details section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+    } else if(bk2.tab==='linked'){
+      body = ph('This screen uses the existing Reservation Linked section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+    } else if(bk2.tab==='history'){
+      body = ph('This screen uses the existing Reservation History section.');
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+    } else { // billing
+      body = `
+        <div class="kv" style="border-bottom:1px solid var(--line2);padding-bottom:8px;margin-bottom:10px"><span class="k">Reservation</span><span>Court 3 · Jun 14 · 6:00–9:00 PM (3 hrs)</span></div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Select client for billing <span style="color:#b54a4a">*</span></label>
+          <div class="sell-client-wrap has-client">
+            <input class="form-ctrl" type="text" value="Jordan Lee" readonly>
+            <button class="sell-client-clear" title="Clear">&#10005;</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <span style="font-size:11.5px;color:#6b7280">Jan 12, 1990 · (555) 201-4832</span>
+            <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>
+          </div>
+        </div>
+        <div class="sech">Payment method</div>
+        <div class="radio" style="cursor:default;align-items:flex-start;border-color:#e3b5b5;background:#fbf2f2">
+          <span class="dot" style="border-color:#d8a0a0;background:#fff;flex:0 0 auto"></span>
+          <div class="t" style="flex:1">
+            <b>10-Hour Court Pack</b>
+            <span style="color:#b54a4a"><b>Not enough plan balance.</b> 10-Hour Court Pack has 1.5 hours remaining, but this rental requires 3.0 hours.</span>
+            <div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="rpSellInit(null)">Sell Rental Plan</span></div>
+          </div>
+        </div>
+        <div class="radio${bk2.method==='rate'?' on':''}" onclick="bk2PickMethod('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$90.00 (3 hrs × $30/hr) · standard rate billing</span></div></div>
+        ${bkExtraMethods(bk2.method, 'bk2PickMethod')}
+      `;
+      const canBook = !!bk2.method;
+      let label = 'Book';
+      if(bk2.method==='rate') label = 'Book &amp; charge rate';
+      else if(bk2.method==='custom') label = 'Book &amp; charge';
+      else if(bk2.method==='nocharge') label = 'Book (no charge)';
+      foot = `<span class="btn" onclick="bk2Tab('details')">Back</span><span class="sp"></span><span class="btn primary" style="opacity:${canBook?1:.4};${canBook?'':'pointer-events:none'}" onclick="go('sch-confirm')">${label}</span>`;
+    }
+    const mk = (t,lbl)=>({label:lbl, on:bk2.tab===t, onclick: bk2.tab===t ? null : `bk2Tab('${t}')`});
+    return ezChrome('Schedule', sched,
+      panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3',
+        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+        body, foot})
+    );
+  }
 };
 
 screens['sch-confirm'] = {
@@ -2183,6 +2256,150 @@ function addSelectModel(m){
   // sync radio dots
   occ.querySelector('.dot').style.cssText=occ.classList.contains('on')?'border-color:#4f9a7c;background:radial-gradient(#4f9a7c 38%,#fff 42%)':'';
   hr.querySelector('.dot').style.cssText=hr.classList.contains('on')?'border-color:#4f9a7c;background:radial-gradient(#4f9a7c 38%,#fff 42%)':'';
+}
+
+/* ---- Schedule booking — Billing tab (2.1) ---- */
+/* Booking context: Court 3, 2-hour rental. Hours plans deduct 2.0 hrs; occurrence plans deduct 1. */
+var BK_REQ_HRS = 2.0;
+var BK_RATE_STR = '$60.00 (2 hrs × $30/hr) · standard rate billing';
+var bkClients = [
+  {name:'Jordan Lee',    dob:'Jan 12, 1990', phone:'(555) 201-4832', type:'Member', ratesConfigured:true,
+    plans:[
+      {planId:1, name:'10-Hour Court Pack', model:'Per Hour',       unit:'hrs',   balance:8.0, total:10},
+      {planId:2, name:'Pickleball 20 Play', model:'Per Occurrence', unit:'plays', balance:6,   total:20}
+    ]},
+  {name:'Alex Rivera',   dob:'Mar 8, 1985',  phone:'(555) 348-9201', type:'Non-member', ratesConfigured:true,  plans:[]},
+  {name:'Sam Chen',      dob:'Jul 22, 1995', phone:'(555) 467-3012', type:'Member',     ratesConfigured:false,
+    plans:[ {planId:4, name:'Drop-in 5 Pack', model:'Per Occurrence', unit:'plays', balance:2, total:5} ]},
+  {name:'Morgan Davis',  dob:'Nov 3, 1988',  phone:'(555) 589-7743', type:'Non-member', ratesConfigured:true,  plans:[]},
+  {name:'Taylor Brooks', dob:'Apr 15, 1992', phone:'(555) 612-0984', type:'Member',     ratesConfigured:true,  plans:[]},
+  {name:'Casey Wright',  dob:'Sep 27, 1993', phone:'(555) 723-5561', type:'Non-member', ratesConfigured:false, plans:[]},
+];
+var bk = { tab:'details', client: null, method:null, q:'' };
+
+function bkTab(t){ bk.tab = t; go('sch-choice'); }
+function bkPickMethod(m){ bk.method = m; go('sch-choice'); }
+
+/* 2.2 insufficient-balance panel — defaults to the Billing tab */
+var bk2 = { tab:'billing', method:null };
+function bk2Tab(t){ bk2.tab = t; go('sch-insufficient'); }
+function bk2PickMethod(m){ bk2.method = m; go('sch-insufficient'); }
+
+function bkClientSection(){
+  const c = bk.client;
+  return `
+    <div class="sell-client-wrap${c?' has-client':''}">
+      <input class="form-ctrl" id="bk-client-input" type="text" placeholder="Search by name or phone…" autocomplete="off"
+        value="${c?c.name:bk.q}"
+        oninput="bkSearchClient(this.value)"
+        onfocus="bkSearchClient(this.value)"
+        onblur="setTimeout(()=>{const d=document.getElementById('bk-client-dd');if(d)d.style.display='none';},150)">
+      <button class="sell-client-clear" onclick="bkClearClient()" title="Clear">&#10005;</button>
+      <div class="sell-dd" id="bk-client-dd"></div>
+    </div>
+    ${c ? `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
+        <span style="font-size:11.5px;color:#6b7280">${c.dob}${c.dob&&c.phone?' · ':''}${c.phone||''}</span>
+        <span class="tag ${c.type==='Member'?'green':'gray'}" style="font-size:10px;padding:1px 5px">${c.type}</span>
+      </div>` : `<div style="margin-top:7px;font-size:12px;color:#6b7280">Search for the client who should be billed for this rental.</div>`}
+  `;
+}
+
+function bkSearchClient(val){
+  bk.q = val||'';
+  const q = bk.q.toLowerCase().trim();
+  if(!q && bk.client){ bk.client = null; bk.method = null; go('sch-choice'); return; }
+  const dd = document.getElementById('bk-client-dd');
+  if(!dd) return;
+  const matches = q ? bkClients.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q)) : bkClients;
+  if(!matches.length){ dd.style.display='none'; return; }
+  dd.innerHTML = matches.map(c=>{
+    const idx = bkClients.indexOf(c);
+    const planTag = c.plans.length
+      ? `<span class="tag green" style="font-size:9.5px;padding:1px 5px">${c.plans.length} plan${c.plans.length>1?'s':''}</span>`
+      : `<span class="tag gray" style="font-size:9.5px;padding:1px 5px">No plans</span>`;
+    return `<div class="sell-dd-item" onmousedown="bkPickClient(${idx})">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-weight:600;font-size:12.5px">${c.name}</span>
+        <span class="tag ${c.type==='Member'?'green':'gray'}" style="font-size:10px;padding:1px 6px">${c.type}</span>
+        ${planTag}
+      </div>
+      <div style="font-size:11px;color:#6b7280;margin-top:2px">${c.dob}${c.phone?' · '+c.phone:''}</div>
+    </div>`;
+  }).join('');
+  dd.style.display='block';
+}
+
+function bkPickClient(idx){ bk.client = bkClients[idx]; bk.method = null; bk.q = ''; go('sch-choice'); }
+function bkClearClient(){ bk.client = null; bk.method = null; bk.q = ''; go('sch-choice'); }
+
+/* Custom-rate expansion: $ amount + unit selector. Shared by 2.1 and 2.2. */
+function bkCustomRateFields(){
+  return `<div style="margin:-2px 0 10px 26px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div class="inline-row" style="border:1px solid var(--line);border-radius:5px;background:#fff;padding:0 10px;height:32px;gap:3px">
+      <span style="font-size:12px;color:#9aa1aa">$</span>
+      <input type="number" style="border:none;background:none;width:70px;font-size:12px;outline:none;color:var(--ink);font-family:inherit" placeholder="0.00" min="0" step="0.01">
+    </div>
+    <select class="form-ctrl" style="width:160px">
+      <option>Per hour</option><option>Per occurrence</option><option>Custom</option>
+    </select>
+  </div>`;
+}
+
+/* Custom rate + No charge rows — appended to both schedule payment-method lists. */
+function bkExtraMethods(selected, pickFn){
+  const selCustom = selected === 'custom';
+  return `
+    <div class="radio${selCustom?' on':''}" onclick="${pickFn}('custom')" style="cursor:pointer">
+      <span class="dot"></span><div class="t"><b>Custom rate</b><span>Set a one-off price for this booking</span></div></div>
+    ${selCustom ? bkCustomRateFields() : ''}
+    <div class="radio${selected==='nocharge'?' on':''}" onclick="${pickFn}('nocharge')" style="cursor:pointer">
+      <span class="dot"></span><div class="t"><b>No charge</b><span>Book without billing the client</span></div></div>`;
+}
+
+function bkPaymentMethodHTML(){
+  const c = bk.client;
+  if(!c){
+    const ghost = `
+      <div class="radio"><span class="dot"></span><div class="t"><b>Use plan — 10-Hour Court Pack</b><span>Plan balance deducts at booking</span></div></div>
+      <div class="radio"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>${BK_RATE_STR}</span></div></div>`;
+    return `<div style="position:relative">
+      <div style="pointer-events:none;opacity:.45">${ghost}</div>
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
+        <span style="font-size:11.5px;color:#6b7280;background:#f3f5f6;padding:5px 12px;border-radius:20px;border:1px solid var(--line2);white-space:nowrap">Select or add a client first</span>
+      </div>
+    </div>`;
+  }
+  const first = c.name.split(' ')[0];
+  let banner = '';
+  if(c.plans.length === 0){
+    const sellBtn = `<div style="margin-top:8px"><span class="btn sm primary" onclick="rpSellInit(null)">Sell Rental Plan</span></div>`;
+    banner = c.ratesConfigured
+      ? `<div class="banner warn" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#9888;&#65039;</span><div><b>${first} has no plan eligible for this rental.</b> Charge the rental rate below, or sell a plan first.${sellBtn}</div></div>`
+      : `<div class="banner danger" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#128683;</span><div><b>No plan and no rental rate available.</b> Sell ${first} a plan, or configure rental rates for Court 3 to bill this booking.${sellBtn}</div></div>`;
+  }
+  let rows = '';
+  c.plans.forEach(p=>{
+    const sel = bk.method === ('plan:'+p.planId);
+    let detail;
+    if(p.model === 'Per Hour'){
+      const left = (p.balance - BK_REQ_HRS).toFixed(1);
+      detail = `${p.balance.toFixed(1)} hrs available · deducts <b>${BK_REQ_HRS.toFixed(1)} hrs</b> → ${left} hrs left`;
+    } else {
+      detail = `${p.balance} plays available · deducts <b>1 play</b> regardless of duration → ${p.balance-1} plays left`;
+    }
+    rows += `<div class="radio${sel?' on':''}" onclick="bkPickMethod('plan:${p.planId}')" style="cursor:pointer">
+        <span class="dot"></span><div class="t"><b>Use plan — ${p.name}</b><span>${detail}</span></div></div>`;
+  });
+  if(c.ratesConfigured){
+    const sel = bk.method === 'rate';
+    rows += `<div class="radio${sel?' on':''}" onclick="bkPickMethod('rate')" style="cursor:pointer">
+        <span class="dot"></span><div class="t"><b>Pay rental rate</b><span>${BK_RATE_STR}</span></div></div>`;
+  } else {
+    rows += `<div class="radio" style="opacity:.55;cursor:not-allowed">
+        <span class="dot"></span><div class="t"><b>Pay rental rate</b><span style="color:#b07d1a">Rental rate not configured for Court 3 — set up rates in Setup, or use a plan.</span></div></div>`;
+  }
+  rows += bkExtraMethods(bk.method, 'bkPickMethod');
+  return banner + rows;
 }
 
 buildNav();
