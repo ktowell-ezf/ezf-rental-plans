@@ -1248,21 +1248,20 @@ screens['sch-choice'] = {
       body = ph('This screen uses the existing Reservation History section.');
       foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
     } else if(bk.tab==='billing'){
-      body = `
+      const head = `
         <div class="kv" style="border-bottom:1px solid var(--line2);padding-bottom:8px;margin-bottom:10px"><span class="k">Reservation</span><span>Court 3 · Jun 14 · 5:00–7:00 PM (2 hrs)</span></div>
         <div class="field" style="margin-bottom:12px">
           <label>Select client for billing <span style="color:#b54a4a">*</span></label>
           ${bkClientSection()}
-        </div>
-        <div class="sech">Payment method</div>
-        ${bkPaymentMethodHTML()}
-      `;
-      const canBook = !!(bk.client && bk.method);
-      let label = 'Book &amp; deduct';
-      if(bk.method==='rate') label = 'Book &amp; charge rate';
-      else if(bk.method==='custom') label = 'Book &amp; charge';
-      else if(bk.method==='nocharge') label = 'Book (no charge)';
-      foot = `<span class="btn" onclick="bkTab('details')">Back</span><span class="sp"></span><span class="btn primary" style="opacity:${canBook?1:.4};${canBook?'':'pointer-events:none'}" onclick="go('sch-confirm')">${label}</span>`;
+          ${bkClientError(bk.payError==='client')}
+        </div>`;
+      if(bksell.active){
+        body = head + bksellBodyHTML();
+        foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+      } else {
+        body = head + `<div class="sech">Payment method</div>${bkPaymentMethodHTML()}`;
+        foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bkPayNow()">Pay Now</span>`;
+      }
     } else { // details (default)
       body = ph('This screen uses the existing Reservation Details section.');
       foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bkTab('billing')">Select client</span>`;
@@ -1295,7 +1294,17 @@ screens['sch-insufficient'] = {
       body = ph('This screen uses the existing Reservation History section.');
       foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
     } else { // billing
-      body = `
+      const f2 = bk2.filter || 'all';
+      const planCard = `<div class="radio" style="cursor:default;align-items:flex-start;border-color:#e3b5b5;background:#fbf2f2">
+          <span class="dot" style="border-color:#d8a0a0;background:#fff;flex:0 0 auto"></span>
+          <div class="t" style="flex:1">
+            <b>10-Hour Court Pack</b>
+            <span style="color:#b54a4a"><b>Not enough plan balance.</b> 10-Hour Court Pack has 1.5 hours remaining, but this rental requires 3.0 hours.</span>
+            <div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="bksellStart('sch-insufficient','Jordan Lee')">Sell Rental Plan</span></div>
+          </div>
+        </div>`;
+      const rateRow = `<div class="radio${bk2.method==='rate'?' on':''}" onclick="bk2PickMethod('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$90.00 (3 hrs × $30/hr) · standard rate billing</span></div></div>`;
+      const head2 = `
         <div class="kv" style="border-bottom:1px solid var(--line2);padding-bottom:8px;margin-bottom:10px"><span class="k">Reservation</span><span>Court 3 · Jun 14 · 6:00–9:00 PM (3 hrs)</span></div>
         <div class="field" style="margin-bottom:12px">
           <label>Select client for billing <span style="color:#b54a4a">*</span></label>
@@ -1307,25 +1316,20 @@ screens['sch-insufficient'] = {
             <span style="font-size:11.5px;color:#6b7280">Jan 12, 1990 · (555) 201-4832</span>
             <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>
           </div>
-        </div>
+        </div>`;
+      if(bksell.active){
+        body = head2 + bksellBodyHTML();
+        foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
+      } else {
+        body = head2 + `
         <div class="sech">Payment method</div>
-        <div class="radio" style="cursor:default;align-items:flex-start;border-color:#e3b5b5;background:#fbf2f2">
-          <span class="dot" style="border-color:#d8a0a0;background:#fff;flex:0 0 auto"></span>
-          <div class="t" style="flex:1">
-            <b>10-Hour Court Pack</b>
-            <span style="color:#b54a4a"><b>Not enough plan balance.</b> 10-Hour Court Pack has 1.5 hours remaining, but this rental requires 3.0 hours.</span>
-            <div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="rpSellInit(null)">Sell Rental Plan</span></div>
-          </div>
-        </div>
-        <div class="radio${bk2.method==='rate'?' on':''}" onclick="bk2PickMethod('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$90.00 (3 hrs × $30/hr) · standard rate billing</span></div></div>
-        ${bkExtraMethods(bk2.method, 'bk2PickMethod')}
-      `;
-      const canBook = !!bk2.method;
-      let label = 'Book';
-      if(bk2.method==='rate') label = 'Book &amp; charge rate';
-      else if(bk2.method==='custom') label = 'Book &amp; charge';
-      else if(bk2.method==='nocharge') label = 'Book (no charge)';
-      foot = `<span class="btn" onclick="bk2Tab('details')">Back</span><span class="sp"></span><span class="btn primary" style="opacity:${canBook?1:.4};${canBook?'':'pointer-events:none'}" onclick="go('sch-confirm')">${label}</span>`;
+        ${bkPayError(bk2.payError)}
+        ${bkFilterChips(f2, 'bk2SetFilter')}
+        ${(f2==='all') ? bkExtraMethods(bk2.method, 'bk2PickMethod') : ''}
+        ${(f2==='all'||f2==='plans') ? (bk2ExtraPlansHTML() + planCard) : ''}
+        ${(f2==='all'||f2==='rates') ? rateRow : ''}`;
+        foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bk2PayNow()">Pay Now</span>`;
+      }
     }
     const mk = (t,lbl)=>({label:lbl, on:bk2.tab===t, onclick: bk2.tab===t ? null : `bk2Tab('${t}')`});
     return ezChrome('Schedule', sched,
@@ -1340,36 +1344,89 @@ screens['sch-confirm'] = {
   group:'2 · Schedule', n:'2.3', crumb:'EZUI Schedule · Booking', title:'Booking confirmation — deduction shown',
   notes:`Deduction happens at <b>booking creation</b>, not after the rental ends. Balance updates immediately and is shown clearly. A toast confirms.
   <ul><li>Restoration is unconditional on cancel/delete (before OR after start time) — see 2.5.</li></ul>`,
-  render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'background:#cfe8df;outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`,
-    panel({closeTarget:'sch-choice', title:'Rental booked · Court 3', tabs:[{label:'Details',on:true},{label:'Billing'}], body:`
-      <div class="banner ok"><span class="bi"></span><div><b>Rental booked.</b> 2.0 hours deducted from 10-Hour Court Pack.</div></div>
-      <div class="kv"><span class="k">Client</span><span>Jordan Lee</span></div>
-      <div class="kv"><span class="k">When</span><span>Jun 14, 5:00–7:00 PM</span></div>
-      <div class="kv"><span class="k">Paid with</span><span>10-Hour Court Pack</span></div>
-      <div class="kv"><span class="k">Deducted</span><span><b>2.0 hrs</b></span></div>
-      <div class="kv"><span class="k">New balance</span><span><b>8.0 hrs</b></span></div>
-    `, foot:`<span class="sp"></span><span class="btn primary" onclick="go('sch-choice')">Done</span>`}) +
-    toast('2.0 hrs deducted · 8.0 hrs remaining on Jordan Lee\'s plan')
-  )
+  render:()=>{
+    const sched = `<div class="pagehead"><h3>Schedule</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'background:#cfe8df;outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`;
+    const ph=(txt)=>`<div style="background:#eef1f3;border:1px solid var(--line2);border-radius:6px;padding:48px 18px;text-align:center;color:#8a929b;font-size:12.5px;line-height:1.5">${txt}</div>`;
+    let body='', foot='';
+    if(bk3tab==='details'){ body=ph('This screen uses the existing Reservation Details section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else if(bk3tab==='linked'){ body=ph('This screen uses the existing Reservation Linked section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else if(bk3tab==='history'){ body=ph('This screen uses the existing Reservation History section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else { // billing
+      const sorth=(t)=>`${t} <span style="opacity:.4;font-weight:400;font-size:10px">&#8597;</span>`;
+      body = `
+        <div style="background:#e9f6f0;border:1px solid #9cc9b6;color:#2b6b50;border-radius:8px;padding:10px 14px;font-size:12.5px;display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4f9a7c;color:#fff;font-size:11px;flex:0 0 18px">&#10003;</span>Rental booked · 2.0 hrs deducted · 8.0 hrs remaining on Jordan Lee's plan</div>
+        <div class="sech">Client(s) Billed</div>
+        <div style="text-align:center;font-weight:600;font-size:12.5px;margin:4px 0 10px">Found 1 result(s)</div>
+        <table class="tbl" style="font-size:11.5px">
+          <thead><tr>
+            <th>${sorth('Invoice')}</th><th>${sorth('Balance')}</th><th>${sorth('Billed')}</th><th>${sorth('Paid')}</th><th>${sorth('Revenue Date')}</th><th>${sorth('Due Date')}</th><th>${sorth('Client')}</th><th></th>
+          </tr></thead>
+          <tbody>
+            <tr><td><span style="color:#3f6f5c;cursor:pointer;text-decoration:underline">View</span></td><td>&#8212;</td><td>$31.05</td><td>$31.05</td><td>6/14/2026</td><td>&#8212;</td><td>Jordan Lee</td><td style="text-align:right"><span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span></td></tr>
+          </tbody>
+        </table>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:11.5px;color:#6b7280">
+          <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">&#171;</span><span class="btn sm" style="opacity:.5">&#8249; Previous</span></div>
+          <div style="display:flex;align-items:center;gap:8px"><span class="pg on">1</span><select class="form-ctrl" style="width:auto;padding:2px 6px"><option>20</option><option>50</option><option>100</option></select></div>
+          <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">Next &#8250;</span><span class="btn sm" style="opacity:.5">&#187;</span></div>
+        </div>
+      `;
+      foot = `<span class="sp"></span><span class="btn primary" onclick="go('sch-choice')">Done</span>`;
+    }
+    const mk=(t,lbl)=>({label:lbl, on:bk3tab===t, onclick: bk3tab===t?null:`bk3Tab('${t}')`});
+    return ezChrome('Schedule', sched,
+      panel({closeTarget:'sch-confirm', title:'Rental booked · Court 3',
+        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+        body, foot})
+    );
+  }
 };
 
 screens['sch-family'] = {
-  group:'2 · Schedule', n:'2.4', crumb:'EZUI Admin · Client Profile · Family', title:'Family sharing — account linking (admin)',
-  notes:`Staff/admin-only. Links client accounts so a family member's booking can deduct from the <b>primary account holder's</b> plan balance. Configured from the client profile.
-  <ul><li>Clients cannot manage family sharing in Self Service (out of scope for this brief).</li>
-  <li>Shared usage is attributed by name in the balance/audit trail.</li></ul>`,
-  render:()=> ezChrome('Clients', `
-    <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Primary</span></h3></div>
-    <div class="seg" style="margin-bottom:16px"><span>Overview</span><span>Schedule</span><span>Packages</span><span>Billing</span><span class="on">Family</span></div>
-    <div class="pagehead"><h3 style="font-size:15px">Linked family members</h3><div class="acts"><span class="btn primary">+ Link account</span></div></div>
-    <div class="note-anchor">Linked members may book using this account's Rental Plan balance. Each shared booking is recorded with the member's name in the audit trail.</div>
-    <table class="tbl"><thead><tr><th>Member</th><th>Relationship</th><th>Can use plans</th><th>Linked on</th><th></th></tr></thead><tbody>
-      <tr><td><b>Sam Lee</b></td><td>Spouse</td><td><span class="toggle on" style="display:inline-block;vertical-align:middle"></span></td><td>May 2, 2026</td><td><div class="rowact"><span class="i"></span></div></td></tr>
-      <tr><td><b>Riley Lee</b></td><td>Child</td><td><span class="toggle on" style="display:inline-block;vertical-align:middle"></span></td><td>May 2, 2026</td><td><div class="rowact"><span class="i"></span></div></td></tr>
-      <tr><td><b>Alex Lee</b></td><td>Child</td><td><span class="toggle" style="display:inline-block;vertical-align:middle"></span></td><td>—</td><td><div class="rowact"><span class="i"></span></div></td></tr>
-    </tbody></table>
-  `)
+  group:'2 · Schedule', n:'2.4', crumb:'EZUI Admin · Client Profile · Plans', title:'Client Profile — Plans tab & plan sharing',
+  notes:`The client profile <b>Plans</b> tab: a grid of the client's Rental Plans. Row action <b>Share</b> opens the plan-sharing side panel (mirrors the existing package-sharing UI).
+  <ul><li>Columns: plan, purchased, scheduled, remaining, status, start/end, billed/paid, balance.</li>
+  <li>Row actions: Invoice · Pay · View · <b>Share</b> · Edit · Delete. Only <b>Share</b> is wired here.</li>
+  <li>Share panel: check related clients to authorize, and/or add non-related clients by name, then Update.</li></ul>`,
+  render:()=>{
+    const profTabs = ['Profile','Membership','Additional','Emergency','Billing','Groups','Packages','Plans','Schedule','Check-in','Documents','Activity','EZSignUp','Smartwaiver'];
+    const tabBar = `<div style="display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line2);margin:0 -18px 14px;padding:0 18px">
+      ${profTabs.map(t=>{const on=t==='Plans';return `<span style="padding:8px 10px;font-size:12px;white-space:nowrap;cursor:${on?'default':'pointer'};border-bottom:2px solid ${on?'#7fb8a3':'transparent'};color:${on?'#2b2f36':'#6b7280'};font-weight:${on?600:400};margin-bottom:-1px">${t}</span>`;}).join('')}
+    </div>`;
+    const actions = (name,bal)=>`<div style="display:flex;gap:9px;align-items:center;justify-content:flex-end;white-space:nowrap">
+        <span style="font-size:11px;color:#9aa1aa">Invoice</span>
+        <span style="font-size:11px;color:#9aa1aa">Pay</span>
+        <span style="font-size:11px;color:#9aa1aa">View</span>
+        <span style="font-size:11px;color:#3f6f5c;cursor:pointer;text-decoration:underline;font-weight:600" onclick="famOpenShare('${name}','${bal}')">Share</span>
+        <span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span>
+        <span title="Delete" style="cursor:pointer;color:#b54a4a;font-size:13px">&#128465;</span>
+      </div>`;
+    const grid = `<table class="tbl" style="font-size:11.5px">
+      <thead><tr>
+        <th>Plan</th><th>Purchased</th><th>Scheduled</th><th>Remaining</th><th>Status</th><th>Start / End</th><th>Billed / Paid</th><th>Balance</th><th style="text-align:right">Actions</th>
+      </tr></thead>
+      <tbody>
+        <tr><td><b>10-Hour Court Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Hours</div></td><td>10 hrs</td><td>2 hrs</td><td><b>8 hrs</b></td><td><span class="tag green">Active</span></td><td>Jan 1 – Apr 1, 2026</td><td>$100 / $100</td><td>$0.00</td><td>${actions('10-Hour Court Pack','10 hours · 8 remaining')}</td></tr>
+        <tr><td><b>Pickleball 20 Play</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>20 occ</td><td>14 occ</td><td><b>6 occ</b></td><td><span class="tag green">Active</span></td><td>Feb 15, 2026 – No end</td><td>$160 / $160</td><td>$0.00</td><td>${actions('Pickleball 20 Play','20 occurrences · 6 remaining')}</td></tr>
+        <tr style="opacity:.65"><td><b>Drop-in 5 Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>5 occ</td><td>5 occ</td><td>0 occ</td><td><span class="tag gray">Completed</span></td><td>Mar 1 – Mar 31, 2026</td><td>$60 / $60</td><td>$0.00</td><td>${actions('Drop-in 5 Pack','5 occurrences · 0 remaining')}</td></tr>
+      </tbody></table>`;
+    const body = `
+      <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3></div>
+      ${tabBar}
+      <div class="pagehead" style="padding-top:0"><h3 style="font-size:15px">Rental Plans</h3>
+        <div class="acts"><span class="btn primary">+ Sell Rental Plan</span></div></div>
+      <div class="filters" style="margin-bottom:10px">
+        <select class="form-ctrl" style="width:auto;min-width:170px">
+          <option selected>Active Plans Only</option>
+          <option>All</option>
+          <option>Completed</option>
+        </select>
+      </div>
+      ${grid}
+    `;
+    return ezChrome('Clients', body, famShareOpen ? famSharePanel() : '');
+  }
 };
 
 screens['sch-restore'] = {
@@ -2275,15 +2332,157 @@ var bkClients = [
   {name:'Taylor Brooks', dob:'Apr 15, 1992', phone:'(555) 612-0984', type:'Member',     ratesConfigured:true,  plans:[]},
   {name:'Casey Wright',  dob:'Sep 27, 1993', phone:'(555) 723-5561', type:'Non-member', ratesConfigured:false, plans:[]},
 ];
-var bk = { tab:'details', client: null, method:null, q:'' };
+var bk = { tab:'details', client: null, method:null, q:'', filter:'all', payError:false };
 
 function bkTab(t){ bk.tab = t; go('sch-choice'); }
-function bkPickMethod(m){ bk.method = m; go('sch-choice'); }
+function bkPickMethod(m){ bk.method = m; bk.payError = null; go('sch-choice'); }
+function bkSetFilter(f){ bk.filter = f; go('sch-choice'); }
+function bkPayNow(){
+  if(!bk.client){ bk.payError = 'client'; go('sch-choice'); }
+  else if(!bk.method){ bk.payError = 'method'; go('sch-choice'); }
+  else { go('sch-confirm'); }
+}
 
 /* 2.2 insufficient-balance panel — defaults to the Billing tab */
-var bk2 = { tab:'billing', method:null };
+var bk2 = { tab:'billing', method:null, filter:'all', payError:false, extraPlans:[] };
 function bk2Tab(t){ bk2.tab = t; go('sch-insufficient'); }
-function bk2PickMethod(m){ bk2.method = m; go('sch-insufficient'); }
+function bk2PickMethod(m){ bk2.method = m; bk2.payError = false; go('sch-insufficient'); }
+function bk2SetFilter(f){ bk2.filter = f; go('sch-insufficient'); }
+function bk2PayNow(){ if(!bk2.method){ bk2.payError = true; go('sch-insufficient'); } else { go('sch-confirm'); } }
+
+/* 2.3 confirmation panel — defaults to the Billing tab */
+var bk3tab = 'billing';
+function bk3Tab(t){ bk3tab = t; go('sch-confirm'); }
+
+/* Filter chips (Show all / Rental Plans / Rental Rates) + payment-method error, shared by 2.1 and 2.2 */
+function bkFilterChips(active, fn){
+  const chip = (f,lbl)=>`<span class="${active===f?'on':''}" onclick="${fn}('${f}')" style="cursor:pointer">${lbl}</span>`;
+  return `<div class="seg" style="margin-bottom:10px">${chip('all','Show all')}${chip('plans','Rental Plans')}${chip('rates','Rental Rates')}</div>`;
+}
+function bkPayError(show){
+  return show ? `<div style="color:#b54a4a;font-size:11.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span>&#9888;&#65039;</span> Select a payment method to continue.</div>` : '';
+}
+function bkClientError(show){
+  return show ? `<div style="color:#b54a4a;font-size:11.5px;margin-top:6px;display:flex;align-items:center;gap:5px"><span>&#9888;&#65039;</span> Select a client to continue.</div>` : '';
+}
+
+/* ---- Inline Sell-a-Plan flow (runs inside the schedule Billing tab, replacing Payment method) ---- */
+var bksell = { active:false, step:'select', planId:null, autoRenew:false, ret:'sch-choice', client:'' };
+function bksellStart(ret, client){ bksell = {active:true, step:'select', planId:null, autoRenew:false, ret:ret, client:client||''}; go(ret); }
+function bksellBack(){ if(bksell.step==='pay'){ bksell.step='select'; } else { bksell.active=false; } go(bksell.ret); }
+function bksellPickPlan(id){ bksell.planId = id; go(bksell.ret); }
+function bksellToggleAR(){ bksell.autoRenew = !bksell.autoRenew; go(bksell.ret); }
+function bksellToPay(){ if(bksell.planId){ bksell.step='pay'; go(bksell.ret); } }
+function bksellCharge(){ bksell.step='confirm'; go(bksell.ret); }
+function bksellDone(){
+  const p = rpPlanData[bksell.planId];
+  if(p){
+    const np = { planId: parseInt(bksell.planId), name:p.name, model:p.model, unit:(p.model==='Per Hour'?'hrs':'plays'), balance: parseFloat(p.qtyNum), total: parseFloat(p.qtyNum) };
+    if(bksell.ret==='sch-choice' && bk.client){
+      if(!bk.client.plans.some(x=>x.planId===np.planId)) bk.client.plans.push(np);
+      bk.method = 'plan:'+np.planId; bk.payError = null;
+    } else if(bksell.ret==='sch-insufficient'){
+      if(!bk2.extraPlans.some(x=>x.planId===np.planId)) bk2.extraPlans.push(np);
+      bk2.method = 'plan:'+np.planId; bk2.payError = false;
+    }
+  }
+  bksell.active=false; go(bksell.ret);
+}
+/* Renders a usable plan option row (shared) */
+function bkPlanRow(p, reqHrs, selected, pickFn){
+  const sel = selected===('plan:'+p.planId);
+  let detail;
+  if(p.model==='Per Hour'){ const left=(p.balance-reqHrs).toFixed(1); detail=`${p.balance.toFixed(1)} hrs available · deducts <b>${reqHrs.toFixed(1)} hrs</b> → ${left} hrs left`; }
+  else { detail=`${p.balance} plays available · deducts <b>1 play</b> regardless of duration → ${p.balance-1} plays left`; }
+  return `<div class="radio${sel?' on':''}" onclick="${pickFn}('plan:${p.planId}')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Use plan — ${p.name}</b><span>${detail}</span></div></div>`;
+}
+function bk2ExtraPlansHTML(){ return bk2.extraPlans.map(p=>bkPlanRow(p, 3.0, bk2.method, 'bk2PickMethod')).join(''); }
+function bksellBodyHTML(){
+  const back = `<div style="margin-bottom:10px"><span class="btn link" style="cursor:pointer" onclick="bksellBack()">&#8249; Back</span></div>`;
+  if(bksell.step==='select'){
+    const cards = Object.entries(rpPlanData).filter(([id,p])=>!p.archived).map(([id,p])=>{
+      const sel = String(bksell.planId)===String(id);
+      const qtyStr = p.model==='Per Hour' ? `${p.qtyNum} hrs` : `${p.qtyNum} occurrences`;
+      const expStr = p.expiry==='No expiration' ? 'no expiry' : `expires ${p.expiry} from purchase`;
+      return `<div class="radio${sel?' on':''}" onclick="bksellPickPlan(${id})" style="cursor:pointer">
+        <span class="dot"></span><div class="t"><b>${p.name}</b><span>${qtyStr} · ${expStr}</span></div>
+        <div class="sell-plan-price"><b>${p.stdPrice}</b></div></div>`;
+    }).join('');
+    const canCont = !!bksell.planId;
+    return back + `<div class="wf-note">Inline <b>Sell a Plan</b> flow — same select → payment → confirm steps as <i>1.3 Sell a Plan</i>, selling to ${bksell.client||'this client'}.</div>
+      <div class="sech">Select a plan</div>${cards}
+      <div class="field" style="margin-top:14px;margin-bottom:0"><label>Auto-renew</label>
+        <div class="rowflex"><span class="toggle${bksell.autoRenew?' on':''}" onclick="bksellToggleAR()" style="cursor:pointer"></span><span style="color:#6b7280;font-size:12px">${bksell.autoRenew?'Renew automatically when balance is depleted':'Off — client can opt in later'}</span></div>
+      </div>
+      <div style="margin-top:16px"><span class="btn primary" style="width:100%;justify-content:center;opacity:${canCont?1:.4};${canCont?'':'pointer-events:none'}" onclick="bksellToPay()">Continue to payment</span></div>`;
+  }
+  if(bksell.step==='pay'){
+    const p = rpPlanData[bksell.planId];
+    const priceNum = parseFloat(p.stdPriceNum||0);
+    const tax = (priceNum*0.08).toFixed(2);
+    const total = (priceNum+parseFloat(tax)).toFixed(2);
+    return back + `<div class="sech">Order summary</div>
+      <div class="kv"><span class="k">Client</span><span>${bksell.client}</span></div>
+      <div class="kv"><span class="k">Plan</span><span>${p.name}</span></div>
+      <div class="kv"><span class="k">Price</span><span>${p.stdPrice}</span></div>
+      <div class="kv"><span class="k">Tax (8%)</span><span>$${tax}</span></div>
+      <div class="kv" style="border-bottom:none"><span style="font-weight:600">Total</span><span style="font-weight:700">$${total}</span></div>
+      <div class="sech" style="margin-top:16px">Payment</div>
+      <div class="iframe-stub"><div class="ph" style="width:120px;height:14px"></div><div>Existing EZUI payment iframe<br/>(card / saved method / terminal)</div></div>
+      <div style="margin-top:14px"><span class="btn primary" style="width:100%;justify-content:center" onclick="bksellCharge()">Charge $${total}</span></div>`;
+  }
+  // confirm
+  const p = rpPlanData[bksell.planId];
+  const balStr = p.model==='Per Hour' ? `${p.qtyNum}.0 / ${p.qtyNum} hrs` : `${p.qtyNum} / ${p.qtyNum} occurrences`;
+  return `<div class="banner ok"><span class="bi"></span><div><b>Plan sold to ${bksell.client}.</b> Balance is available now.</div></div>
+    <div class="plancard-lg" style="border-radius:8px;padding:16px">
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px">${p.name}</div>
+      <div class="kv"><span class="k">Balance</span><span><b>${balStr}</b></span></div>
+      <div class="kv"><span class="k">Status</span><span><span class="tag green">Active</span></span></div>
+      <div class="kv" style="border-bottom:none"><span class="k">Auto-renew</span><span>${bksell.autoRenew?'On':'Off'}</span></div>
+    </div>
+    <div style="margin-top:16px"><span class="btn primary" style="width:100%;justify-content:center" onclick="bksellDone()">Done — back to payment</span></div>`;
+}
+
+/* ---- 2.4 Plans tab — Share a plan ---- */
+var famShareOpen = false;
+var famSharePlan = { name:'', bal:'' };
+var famRelChecked = new Set();
+var famShares = [];
+function famOpenShare(name, bal){ famShareOpen = true; famSharePlan = {name, bal}; go('sch-family'); }
+function famCloseShare(){ famShareOpen = false; go('sch-family'); }
+function famToggleRel(n){ if(famRelChecked.has(n)) famRelChecked.delete(n); else famRelChecked.add(n); go('sch-family'); }
+function famAddShare(){ var el=document.getElementById('fam-share-input'); var v=el?el.value.trim():''; if(v) famShares.push(v); go('sch-family'); }
+function famRemoveShare(i){ famShares.splice(i,1); go('sch-family'); }
+function famSharePanel(){
+  const rels = [{name:'Sam Lee',rel:'Spouse'},{name:'Riley Lee',rel:'Child'},{name:'Alex Lee',rel:'Child'}];
+  const relHTML = rels.map(r=>`<label style="display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--line2);font-size:12.5px;cursor:pointer">
+      <input type="checkbox" ${famRelChecked.has(r.name)?'checked':''} onchange="famToggleRel('${r.name}')" style="accent-color:#4f9a7c;width:15px;height:15px">
+      <span><b>${r.name}</b> <span style="color:#6b7280">· ${r.rel}</span></span>
+    </label>`).join('');
+  const sharesHTML = famShares.length
+    ? famShares.map((n,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 9px;border:1px solid var(--line2);border-radius:5px;margin-bottom:6px;font-size:12.5px"><span>${n}</span><span style="color:#b54a4a;cursor:pointer;font-size:11px" onclick="famRemoveShare(${i})">&#10005; Remove</span></div>`).join('')
+    : `<p style="font-size:11.5px;color:#9aa1aa;text-align:center;margin:2px 0 0">No additional shares yet.</p>`;
+  const bar = (t)=>`<div style="background:#1f2329;color:#fff;text-align:center;font-weight:600;padding:7px;font-size:12px;letter-spacing:.3px">${t}</div>`;
+  return `<div class="dim" onclick="famCloseShare()"></div>
+   <div class="panel" id="sidePanel">
+     <div class="ph-head" style="background:#2f5e46"><h4 style="color:#fff">${famSharePlan.name}</h4><div class="x" onclick="famCloseShare()" style="cursor:pointer;color:#fff">&#10005;</div></div>
+     <div style="background:#2f5e46;color:#fff;text-align:center;font-size:11.5px;padding:0 12px 9px">Rental Plan of Jordan Lee · ${famSharePlan.bal}</div>
+     <div class="pbody">
+       ${bar('Relationships')}
+       <p style="font-size:12px;text-align:center;margin:10px 4px 8px">Place a check beside clients who are authorized to use sessions from this plan.</p>
+       ${relHTML}
+       ${bar('Other shares (Non-related)')}
+       <p style="font-size:12px;text-align:center;margin:10px 4px 8px">Clients listed below are also authorized to use sessions in this plan. Type a name to add.</p>
+       ${sharesHTML}
+       <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+         <input id="fam-share-input" class="form-ctrl" type="text" placeholder="Type a client name…" style="max-width:240px" onkeydown="if(event.key==='Enter'){famAddShare();}">
+         <button class="btn" onclick="famAddShare()">Add</button>
+       </div>
+     </div>
+     <div class="pfoot"><span class="sp"></span><span class="btn" onclick="famCloseShare()">Cancel</span><span class="btn primary" onclick="famCloseShare()">Update</span></div>
+   </div>`;
+}
 
 function bkClientSection(){
   const c = bk.client;
@@ -2329,8 +2528,8 @@ function bkSearchClient(val){
   dd.style.display='block';
 }
 
-function bkPickClient(idx){ bk.client = bkClients[idx]; bk.method = null; bk.q = ''; go('sch-choice'); }
-function bkClearClient(){ bk.client = null; bk.method = null; bk.q = ''; go('sch-choice'); }
+function bkPickClient(idx){ bk.client = bkClients[idx]; bk.method = null; bk.q = ''; bk.payError = null; go('sch-choice'); }
+function bkClearClient(){ bk.client = null; bk.method = null; bk.q = ''; bk.payError = null; go('sch-choice'); }
 
 /* Custom-rate expansion: $ amount + unit selector. Shared by 2.1 and 2.2. */
 function bkCustomRateFields(){
@@ -2358,48 +2557,60 @@ function bkExtraMethods(selected, pickFn){
 
 function bkPaymentMethodHTML(){
   const c = bk.client;
+  const err = bkPayError(bk.payError==='method');
   if(!c){
     const ghost = `
+      <div class="radio"><span class="dot"></span><div class="t"><b>Custom rate</b><span>Set a one-off price for this booking</span></div></div>
+      <div class="radio"><span class="dot"></span><div class="t"><b>No charge</b><span>Book without billing the client</span></div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Use plan — 10-Hour Court Pack</b><span>Plan balance deducts at booking</span></div></div>
       <div class="radio"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>${BK_RATE_STR}</span></div></div>`;
-    return `<div style="position:relative">
+    return err + `<div style="position:relative">
       <div style="pointer-events:none;opacity:.45">${ghost}</div>
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">
         <span style="font-size:11.5px;color:#6b7280;background:#f3f5f6;padding:5px 12px;border-radius:20px;border:1px solid var(--line2);white-space:nowrap">Select or add a client first</span>
       </div>
     </div>`;
   }
+  const filter = bk.filter || 'all';
   const first = c.name.split(' ')[0];
-  let banner = '';
-  if(c.plans.length === 0){
-    const sellBtn = `<div style="margin-top:8px"><span class="btn sm primary" onclick="rpSellInit(null)">Sell Rental Plan</span></div>`;
-    banner = c.ratesConfigured
-      ? `<div class="banner warn" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#9888;&#65039;</span><div><b>${first} has no plan eligible for this rental.</b> Charge the rental rate below, or sell a plan first.${sellBtn}</div></div>`
-      : `<div class="banner danger" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#128683;</span><div><b>No plan and no rental rate available.</b> Sell ${first} a plan, or configure rental rates for Court 3 to bill this booking.${sellBtn}</div></div>`;
-  }
-  let rows = '';
-  c.plans.forEach(p=>{
-    const sel = bk.method === ('plan:'+p.planId);
-    let detail;
-    if(p.model === 'Per Hour'){
-      const left = (p.balance - BK_REQ_HRS).toFixed(1);
-      detail = `${p.balance.toFixed(1)} hrs available · deducts <b>${BK_REQ_HRS.toFixed(1)} hrs</b> → ${left} hrs left`;
+  /* Custom rate + No charge only appear under "Show all" */
+  const top = (filter==='all') ? bkExtraMethods(bk.method, 'bkPickMethod') : '';
+  /* Rental Plans group */
+  let plans = '';
+  if(filter==='all' || filter==='plans'){
+    if(c.plans.length === 0){
+      const sellBtn = `<div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="bksellStart('sch-choice','${c.name}')">Sell Rental Plan</span></div>`;
+      plans = c.ratesConfigured
+        ? `<div class="banner warn" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#9888;&#65039;</span><div><b>${first} has no plan eligible for this rental.</b> Charge the rental rate below, or sell a plan first.${sellBtn}</div></div>`
+        : `<div class="banner danger" style="margin-bottom:10px"><span style="font-size:15px;line-height:1">&#128683;</span><div><b>No plan and no rental rate available.</b> Sell ${first} a plan, or configure rental rates for Court 3 to bill this booking.${sellBtn}</div></div>`;
     } else {
-      detail = `${p.balance} plays available · deducts <b>1 play</b> regardless of duration → ${p.balance-1} plays left`;
+      c.plans.forEach(p=>{
+        const sel = bk.method === ('plan:'+p.planId);
+        let detail;
+        if(p.model === 'Per Hour'){
+          const left = (p.balance - BK_REQ_HRS).toFixed(1);
+          detail = `${p.balance.toFixed(1)} hrs available · deducts <b>${BK_REQ_HRS.toFixed(1)} hrs</b> → ${left} hrs left`;
+        } else {
+          detail = `${p.balance} plays available · deducts <b>1 play</b> regardless of duration → ${p.balance-1} plays left`;
+        }
+        plans += `<div class="radio${sel?' on':''}" onclick="bkPickMethod('plan:${p.planId}')" style="cursor:pointer">
+            <span class="dot"></span><div class="t"><b>Use plan — ${p.name}</b><span>${detail}</span></div></div>`;
+      });
     }
-    rows += `<div class="radio${sel?' on':''}" onclick="bkPickMethod('plan:${p.planId}')" style="cursor:pointer">
-        <span class="dot"></span><div class="t"><b>Use plan — ${p.name}</b><span>${detail}</span></div></div>`;
-  });
-  if(c.ratesConfigured){
-    const sel = bk.method === 'rate';
-    rows += `<div class="radio${sel?' on':''}" onclick="bkPickMethod('rate')" style="cursor:pointer">
-        <span class="dot"></span><div class="t"><b>Pay rental rate</b><span>${BK_RATE_STR}</span></div></div>`;
-  } else {
-    rows += `<div class="radio" style="opacity:.55;cursor:not-allowed">
-        <span class="dot"></span><div class="t"><b>Pay rental rate</b><span style="color:#b07d1a">Rental rate not configured for Court 3 — set up rates in Setup, or use a plan.</span></div></div>`;
   }
-  rows += bkExtraMethods(bk.method, 'bkPickMethod');
-  return banner + rows;
+  /* Rental Rates group */
+  let rates = '';
+  if(filter==='all' || filter==='rates'){
+    if(c.ratesConfigured){
+      const sel = bk.method === 'rate';
+      rates = `<div class="radio${sel?' on':''}" onclick="bkPickMethod('rate')" style="cursor:pointer">
+          <span class="dot"></span><div class="t"><b>Pay rental rate</b><span>${BK_RATE_STR}</span></div></div>`;
+    } else {
+      rates = `<div class="radio" style="opacity:.55;cursor:not-allowed">
+          <span class="dot"></span><div class="t"><b>Pay rental rate</b><span style="color:#b07d1a">Rental rate not configured for Court 3 — set up rates in Setup, or use a plan.</span></div></div>`;
+    }
+  }
+  return err + bkFilterChips(filter, 'bkSetFilter') + top + plans + rates;
 }
 
 buildNav();
