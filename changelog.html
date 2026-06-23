@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Rental Plans Wireframes — Changelog</title>
+<style>
+  :root {
+    --ink: #2b2f36;
+    --muted: #6b7280;
+    --line: #dfe3e7;
+    --green: #4f9a7c;
+    --greenBg: #edf7f3;
+    --greenLine: #9cc9b6;
+    --nav: #1f2329;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f5f7;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .back {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12.5px; color: var(--muted); text-decoration: none;
+    margin-bottom: 32px;
+  }
+  .back:hover { color: var(--ink); }
+  .eyebrow {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  h1 { font-size: 26px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .meta { font-size: 12.5px; color: var(--muted); margin-bottom: 40px; }
+
+  .version {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .version-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--line);
+    background: var(--greenBg);
+  }
+  .version-header h2 { font-size: 16px; font-weight: 700; color: var(--ink); }
+  .version-date {
+    font-size: 12px; color: var(--muted);
+    background: #fff; border: 1px solid var(--greenLine);
+    border-radius: 20px; padding: 3px 10px;
+  }
+  .version-badge {
+    display: inline-block;
+    font-size: 11px; font-weight: 600; letter-spacing: .3px;
+    background: var(--green); color: #fff;
+    border-radius: 4px; padding: 2px 8px;
+    margin-right: 10px; vertical-align: middle;
+  }
+  .change-list { list-style: none; padding: 0; }
+  .change-list li {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13.5px; line-height: 1.6;
+  }
+  .change-list li:last-child { border-bottom: none; }
+  .change-num {
+    flex: 0 0 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--greenBg); border: 1px solid var(--greenLine);
+    border-radius: 50%; font-size: 11px; font-weight: 600; color: var(--green);
+    margin-top: 1px;
+  }
+  .change-body { flex: 1; }
+  .change-body strong { color: var(--ink); }
+  .change-body p { margin: 0; color: #4b5159; }
+  .change-body .detail {
+    margin-top: 6px; font-size: 12.5px; color: var(--muted);
+    background: #f7f8f9; border-left: 3px solid var(--greenLine);
+    padding: 8px 12px; border-radius: 0 4px 4px 0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="index.html">← Back to wireframes</a>
+
+  <div class="eyebrow">Rental Plans — Wireframes</div>
+  <h1>Changelog</h1>
+  <p class="meta">A record of updates to the wireframe across versions.</p>
+
+  <div class="version">
+    <div class="version-header">
+      <h2><span class="version-badge">v2</span> Version 2</h2>
+      <span class="version-date">June 23, 2026</span>
+    </div>
+    <ul class="change-list">
+      <li>
+        <span class="change-num">1</span>
+        <div class="change-body">
+          <p><strong>Rental booking: Details tab</strong> updated to show the full rental details form, including venue, instructor (multiselect), rental type, title, dates, times, recurrence, and notes — pre-filled with demo data.</p>
+        </div>
+      </li>
+      <li>
+        <span class="change-num">2</span>
+        <div class="change-body">
+          <p><strong>Rental booking: Client Selection</strong> (new step 2.2) updated to show the typical client selection process — a searchable grid of clients with a single-select radio pattern. Matches the existing EZFacility client picker UI.</p>
+        </div>
+      </li>
+      <li>
+        <span class="change-num">3</span>
+        <div class="change-body">
+          <p><strong>Rental booking: Billing</strong> (step 2.3) updated with revised plans-vs-rates filtering and expanded plan options.</p>
+          <div class="detail">
+            Select <strong>Rental Special</strong> to see the apply-to options: <em>This occurrence</em>, <em>Remaining occurrences</em> (with tooltip), and <em>Custom</em>. Choose <strong>Custom</strong> to explore the session-picker grid, including the error state when selected occurrences exceed the plan balance.
+          </div>
+        </div>
+      </li>
+      <li>
+        <span class="change-num">4</span>
+        <div class="change-body">
+          <p><strong>Rental booking: Confirmation</strong> (step 2.4) now supports adding an additional client for billing on the same rental. A new <em>Booking: Confirmation (Multiple clients)</em> step shows the updated Client(s) Billed grid with both clients listed.</p>
+        </div>
+      </li>
+      <li>
+        <span class="change-num">5</span>
+        <div class="change-body">
+          <p><strong>General tidying up</strong> — navigation step names updated, panel widths adjusted for readability, client profile summary bar placeholder added, and minor layout consistency fixes throughout.</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
