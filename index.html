@@ -128,6 +128,9 @@
   .banner.info{background:#e9f1f6;border:1px solid #b6cfe0;color:#3c5a70}
   .banner.info .bi{background:#5d86a6}
   .banner.ok{background:#e7f3ed;border:1px solid #9cc9b6;color:#2c6347}
+  .tip-wrap{position:relative;display:inline-flex;align-items:center}
+  .tip-wrap .tip-bubble{display:none;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 6px);background:#2b2f36;color:#fff;font-size:11px;line-height:1.4;padding:6px 9px;border-radius:5px;white-space:nowrap;max-width:240px;white-space:normal;z-index:999;pointer-events:none}
+  .tip-wrap:hover .tip-bubble{display:block}
   .banner.ok .bi{background:#4f9a7c}
   .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line2);font-size:12.5px}
   .kv:last-child{border-bottom:none}
@@ -1016,9 +1019,9 @@ screens['s-sell-select'] = {
     }).join('');
 
     const canContinue = !!(hasClient && sellPlanId);
-    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
+    const closeTarget = sellFromProfile ? sellReturnScreen : 's-list';
     const bgChrome    = sellFromProfile ? 'Clients' : 'Rental Plans';
-    const bgBody      = sellFromProfile ? rpProfileBody() : rpListBody();
+    const bgBody      = sellFromProfile ? sellBgBody() : rpListBody();
 
     /* Locked client display (when selling from profile) */
     const lockedClientSection = `
@@ -1109,8 +1112,8 @@ screens['s-sell-pay'] = {
     const priceNum = p ? (isMem && p.memPriceNum ? parseFloat(p.memPriceNum) : parseFloat(p.stdPriceNum||0)) : 0;
     const tax = (priceNum * 0.08).toFixed(2);
     const total = (priceNum + parseFloat(tax)).toFixed(2);
-    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
-    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?rpProfileBody():rpListBody(),
+    const closeTarget = sellFromProfile ? sellReturnScreen : 's-list';
+    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?sellBgBody():rpListBody(),
       panel({closeTarget, title:'Sell Rental Plan', tabs:[{label:'Select',onclick:"go('s-sell-select')"},{label:'Payment',on:true},{label:'Confirm'}], body:`
         <div class="sech">Order summary</div>
         <div class="kv"><span class="k">Client</span><span>${clientName}${isMem?' <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>':''}</span></div>
@@ -1149,9 +1152,9 @@ screens['s-sell-confirm'] = {
       return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) + ` (${p.expiry})`;
     })() : 'No expiration';
     const balStr = p ? (p.model==='Per Hour' ? `${p.qtyNum}.0 / ${p.qtyNum} hrs` : `${p.qtyNum} / ${p.qtyNum} occurrences`) : '—';
-    const closeTarget = sellFromProfile ? 's-profile' : 's-list';
-    const doneTarget  = sellFromProfile ? 's-profile' : 's-list';
-    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?rpProfileBody():rpListBody(),
+    const closeTarget = sellFromProfile ? sellReturnScreen : 's-list';
+    const doneTarget  = sellFromProfile ? sellReturnScreen : 's-list';
+    return ezChrome(sellFromProfile?'Clients':'Rental Plans', sellFromProfile?sellBgBody():rpListBody(),
       panel({closeTarget, title:'Sell Rental Plan', tabs:[{label:'Select'},{label:'Payment'},{label:'Confirm',on:true}], body:`
         <div class="banner ok"><span class="bi"></span><div><b>Plan sold to ${clientName}.</b> Balance is available now.</div></div>
         <div class="plancard-lg" style="border-radius:8px;padding:16px">
@@ -1166,6 +1169,79 @@ screens['s-sell-confirm'] = {
     );
   }
 };
+
+function schFamilyBody(hasPlans=true){
+  const profTabs = ['Profile','Membership','Additional','Emergency','Billing','Groups','Packages','Rental Plans','Schedule','Check-in','Documents','Activity','EZSignUp','Smartwaiver'];
+  const tabBar = `<div style="display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line2);margin:0 -18px 14px;padding:0 18px">
+    ${profTabs.map(t=>{const on=t==='Rental Plans';return `<span style="padding:8px 10px;font-size:12px;white-space:nowrap;cursor:${on?'default':'pointer'};border-bottom:2px solid ${on?'#7fb8a3':'transparent'};color:${on?'#2b2f36':'#6b7280'};font-weight:${on?600:400};margin-bottom:-1px">${t}</span>`;}).join('')}
+  </div>`;
+  const actions = (name,bal)=>`<div style="display:flex;gap:9px;align-items:center;justify-content:flex-end;white-space:nowrap">
+      <span style="font-size:11px;color:#9aa1aa">Invoice</span>
+      <span style="font-size:11px;color:#9aa1aa">Pay</span>
+      <span style="font-size:11px;color:#9aa1aa">View</span>
+      <span style="font-size:11px;color:#3f6f5c;cursor:pointer;text-decoration:underline;font-weight:600" onclick="famOpenShare('${name}','${bal}')">Share</span>
+      <span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span>
+      <span title="Delete" style="cursor:pointer;color:#b54a4a;font-size:13px">&#128465;</span>
+    </div>`;
+  const grid = `<table class="tbl" style="font-size:11.5px">
+    <thead><tr>
+      <th>Plan</th><th>Purchased</th><th>Scheduled</th><th>Remaining</th><th>Status</th><th>Start / End</th><th>Billed / Paid</th><th>Balance</th><th style="text-align:right">Actions</th>
+    </tr></thead>
+    <tbody>
+      <tr><td><b>10-Hour Court Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Hours</div></td><td>10 hrs</td><td>2 hrs</td><td><b>8 hrs</b></td><td><span class="tag green">Active</span></td><td>Jan 1 – Apr 1, 2026</td><td>$100 / $100</td><td>$0.00</td><td>${actions('10-Hour Court Pack','10 hours · 8 remaining')}</td></tr>
+      <tr><td><b>Pickleball 20 Play</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>20 occ</td><td>14 occ</td><td><b>6 occ</b></td><td><span class="tag green">Active</span></td><td>Feb 15, 2026 – No end</td><td>$160 / $160</td><td>$0.00</td><td>${actions('Pickleball 20 Play','20 occurrences · 6 remaining')}</td></tr>
+      <tr style="opacity:.65"><td><b>Drop-in 5 Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>5 occ</td><td>5 occ</td><td>0 occ</td><td><span class="tag gray">Completed</span></td><td>Mar 1 – Mar 31, 2026</td><td>$60 / $60</td><td>$0.00</td><td>${actions('Drop-in 5 Pack','5 occurrences · 0 remaining')}</td></tr>
+    </tbody></table>`;
+  const summaryBar = `<div style="display:flex;align-items:stretch;gap:0;border:1px solid var(--line2);border-radius:7px;overflow:hidden;margin-bottom:14px;background:#fff">
+    <!-- Avatar / membership card -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 16px;border-right:1px solid var(--line2);min-width:120px;background:#f7f8f9">
+      <div class="skel" style="width:48px;height:48px;border-radius:50%"></div>
+      <div class="skel" style="width:80px;height:9px;border-radius:4px"></div>
+      <div class="skel" style="width:64px;height:9px;border-radius:4px"></div>
+      <div class="skel" style="width:88px;height:22px;border-radius:4px;margin-top:2px"></div>
+      <div style="display:flex;gap:8px;margin-top:2px"><div class="skel" style="width:36px;height:8px;border-radius:3px"></div><div class="skel" style="width:44px;height:8px;border-radius:3px"></div></div>
+      <div class="skel" style="width:80px;height:18px;border-radius:4px;margin-top:2px"></div>
+    </div>
+    <!-- Summary stat cells -->
+    ${[['Balance',''],['Due',''],['On Account',''],['Un-Invoiced',''],['Membership No.','wide'],['Access Mode','wide']].map(([label,cls])=>`
+    <div style="display:flex;flex-direction:column;justify-content:center;padding:12px 18px;border-right:1px solid var(--line2);gap:6px;min-width:${cls==='wide'?'130px':'90px'}">
+      <div class="skel" style="width:60px;height:8px;border-radius:3px"></div>
+      <div class="skel" style="width:72px;height:14px;border-radius:4px"></div>
+      <div class="skel" style="width:56px;height:20px;border-radius:4px;margin-top:2px"></div>
+    </div>`).join('')}
+    <div style="flex:1"></div>
+  </div>
+`;
+  return `
+    <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3></div>
+    ${summaryBar}
+    ${tabBar}
+    <div class="pagehead" style="padding-top:0"><h3 style="font-size:15px">Rental Plans</h3>
+      <div class="acts"><span class="btn primary" onclick="schFamilySellInit()">+ Sell Rental Plan</span></div></div>
+    <div class="filters" style="margin-bottom:10px">
+      <select class="form-ctrl" style="width:auto;min-width:170px">
+        <option selected>Active Plans Only</option>
+        <option>All</option>
+        <option>Completed</option>
+      </select>
+    </div>
+    ${hasPlans ? grid : `<div style="border:1px solid var(--line2);border-radius:7px;padding:40px 24px;text-align:center;color:#8a929b;background:#fafbfc">
+      <div style="font-size:15px;font-weight:500;color:#4b5159;margin-bottom:6px">No rental plans</div>
+      <div style="font-size:12.5px;line-height:1.6;margin-bottom:16px">This client hasn't purchased any rental plans yet.</div>
+      <span class="btn primary" onclick="schFamilySellInit()">+ Sell Rental Plan</span>
+    </div>`}
+  `;
+}
+
+function schFamilySellInit(){
+  sellClient = {name:'Jordan Lee', dob:'Jan 12, 1990', phone:'(555) 201-4832', type:'Member', locked:true};
+  sellPlanId = null; sellAutoRenew = false; sellNewClient = false; sellSearchQuery = '';
+  sellFromProfile = true; sellReturnScreen = 'sch-family';
+  sellArUseDefault = true; sellArTriggerType = 'before';
+  sellArTriggerNum = '7'; sellArTriggerUnit = 'Days'; sellArRenewAs = 'copy';
+  sellAutoSelectPlan();
+  go('s-sell-select');
+}
 
 function rpProfileBody(){ return `
     <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3>
@@ -1198,7 +1274,7 @@ screens['s-profile'] = {
   <ul><li>Filter: Active Only / All / Completed. Columns: plan, purchased, used, remaining, status, expiry, auto-renew.</li>
   <li>Row actions: View details / Edit / Set Active / Set Inactive. <b>Edit</b> opens the edit panel.</li>
   <li>No refund screen here — refunds use the existing Billing tab.</li></ul>`,
-  render:()=> ezChrome('Clients', rpProfileBody())
+  render:()=> ezChrome('Clients', schFamilyBody(false))
 };
 
 screens['s-edit'] = {
@@ -1230,9 +1306,9 @@ screens['s-edit'] = {
 
 /* ---------- Group: Schedule Integration ---------- */
 screens['sch-choice'] = {
-  group:'2 · Schedule', n:'2.1', crumb:'EZUI Schedule · Booking', title:'Booking — plan or rate choice (staff)',
+  group:'2 · Schedule', n:'2.1', crumb:'EZUI Schedule · Booking', title:'Booking: Details',
   notes:`The <b>New Rental</b> reservation panel with four tabs: <b>Details</b>, <b>Billing</b>, <b>Linked</b>, <b>History</b>. The plan-vs-rate decision lives on the <b>Billing</b> tab.
-  <ul><li><b>Details / Linked / History</b> reuse the existing Reservation panel sections (shown here as placeholders).</li>
+  <ul><li><b>Details</b> reuses the existing Reservation Details form (pre-filled with demo data). <b>Linked / History</b> remain placeholders.</li>
   <li><b>Billing</b> uses the same client lookup as <i>1.3 · Sell a Plan</i> ("Select client for billing"), then shows <b>Payment method</b>.</li>
   <li>Switch the billing client to preview each state — <b>Jordan Lee</b> = multiple eligible plans; <b>Alex Rivera</b> = no eligible plan (rate only); <b>Sam Chen</b> = plan available but rental rate not configured; <b>Casey Wright</b> = neither plan nor rate.</li>
   <li>No hybrid payments — one booking = one method. Occurrence plans deduct 1 regardless of duration.</li></ul>`,
@@ -1263,22 +1339,141 @@ screens['sch-choice'] = {
         foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bkPayNow()">Pay Now</span>`;
       }
     } else { // details (default)
-      body = ph('This screen uses the existing Reservation Details section.');
-      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bkTab('billing')">Select client</span>`;
+      body = `
+        <div class="sech" style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:12px">Reservation Details</div>
+        <div class="field"><label>Schedule type <span style="color:#b54a4a">*</span></label>
+          <select class="form-ctrl"><option>Rental</option></select></div>
+        <div class="field"><label>Venue(s) <span style="color:#b54a4a">*</span></label>
+          <div class="form-ctrl" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;height:auto;min-height:32px;cursor:pointer;justify-content:space-between">
+            <div style="display:flex;gap:5px;flex-wrap:wrap;flex:1">
+              <span style="background:#4b5159;color:#fff;border-radius:3px;padding:2px 7px;font-size:11.5px;font-weight:500">Court 3</span>
+            </div>
+            <span style="color:#9aa1aa;font-size:11px">▾</span>
+          </div>
+        </div>
+        <div class="field"><label>Instructor(s) <span style="color:#b54a4a">*</span></label>
+          <div class="form-ctrl" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;height:auto;min-height:32px;cursor:pointer;justify-content:space-between">
+            <div style="display:flex;gap:5px;flex-wrap:wrap;flex:1">
+              <span style="background:#4b5159;color:#fff;border-radius:3px;padding:2px 7px;font-size:11.5px;font-weight:500">Jordan Smith</span>
+            </div>
+            <span style="color:#9aa1aa;font-size:11px">▾</span>
+          </div>
+        </div>
+        <div class="field"><label>Rental type <span style="color:#b54a4a">*</span></label>
+          <select class="form-ctrl"><option>Clinic</option></select></div>
+        <div class="field"><label>Title <span style="color:#b54a4a">*</span></label>
+          <input class="form-ctrl" type="text" value="Court 3 Rental"></div>
+        <div class="field row2">
+          <div class="field"><label>Start date <span style="color:#b54a4a">*</span></label>
+            <input class="form-ctrl" type="text" value="6/14/2026"></div>
+          <div class="field"><label>End date <span style="color:#b54a4a">*</span></label>
+            <input class="form-ctrl" type="text" value="6/14/2026"></div>
+        </div>
+        <div class="field row2" style="align-items:center">
+          <div class="field"><label>Start time <span style="color:#b54a4a">*</span></label>
+            <select class="form-ctrl"><option>5:00 PM</option></select></div>
+          <div style="display:flex;align-items:center;gap:6px;padding-top:18px;white-space:nowrap">
+            <input type="checkbox" style="accent-color:#4f9a7c"> <span style="font-size:12px">All day</span></div>
+          <div class="field"><label>End time <span style="color:#b54a4a">*</span></label>
+            <select class="form-ctrl"><option>7:00 PM</option></select></div>
+        </div>
+        <div class="field row2" style="align-items:flex-end">
+          <div class="field" style="flex:1"><label style="font-size:11px">Pre-buffer</label>
+            <div style="font-size:10.5px;color:#8a929b;margin-bottom:4px">Block transitional time prior to session</div>
+            <select class="form-ctrl"><option>—None—</option></select></div>
+          <div style="padding-bottom:10px;font-size:11.5px;color:#6b7280">and/or</div>
+          <div class="field" style="flex:1"><label style="font-size:11px">Post-buffer</label>
+            <div style="font-size:10.5px;color:#8a929b;margin-bottom:4px">Block transitional time after session</div>
+            <select class="form-ctrl"><option>—None—</option></select></div>
+          <div style="display:flex;align-items:center;gap:5px;padding-bottom:10px;white-space:nowrap">
+            <input type="checkbox" checked style="accent-color:#4f9a7c"> <span style="font-size:12px">Use default</span></div>
+        </div>
+        <div class="field"><label>Recurring <span style="color:#b54a4a">*</span></label>
+          <div style="display:flex;gap:16px;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="bk-recur" value="yes" checked style="accent-color:#4f9a7c"> Yes</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="bk-recur" value="no" style="accent-color:#4f9a7c"> No</label>
+          </div>
+        </div>
+        <div class="field"><label>Recurrence</label>
+          <select class="form-ctrl"><option>Weekly</option><option>Daily</option><option>Monthly</option></select>
+        </div>
+        <div class="field"><label>Ending</label>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:2px">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="bk-end" value="on" checked style="accent-color:#4f9a7c"> On</label>
+            <input class="form-ctrl" type="text" value="9/14/2026" style="width:110px;display:inline-block">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-left:8px"><input type="radio" name="bk-end" value="after" style="accent-color:#4f9a7c"> After</label>
+            <input class="form-ctrl" type="text" value="13" style="width:52px;display:inline-block">
+            <span style="font-size:12px;color:#4b5159">Occurrences</span>
+          </div>
+        </div>
+        <div class="field"><label>Notes</label>
+          <textarea class="form-ctrl" rows="3" placeholder="Enter notes" style="resize:vertical"></textarea></div>
+        <div style="font-size:12px;margin-bottom:10px">
+          <b>Additional options:</b> <a href="#" style="color:#4f9a7c;text-decoration:none" onclick="return false">Edit</a>
+        </div>
+        <div style="font-size:12px;color:#4b5159">Show on EZLeagues: No</div>`;
+      foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('sch-client')">Select client</span>`;
     }
     const mk = (t,lbl)=>({label:lbl, on:bk.tab===t, onclick: bk.tab===t ? null : `bkTab('${t}')`});
     return ezChrome('Schedule', sched,
       panel({closeTarget:'sch-choice', title:'New Rental · Court 3',
-        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+        tabs:[mk('details','Details'),{label:'Billing', onclick:"go('sch-client')"},mk('linked','Linked'),mk('history','History')],
         body, foot})
     );
   }
 };
 
+screens['sch-client'] = {
+  group:'2 · Schedule', n:'2.2', crumb:'EZUI Schedule · Booking', title:'Booking: Client Selection',
+  notes:`Staff selects one client to bill for this rental. Accessed via the <b>Billing</b> tab from the Details step.
+  <ul><li>Search filters the list in real time. Only one client can be selected (radio).</li>
+  <li>Continuing with a selected client advances to the Payment Options step (2.3).</li></ul>`,
+  render:()=>{
+    const sched = `<div class="pagehead"><h3>Schedule</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`;
+    const rows = bkClientList.map((c,i)=>`<tr style="${i===bkClientSelIdx?'background:#edf7f3':''}">
+      <td><input type="radio" name="bk-client-sel" ${i===bkClientSelIdx?'checked':''} onchange="bkSelectClient(${i})" style="accent-color:#4f9a7c"></td>
+      <td>${c.first}</td><td>${c.last}</td><td style="color:#6b7280">${c.mem}</td>
+      <td>${c.phone}</td><td>${c.age}</td><td>${c.dob}</td>
+    </tr>`).join('');
+    const sorth=(t)=>`${t} <span style="opacity:.4;font-weight:400;font-size:10px">&#8597;</span>`;
+    const body = `
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+        <div style="flex:1;position:relative">
+          <input class="form-ctrl" type="text" placeholder="Search clients by name, ID and more." style="padding-right:32px">
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#9aa1aa;font-size:14px">&#128269;</span>
+        </div>
+        <span style="font-size:12px;color:#6b7280;white-space:nowrap">OR</span>
+        <span class="btn primary">Create Client</span>
+      </div>
+      <div style="border-top:1px solid var(--line2);margin:0 -18px 12px"></div>
+      <div style="text-align:center;font-weight:600;font-size:12.5px;margin-bottom:10px">Found 8 result(s)</div>
+      <table class="tbl" style="font-size:11.5px">
+        <thead><tr>
+          <th></th>
+          <th>${sorth('First Name')}</th><th>${sorth('Last Name')}</th><th>${sorth('Membership #')}</th>
+          <th>${sorth('Mobile')}</th><th>${sorth('Age')}</th><th>${sorth('Date Of Birth')}</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:11.5px;color:#6b7280">
+        <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">&#171;</span><span class="btn sm" style="opacity:.5">&#8249; Previous</span></div>
+        <div style="display:flex;align-items:center;gap:8px"><span class="pg on">1</span><select class="form-ctrl" style="width:auto;padding:2px 6px"><option>10</option><option>25</option><option>50</option></select></div>
+        <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">Next &#8250;</span><span class="btn sm" style="opacity:.5">&#187;</span></div>
+      </div>`;
+    return ezChrome('Schedule', sched,
+      panel({closeTarget:'sch-client', title:'New Rental · Court 3', wide:true,
+        tabs:[{label:'Details', onclick:"go('sch-choice')"},{label:'Billing',on:true},{label:'Linked'},{label:'History'}],
+        body, foot:`<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="go('sch-insufficient')">Continue</span>`})
+    );
+  }
+};
+
 screens['sch-insufficient'] = {
-  group:'2 · Schedule', n:'2.2', crumb:'EZUI Schedule · Booking', title:'Booking — insufficient balance (staff)',
-  notes:`The same four-tab <b>New Rental</b> panel as 2.1, opened on the <b>Billing</b> tab with a client already selected whose plan <b>doesn't cover the booking</b>. No partial coverage in MVP.
-  <ul><li>Options: <b>purchase more for the client</b>, <b>charge the rental rate</b>, or <b>cancel</b>. Uses the existing inline red-banner pattern.</li></ul>`,
+  group:'2 · Schedule', n:'2.3', crumb:'EZUI Schedule · Booking', title:'Booking: Billing',
+  notes:`The <b>Billing</b> tab after a client has been selected. Shows the chosen client at the top and payment options below. No partial plan coverage in MVP.
+  <ul><li>When the client's plan balance is insufficient, the plan row shows an error and a <b>Sell Rental Plan</b> shortcut.</li>
+  <li>Staff can also pay the rental rate instead.</li></ul>`,
   render:()=>{
     const sched = `<div class="pagehead"><h3>Schedule</h3></div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'outline:2px solid #b54a4a':''}"></div>`).join('')}</div>`;
@@ -1306,44 +1501,97 @@ screens['sch-insufficient'] = {
       const rateRow = `<div class="radio${bk2.method==='rate'?' on':''}" onclick="bk2PickMethod('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay rental rate</b><span>$90.00 (3 hrs × $30/hr) · standard rate billing</span></div></div>`;
       const head2 = `
         <div class="kv" style="border-bottom:1px solid var(--line2);padding-bottom:8px;margin-bottom:10px"><span class="k">Reservation</span><span>Court 3 · Jun 14 · 6:00–9:00 PM (3 hrs)</span></div>
-        <div class="field" style="margin-bottom:12px">
-          <label>Select client for billing <span style="color:#b54a4a">*</span></label>
-          <div class="sell-client-wrap has-client">
-            <input class="form-ctrl" type="text" value="Jordan Lee" readonly>
-            <button class="sell-client-clear" title="Clear">&#10005;</button>
-          </div>
-          <div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">
-            <span style="font-size:11.5px;color:#6b7280">Jan 12, 1990 · (555) 201-4832</span>
-            <span class="tag green" style="font-size:10px;padding:1px 5px">Member</span>
-          </div>
+        <div style="margin-bottom:12px">
+          <table class="tbl" style="font-size:11.5px">
+            <thead><tr><th>First Name</th><th>Last Name</th><th>Mobile Phone</th><th>Age</th><th>Date Of Birth</th><th></th></tr></thead>
+            <tbody><tr style="background:#edf7f3">
+              <td>Jordan</td><td>Lee</td><td>(555) 201-4832</td><td>36</td><td>Jan 12, 1990</td>
+              <td><span style="color:#4f9a7c;cursor:pointer;font-size:15px" onclick="go('sch-client')" title="Change client">&#128465;</span></td>
+            </tr></tbody>
+          </table>
         </div>`;
-      if(bksell.active){
+      /* ---- Custom sessions modal (replaces body when open) ---- */
+      if(rs.modalOpen){
+        const rsSessions = [
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (6/22/2026)',start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (6/29/2026)',start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (7/6/2026)', start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (7/13/2026)',start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (7/20/2026)',start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (7/27/2026)',start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (8/3/2026)', start:'5:00 PM',end:'7:00 PM'},
+          {venue:'Court 3',instructor:'Jordan Smith',date:'Monday (8/10/2026)',start:'5:00 PM',end:'7:00 PM'},
+        ];
+        const overLimit = rs.customSessions.length > 5;
+        const rows = rsSessions.map((s,i)=>{
+          const chk = rs.customSessions.includes(i);
+          return `<tr style="${chk?'background:#edf7f3':''}">
+            <td><input type="checkbox" ${chk?'checked':''} onchange="rsToggleSess(${i})" style="accent-color:#4f9a7c"></td>
+            <td>${s.venue}</td><td>${s.instructor}</td><td>${s.date}</td><td>${s.start}</td><td>${s.end}</td>
+          </tr>`;
+        }).join('');
+        body = `
+          <div style="font-weight:600;font-size:13px;margin-bottom:12px">Select Occurrences</div>
+          ${overLimit?`<div class="banner danger"><span class="bi"></span><div><b>Too many occurrences selected.</b> Rental Special has 5 occurrences remaining. Deselect ${rs.customSessions.length-5} to continue.</div></div>`:''}
+          <table class="tbl" style="font-size:11.5px">
+            <thead><tr>
+              <th><input type="checkbox" style="accent-color:#4f9a7c" ${rs.customSessions.length===8?'checked':''} onchange="if(this.checked){rs.customSessions=[0,1,2,3,4,5,6,7];}else{rs.customSessions=[];}go('sch-insufficient')"></th>
+              <th>Venue</th><th>Instructor</th><th>Available Date</th><th>Start Time</th><th>End Time</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:11.5px;color:#6b7280">
+            <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">&#171;</span><span class="btn sm" style="opacity:.5">&#8249; Previous</span></div>
+            <div style="display:flex;align-items:center;gap:8px"><span class="pg on">1</span><select class="form-ctrl" style="width:auto;padding:2px 6px"><option>10</option></select></div>
+            <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">Next &#8250;</span><span class="btn sm" style="opacity:.5">&#187;</span></div>
+          </div>`;
+        foot = `<span class="btn" onclick="rsBookSelected()">Cancel</span><span class="sp"></span><span class="btn primary" style="${overLimit?'opacity:.4;pointer-events:none':''}" onclick="${overLimit?'':'rsBookSelected()'}">Book Selected</span>`;
+      } else if(bksell.active){
         body = head2 + bksellBodyHTML();
         foot = `<span class="btn" onclick="panelTryClose()">Cancel</span>`;
       } else {
+        /* ---- Rental Special card ---- */
+        const rsSel = bk2.method==='rs';
+        const rsTooltip = `<span class="tip-wrap" style="margin-left:5px"><span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#6b7280;color:#fff;font-size:10px;cursor:help;line-height:1;font-style:italic;font-family:serif">i</span><span class="tip-bubble">Occurrences will be auto-selected from soonest to latest available.</span></span>`;
+        const rsOccPicker = rsSel ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)">
+          <div style="font-size:11.5px;color:#6b7280;margin-bottom:5px">Apply to</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <select class="form-ctrl" onchange="rsSetMode(this.value)" style="width:auto;min-width:170px">
+              <option value="this" ${rs.occMode==='this'?'selected':''}>This occurrence</option>
+              <option value="remaining" ${rs.occMode==='remaining'?'selected':''}>Remaining occurrences</option>
+              <option value="custom" ${rs.occMode==='custom'?'selected':''}>Custom</option>
+            </select>
+            ${rs.occMode==='remaining'?rsTooltip:''}
+          </div>
+          ${rs.occMode==='custom'?`<div style="margin-top:6px;font-size:11.5px;color:#4b5159">${rs.customSessions.length} session${rs.customSessions.length!==1?'s':''} selected — <span style="color:#4f9a7c;cursor:pointer;text-decoration:underline" onclick="rsSetMode('custom')">Edit</span></div>`:''}
+        </div>` : '';
+        const rsCard = `<div class="radio${rsSel?' on':''}" onclick="rsSelect()" style="cursor:pointer;align-items:flex-start">
+          <span class="dot" style="flex:0 0 auto;margin-top:2px"></span>
+          <div class="t" style="flex:1"><b>Rental Special</b><span>5 occurrences · 5 remaining</span>${rsOccPicker}</div>
+        </div>`;
         body = head2 + `
-        <div class="sech">Payment method</div>
+        <div class="sech">Payment Options</div>
         ${bkPayError(bk2.payError)}
         ${bkFilterChips(f2, 'bk2SetFilter')}
         ${(f2==='all') ? bkExtraMethods(bk2.method, 'bk2PickMethod') : ''}
-        ${(f2==='all'||f2==='plans') ? (bk2ExtraPlansHTML() + planCard) : ''}
-        ${(f2==='all'||f2==='rates') ? rateRow : ''}`;
+        ${(f2==='all'||f2==='rates') ? rateRow : ''}
+        ${(f2==='all'||f2==='plans') ? (rsCard + bk2ExtraPlansHTML() + planCard) : ''}`;
         foot = `<span class="btn" onclick="panelTryClose()">Cancel</span><span class="sp"></span><span class="btn primary" onclick="bk2PayNow()">Pay Now</span>`;
       }
     }
     const mk = (t,lbl)=>({label:lbl, on:bk2.tab===t, onclick: bk2.tab===t ? null : `bk2Tab('${t}')`});
     return ezChrome('Schedule', sched,
-      panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3',
-        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+      panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3', wide:rs.modalOpen,
+        tabs:[{label:'Details', onclick:"go('sch-choice')"},mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
         body, foot})
     );
   }
 };
 
 screens['sch-confirm'] = {
-  group:'2 · Schedule', n:'2.3', crumb:'EZUI Schedule · Booking', title:'Booking confirmation — deduction shown',
+  group:'2 · Schedule', n:'2.4', crumb:'EZUI Schedule · Booking', title:'Booking: Confirmation',
   notes:`Deduction happens at <b>booking creation</b>, not after the rental ends. Balance updates immediately and is shown clearly. A toast confirms.
-  <ul><li>Restoration is unconditional on cancel/delete (before OR after start time) — see 2.5.</li></ul>`,
+  <ul><li>Restoration is unconditional on cancel/delete (before OR after start time) — see 2.6.</li></ul>`,
   render:()=>{
     const sched = `<div class="pagehead"><h3>Schedule</h3></div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'background:#cfe8df;outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`;
@@ -1353,84 +1601,55 @@ screens['sch-confirm'] = {
     else if(bk3tab==='linked'){ body=ph('This screen uses the existing Reservation Linked section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
     else if(bk3tab==='history'){ body=ph('This screen uses the existing Reservation History section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
     else { // billing
-      const sorth=(t)=>`${t} <span style="opacity:.4;font-weight:400;font-size:10px">&#8597;</span>`;
-      body = `
-        <div style="background:#e9f6f0;border:1px solid #9cc9b6;color:#2b6b50;border-radius:8px;padding:10px 14px;font-size:12.5px;display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4f9a7c;color:#fff;font-size:11px;flex:0 0 18px">&#10003;</span>Rental booked · 2.0 hrs deducted · 8.0 hrs remaining on Jordan Lee's plan</div>
-        <div class="sech">Client(s) Billed</div>
-        <div style="text-align:center;font-weight:600;font-size:12.5px;margin:4px 0 10px">Found 1 result(s)</div>
-        <table class="tbl" style="font-size:11.5px">
-          <thead><tr>
-            <th>${sorth('Invoice')}</th><th>${sorth('Balance')}</th><th>${sorth('Billed')}</th><th>${sorth('Paid')}</th><th>${sorth('Revenue Date')}</th><th>${sorth('Due Date')}</th><th>${sorth('Client')}</th><th></th>
-          </tr></thead>
-          <tbody>
-            <tr><td><span style="color:#3f6f5c;cursor:pointer;text-decoration:underline">View</span></td><td>&#8212;</td><td>$31.05</td><td>$31.05</td><td>6/14/2026</td><td>&#8212;</td><td>Jordan Lee</td><td style="text-align:right"><span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span></td></tr>
-          </tbody>
-        </table>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:11.5px;color:#6b7280">
-          <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">&#171;</span><span class="btn sm" style="opacity:.5">&#8249; Previous</span></div>
-          <div style="display:flex;align-items:center;gap:8px"><span class="pg on">1</span><select class="form-ctrl" style="width:auto;padding:2px 6px"><option>20</option><option>50</option><option>100</option></select></div>
-          <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">Next &#8250;</span><span class="btn sm" style="opacity:.5">&#187;</span></div>
-        </div>
-      `;
+      body = bk3BillingHTML();
       foot = `<span class="sp"></span><span class="btn primary" onclick="go('sch-choice')">Done</span>`;
     }
     const mk=(t,lbl)=>({label:lbl, on:bk3tab===t, onclick: bk3tab===t?null:`bk3Tab('${t}')`});
     return ezChrome('Schedule', sched,
-      panel({closeTarget:'sch-confirm', title:'Rental booked · Court 3',
-        tabs:[mk('details','Details'),mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+      panel({closeTarget:'sch-confirm', title:'Rental booked · Court 3', wide:true,
+        tabs:[{label:'Details', onclick:"go('sch-choice')"},mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
+        body, foot})
+    );
+  }
+};
+
+screens['sch-confirm-multi'] = {
+  group:'2 · Schedule', n:'2.4', crumb:'EZUI Schedule · Booking', title:'Booking: Confirmation (Multiple clients)',
+  notes:`Confirmation state after a second client has been added for billing on the same rental. The <b>Client(s) Billed</b> grid shows all billed clients.
+  <ul><li>Reached by clicking <b>Pay Now</b> after completing the Add Client flow from the single-client confirmation step.</li>
+  <li>Additional clients can still be added from this step using the same <b>+ Add Client</b> pattern.</li></ul>`,
+  render:()=>{
+    const sched = `<div class="pagehead"><h3>Schedule</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${Array.from({length:20}).map((_,i)=>`<div class="skel" style="height:46px;opacity:${i===7?'1':'.5'};${i===7?'background:#cfe8df;outline:2px solid #7fb8a3':''}"></div>`).join('')}</div>`;
+    const ph=(txt)=>`<div style="background:#eef1f3;border:1px solid var(--line2);border-radius:6px;padding:48px 18px;text-align:center;color:#8a929b;font-size:12.5px;line-height:1.5">${txt}</div>`;
+    let body='', foot='';
+    if(bk3tab==='details'){ body=ph('This screen uses the existing Reservation Details section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else if(bk3tab==='linked'){ body=ph('This screen uses the existing Reservation Linked section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else if(bk3tab==='history'){ body=ph('This screen uses the existing Reservation History section.'); foot=`<span class="btn" onclick="panelTryClose()">Close</span>`; }
+    else {
+      body = bk3BillingHTML(true);
+      foot = `<span class="sp"></span><span class="btn primary" onclick="go('sch-choice')">Done</span>`;
+    }
+    const mk=(t,lbl)=>({label:lbl, on:bk3tab===t, onclick: bk3tab===t?null:`bk3Tab('${t}')`});
+    return ezChrome('Schedule', sched,
+      panel({closeTarget:'sch-confirm-multi', title:'Rental booked · Court 3', wide:true,
+        tabs:[{label:'Details', onclick:"go('sch-choice')"},mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
         body, foot})
     );
   }
 };
 
 screens['sch-family'] = {
-  group:'2 · Schedule', n:'2.4', crumb:'EZUI Admin · Client Profile · Plans', title:'Client Profile — Plans tab & plan sharing',
+  group:'2 · Schedule', n:'2.5', crumb:'EZUI Admin · Client Profile · Plans', title:'Client Profile — Plans tab & plan sharing',
   notes:`The client profile <b>Plans</b> tab: a grid of the client's Rental Plans. Row action <b>Share</b> opens the plan-sharing side panel (mirrors the existing package-sharing UI).
   <ul><li>Columns: plan, purchased, scheduled, remaining, status, start/end, billed/paid, balance.</li>
   <li>Row actions: Invoice · Pay · View · <b>Share</b> · Edit · Delete. Only <b>Share</b> is wired here.</li>
   <li>Share panel: check related clients to authorize, and/or add non-related clients by name, then Update.</li></ul>`,
-  render:()=>{
-    const profTabs = ['Profile','Membership','Additional','Emergency','Billing','Groups','Packages','Plans','Schedule','Check-in','Documents','Activity','EZSignUp','Smartwaiver'];
-    const tabBar = `<div style="display:flex;flex-wrap:wrap;border-bottom:1px solid var(--line2);margin:0 -18px 14px;padding:0 18px">
-      ${profTabs.map(t=>{const on=t==='Plans';return `<span style="padding:8px 10px;font-size:12px;white-space:nowrap;cursor:${on?'default':'pointer'};border-bottom:2px solid ${on?'#7fb8a3':'transparent'};color:${on?'#2b2f36':'#6b7280'};font-weight:${on?600:400};margin-bottom:-1px">${t}</span>`;}).join('')}
-    </div>`;
-    const actions = (name,bal)=>`<div style="display:flex;gap:9px;align-items:center;justify-content:flex-end;white-space:nowrap">
-        <span style="font-size:11px;color:#9aa1aa">Invoice</span>
-        <span style="font-size:11px;color:#9aa1aa">Pay</span>
-        <span style="font-size:11px;color:#9aa1aa">View</span>
-        <span style="font-size:11px;color:#3f6f5c;cursor:pointer;text-decoration:underline;font-weight:600" onclick="famOpenShare('${name}','${bal}')">Share</span>
-        <span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span>
-        <span title="Delete" style="cursor:pointer;color:#b54a4a;font-size:13px">&#128465;</span>
-      </div>`;
-    const grid = `<table class="tbl" style="font-size:11.5px">
-      <thead><tr>
-        <th>Plan</th><th>Purchased</th><th>Scheduled</th><th>Remaining</th><th>Status</th><th>Start / End</th><th>Billed / Paid</th><th>Balance</th><th style="text-align:right">Actions</th>
-      </tr></thead>
-      <tbody>
-        <tr><td><b>10-Hour Court Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Hours</div></td><td>10 hrs</td><td>2 hrs</td><td><b>8 hrs</b></td><td><span class="tag green">Active</span></td><td>Jan 1 – Apr 1, 2026</td><td>$100 / $100</td><td>$0.00</td><td>${actions('10-Hour Court Pack','10 hours · 8 remaining')}</td></tr>
-        <tr><td><b>Pickleball 20 Play</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>20 occ</td><td>14 occ</td><td><b>6 occ</b></td><td><span class="tag green">Active</span></td><td>Feb 15, 2026 – No end</td><td>$160 / $160</td><td>$0.00</td><td>${actions('Pickleball 20 Play','20 occurrences · 6 remaining')}</td></tr>
-        <tr style="opacity:.65"><td><b>Drop-in 5 Pack</b><div style="color:#6b7280;font-size:10.5px">Court · Occurrences</div></td><td>5 occ</td><td>5 occ</td><td>0 occ</td><td><span class="tag gray">Completed</span></td><td>Mar 1 – Mar 31, 2026</td><td>$60 / $60</td><td>$0.00</td><td>${actions('Drop-in 5 Pack','5 occurrences · 0 remaining')}</td></tr>
-      </tbody></table>`;
-    const body = `
-      <div class="pagehead"><h3>Jordan Lee <span class="tag green" style="vertical-align:middle">Member</span></h3></div>
-      ${tabBar}
-      <div class="pagehead" style="padding-top:0"><h3 style="font-size:15px">Rental Plans</h3>
-        <div class="acts"><span class="btn primary">+ Sell Rental Plan</span></div></div>
-      <div class="filters" style="margin-bottom:10px">
-        <select class="form-ctrl" style="width:auto;min-width:170px">
-          <option selected>Active Plans Only</option>
-          <option>All</option>
-          <option>Completed</option>
-        </select>
-      </div>
-      ${grid}
-    `;
-    return ezChrome('Clients', body, famShareOpen ? famSharePanel() : '');
-  }
+  render:()=> ezChrome('Clients', schFamilyBody(), famShareOpen ? famSharePanel() : '')
 };
 
 screens['sch-restore'] = {
-  group:'2 · Schedule', n:'2.5', crumb:'EZUI Schedule · Cancellation', title:'Balance restoration on cancel/delete',
+  group:'2 · Schedule', n:'2.6', crumb:'EZUI Schedule · Cancellation', title:'Balance restoration on cancel/delete',
   notes:`No dedicated screen — restoration is a system action. The UX surfaces are the <b>confirmation modal</b>, a <b>toast</b>, and the updated balance on the plan view. Plus a client notification (see auto-renew/notification emails).
   <ul><li>Restoration is <b>unconditional</b> — applies whether cancelled before or after start time. (Flag the open question: confirm vs. automatic.)</li>
   <li>For family bookings, confirm who receives the notification (open question).</li></ul>`,
@@ -1439,7 +1658,7 @@ screens['sch-restore'] = {
   )
 };
 screens['sch-restore-done'] = {
-  group:'2 · Schedule', n:'2.5', crumb:'EZUI Schedule · Cancellation', title:'Balance restored — confirmation',
+  group:'2 · Schedule', n:'2.6', crumb:'EZUI Schedule · Cancellation', title:'Balance restored — confirmation',
   hideNav:true,
   notes:`After deletion: toast confirms restoration and the client is notified. Balance reflects the restored amount on the plan view (1.5 / 1.6).`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
@@ -1698,7 +1917,7 @@ screens['about'] = {
 
 /* ============ Nav + routing ============ */
 const order = ['s-list','s-view','s-plan-edit','s-plan-edit-pricing','s-plan-edit-history','s-add','s-add-pricing','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
-  'sch-choice','sch-insufficient','sch-confirm','sch-family','sch-restore','sch-restore-done',
+  'sch-choice','sch-client','sch-insufficient','sch-confirm','sch-confirm-multi','sch-family','sch-restore','sch-restore-done',
   'ss-catalog','ss-detail','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-choice','ss-book-confirm','ss-insufficient',
   'ar-notice','ar-success','ar-fail','ar-cancel','ar-cancel-done'];
 function buildNav(){
@@ -1706,7 +1925,7 @@ function buildNav(){
   order.forEach(id=>{
     const s=screens[id]; if(s.hideNav) return;
     if(s.group!==lastGroup){
-      const statusTag = s.group==='1 · Staff Sales'
+      const statusTag = (s.group==='1 · Staff Sales'||s.group==='2 · Schedule')
         ? `<span class="tag green" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Ready for Review</span>`
         : `<span class="tag amber" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Pending</span>`;
       html+=`<div class="grp">${s.group}${statusTag}</div>`; lastGroup=s.group;
@@ -2063,6 +2282,7 @@ var sellArTriggerNum  = '7';
 var sellArTriggerUnit = 'Days';
 var sellArRenewAs     = 'copy';
 var sellFromProfile   = false;  // true = initiated from client profile
+var sellReturnScreen  = 's-profile'; // screen to close/done back to when sellFromProfile
 
 function rpProfileSellMenuToggle(e){
   e.stopPropagation();
@@ -2073,11 +2293,13 @@ function rpProfileSellMenuClose(){
   const m = document.getElementById('rp-profile-sell-dd');
   if(m) m.style.display = 'none';
 }
+function sellBgBody(){ return sellReturnScreen==='sch-family' ? schFamilyBody() : rpProfileBody(); }
+
 function rpProfileSellInit(){
   rpProfileSellMenuClose();
   sellClient = {name:'Jordan Lee', dob:'Jan 12, 1990', phone:'(555) 201-4832', type:'Member', locked:true};
   sellPlanId = null; sellAutoRenew = false; sellNewClient = false; sellSearchQuery = '';
-  sellFromProfile = true;
+  sellFromProfile = true; sellReturnScreen = 's-profile';
   sellArUseDefault = true; sellArTriggerType = 'before';
   sellArTriggerNum = '7'; sellArTriggerUnit = 'Days'; sellArRenewAs = 'copy';
   sellAutoSelectPlan();
@@ -2344,15 +2566,80 @@ function bkPayNow(){
 }
 
 /* 2.2 insufficient-balance panel — defaults to the Billing tab */
+var bkClientList = [
+  {first:'Jordan', last:'Lee',      mem:'1022847', phone:'(555) 201-4832', age:36, dob:'Jan 12, 1990'},
+  {first:'Alex',   last:'Rivera',   mem:'1018432', phone:'(555) 348-9210', age:29, dob:'Mar 5, 1997'},
+  {first:'Sam',    last:'Chen',     mem:'1031765', phone:'(555) 472-0831', age:44, dob:'Sep 18, 1981'},
+  {first:'Casey',  last:'Wright',   mem:'1029384', phone:'(555) 619-7743', age:51, dob:'Nov 22, 1974'},
+  {first:'Morgan', last:'Davis',    mem:'1041203', phone:'(555) 284-5567', age:33, dob:'Feb 28, 1993'},
+  {first:'Taylor', last:'Kim',      mem:'1038567', phone:'(555) 731-2094', age:27, dob:'Jul 14, 1998'},
+  {first:'Riley',  last:'Johnson',  mem:'1025891', phone:'(555) 956-8432', age:38, dob:'Apr 3, 1988'},
+  {first:'Drew',   last:'Martinez', mem:'1044628', phone:'(555) 127-6384', age:42, dob:'Dec 9, 1983'},
+];
+var bkClientSelIdx  = 0;
+var bk3Clients      = [];
+var bkAddingClient  = false;
+function bkSelectClient(idx){ bkClientSelIdx = idx; go('sch-client'); }
+function bkAddClient(){ bkAddingClient = true; bkClientSelIdx = 1; go('sch-client'); }
+
 var bk2 = { tab:'billing', method:null, filter:'all', payError:false, extraPlans:[] };
 function bk2Tab(t){ bk2.tab = t; go('sch-insufficient'); }
 function bk2PickMethod(m){ bk2.method = m; bk2.payError = false; go('sch-insufficient'); }
 function bk2SetFilter(f){ bk2.filter = f; go('sch-insufficient'); }
-function bk2PayNow(){ if(!bk2.method){ bk2.payError = true; go('sch-insufficient'); } else { go('sch-confirm'); } }
+function bk2PayNow(){
+  if(!bk2.method){ bk2.payError = true; go('sch-insufficient'); return; }
+  if(bk2.method==='rs'){
+    if(rs.occMode==='this')           bk2PayResult = '1 occurrence deducted from Rental Special · 4 remaining';
+    else if(rs.occMode==='remaining') bk2PayResult = '5 occurrences deducted from Rental Special · 0 remaining';
+    else bk2PayResult = rs.customSessions.length + ' occurrence' + (rs.customSessions.length!==1?'s':'') + ' deducted from Rental Special · ' + (5-rs.customSessions.length) + ' remaining';
+  } else {
+    bk2PayResult = null;
+  }
+  const c = bkClientList[bkClientSelIdx];
+  bk3Clients.push({name: c.first+' '+c.last, amount:'$31.05'});
+  bkAddingClient = false;
+  go(bk3Clients.length > 1 ? 'sch-confirm-multi' : 'sch-confirm');
+}
 
-/* 2.3 confirmation panel — defaults to the Billing tab */
+/* Rental Special plan state */
+var rs = {occMode:'this', customSessions:[], modalOpen:false};
+var bk2PayResult = null;
+function rsSelect(){ bk2.method='rs'; bk2.payError=false; go('sch-insufficient'); }
+function rsSetMode(mode){ rs.occMode=mode; rs.modalOpen=(mode==='custom'); go('sch-insufficient'); }
+function rsToggleSess(idx){
+  const i=rs.customSessions.indexOf(idx);
+  if(i>=0) rs.customSessions.splice(i,1); else rs.customSessions.push(idx);
+  go('sch-insufficient');
+}
+function rsBookSelected(){ rs.modalOpen=false; go('sch-insufficient'); }
+
+/* 2.4 / 2.4-multi confirmation panel — defaults to the Billing tab */
 var bk3tab = 'billing';
-function bk3Tab(t){ bk3tab = t; go('sch-confirm'); }
+function bk3Tab(t){ bk3tab = t; go(bk3Clients.length>1?'sch-confirm-multi':'sch-confirm'); }
+function bk3BillingHTML(multi=false){
+  const sorth=(t)=>`${t} <span style="opacity:.4;font-weight:400;font-size:10px">&#8597;</span>`;
+  const demoRows = multi
+    ? [{name:'Jordan Lee',amount:'$31.05'},{name:'Alex Rivera',amount:'$31.05'}]
+    : [{name:'Jordan Lee',amount:'$31.05'}];
+  const rows = (bk3Clients.length ? bk3Clients : demoRows)
+    .map((c,i)=>`<tr><td><span style="color:#3f6f5c;cursor:pointer;text-decoration:underline">INV-${10042+i}</span></td><td>&#8212;</td><td>${c.amount}</td><td>${c.amount}</td><td>6/14/2026</td><td>&#8212;</td><td>${c.name}</td><td style="text-align:right"><span title="Edit" style="cursor:pointer;color:#6b7280;font-size:13px">&#9998;</span></td></tr>`).join('');
+  const count = bk3Clients.length || (multi?2:1);
+  return `
+    <div style="background:#e9f6f0;border:1px solid #9cc9b6;color:#2b6b50;border-radius:8px;padding:10px 14px;font-size:12.5px;display:flex;align-items:center;gap:10px;margin-bottom:14px"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4f9a7c;color:#fff;font-size:11px;flex:0 0 18px">&#10003;</span>Rental booked · ${bk2PayResult||'2.0 hrs deducted · 8.0 hrs remaining on Jordan Lee\'s plan'}</div>
+    <div class="sech" style="display:flex;align-items:center;justify-content:space-between">Client(s) Billed<span class="btn sm" onclick="bkAddClient()" style="font-size:11px;text-transform:none;letter-spacing:0;cursor:pointer">+ Add Client</span></div>
+    <div style="text-align:center;font-weight:600;font-size:12.5px;margin:4px 0 10px">Found ${count} result(s)</div>
+    <table class="tbl" style="font-size:11.5px">
+      <thead><tr>
+        <th>${sorth('Invoice')}</th><th>${sorth('Balance')}</th><th>${sorth('Billed')}</th><th>${sorth('Paid')}</th><th>${sorth('Revenue Date')}</th><th>${sorth('Due Date')}</th><th>${sorth('Client')}</th><th></th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:11.5px;color:#6b7280">
+      <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">&#171;</span><span class="btn sm" style="opacity:.5">&#8249; Previous</span></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="pg on">1</span><select class="form-ctrl" style="width:auto;padding:2px 6px"><option>20</option><option>50</option><option>100</option></select></div>
+      <div style="display:flex;gap:6px"><span class="btn sm" style="opacity:.5">Next &#8250;</span><span class="btn sm" style="opacity:.5">&#187;</span></div>
+    </div>`;
+}
 
 /* Filter chips (Show all / Rental Plans / Rental Rates) + payment-method error, shared by 2.1 and 2.2 */
 function bkFilterChips(active, fn){

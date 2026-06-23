@@ -382,7 +382,7 @@ screens['s-edit'] = {
 
 /* ---------- Group: Schedule Integration ---------- */
 screens['sch-choice'] = {
-  group:'2 · Schedule', n:'2.1', crumb:'EZUI Schedule · Booking', title:'Booking — plan or rate choice (staff)',
+  group:'2 · Schedule', n:'2.1', crumb:'EZUI Schedule · Booking', title:'Booking: Details',
   notes:`When booking a rental for a client who has an <b>active eligible plan</b>, staff see a required choice: use the plan or pay the rental rate. This is the staff equivalent of the Self-Service decision point.
   <ul><li><b>Open question for you:</b> choice UI — inline toggle (shown here) vs. modal vs. a dedicated step. Same decision applies in Self Service (2.x mirrors 3.x).</li>
   <li>No hybrid payments — one booking = one method.</li></ul>`,
@@ -400,7 +400,7 @@ screens['sch-choice'] = {
 };
 
 screens['sch-insufficient'] = {
-  group:'2 · Schedule', n:'2.2', crumb:'EZUI Schedule · Booking', title:'Booking — insufficient balance (staff)',
+  group:'2 · Schedule', n:'2.2', crumb:'EZUI Schedule · Booking', title:'Booking: Billing',
   notes:`Client's plan doesn't cover the booking. Booking is blocked with a clear message and options. No partial coverage in MVP.
   <ul><li>Options: <b>purchase more for the client</b>, <b>charge the rental rate</b>, or <b>cancel</b>. Uses the existing inline red-banner pattern seen in the rental booking panels.</li></ul>`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>`,
@@ -416,7 +416,7 @@ screens['sch-insufficient'] = {
 };
 
 screens['sch-confirm'] = {
-  group:'2 · Schedule', n:'2.3', crumb:'EZUI Schedule · Booking', title:'Booking confirmation — deduction shown',
+  group:'2 · Schedule', n:'2.3', crumb:'EZUI Schedule · Booking', title:'Booking: Confirmation',
   notes:`Deduction happens at <b>booking creation</b>, not after the rental ends. Balance updates immediately and is shown clearly. A toast confirms.
   <ul><li>Restoration is unconditional on cancel/delete (before OR after start time) — see 2.5.</li></ul>`,
   render:()=> ezChrome('Schedule',`<div class="pagehead"><h3>Schedule</h3></div>
