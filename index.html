@@ -2984,7 +2984,7 @@ function ssbkConfirm(){ if(!ssbk.method){ ssbk.err=true; go('ss-book-choice'); }
 function ssinsSetFilter(f){ ssins.filter=f; go('ss-insufficient'); }
 function ssinsPick(m){ ssins.method=m; ssins.err=false; go('ss-insufficient'); }
 function ssinsConfirm(){ if(!ssins.method){ ssins.err=true; go('ss-insufficient'); } else { go('ss-book-confirm'); } }
-function ssBuyPlan(){ go('ss-catalog'); }
+function ssBuyPlan(){ go('ss-catalog-reg'); }
 function ssChoiceError(show){ return show ? `<div style="color:#b54a4a;font-size:11.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span>&#9888;&#65039;</span> Select how you'd like to pay.</div>` : ''; }
 function bksellBodyHTML(){
   const back = `<div style="margin-bottom:10px"><span class="btn link" style="cursor:pointer" onclick="bksellBack()">&#8249; Back</span></div>`;
