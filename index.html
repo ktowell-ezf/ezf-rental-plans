@@ -395,15 +395,16 @@ function ssCatalogBody(guest){
   const buyAction = guest ? 'ssOpenGate()' : "go('ss-detail')";
   const headCell = (t)=>`<th style="background:#3aaf85;color:#fff;border:none;padding:12px 10px">${t}</th>`;
   const plans = [
-    ['Individual','Court','Prepaid court time — deducts as you book','10 hrs','$100.00 / Package','—'],
-    ['Individual','Court','Pickleball league &amp; open play','20 occ','$160.00 / Package','—'],
-    ['Individual','Field','Field time bundle','5 hrs','$75.00 / Package','—'],
-    ['Individual','Court','Casual drop-in play','5 occ','$60.00 / Package','—'],
-    ['Individual','Court','Weekend court time','8 hrs','$90.00 / Package','Auto-renew'],
+    ['Individual','Court','Prepaid court time — deducts as you book','10 hrs','$100.00','$80.00','—'],
+    ['Individual','Court','Pickleball league &amp; open play','20 occ','$160.00','$140.00','—'],
+    ['Individual','Field','Field time bundle','5 hrs','$75.00','$55.00','—'],
+    ['Individual','Court','Casual drop-in play','5 occ','$60.00','$40.00','—'],
+    ['Individual','Court','Weekend court time','8 hrs','$90.00','$70.00','Auto-renew'],
   ];
+  const fee = (r) => `${guest ? r[4] : r[5]} / Package`;
   const rows = plans.map(r=>`<tr>
     <td style="padding:13px 10px"><input type="checkbox" style="cursor:pointer"></td>
-    <td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td>
+    <td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${fee(r)}</td><td>${r[6]}</td>
     <td style="text-align:right;white-space:nowrap;padding-right:14px"><span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:4px 16px;font-weight:600" onclick="${buyAction}">BUY</span> <span style="cursor:pointer;color:#6b7280;font-size:14px" onclick="${buyAction}" title="Add to cart">&#128722;</span></td>
   </tr>`).join('');
   return `
@@ -412,13 +413,14 @@ function ssCatalogBody(guest){
       <span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;font-weight:600">SWITCH TO WIZARD</span>
     </div>
     <div style="background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-      <div style="display:flex;align-items:center;margin-bottom:8px;font-size:13px">
+      ${guest ? '' : `<div style="display:flex;align-items:center;margin-bottom:8px;font-size:13px">
         <div>Plans For <b style="margin-left:8px">Jordan Lee</b></div>
         <div style="display:flex;align-items:center;justify-content:flex-end;flex:1;gap:10px;color:#6b7280"><span title="Refresh" style="cursor:pointer;font-size:15px">&#8635;</span><span style="border:1px solid var(--line);border-radius:4px;padding:2px 10px">10</span><span style="cursor:pointer;font-size:15px">&#9783;</span></div>
-      </div>
-      <div style="display:flex;gap:42px;margin-bottom:14px;font-size:13px">
+      </div>`}
+      <div style="display:flex;align-items:center;gap:42px;margin-bottom:14px;font-size:13px">
         <div>Locations <b style="margin-left:8px">EZ Trainings - Bethpage</b></div>
         <div>Reservation Types <b style="margin-left:8px">All</b></div>
+        ${guest ? `<div style="display:flex;align-items:center;justify-content:flex-end;flex:1;gap:10px;color:#6b7280"><span title="Refresh" style="cursor:pointer;font-size:15px">&#8635;</span><span style="border:1px solid var(--line);border-radius:4px;padding:2px 10px">10</span><span style="cursor:pointer;font-size:15px">&#9783;</span></div>` : ''}
       </div>
       <table class="tbl" style="font-size:12.5px">
         <thead><tr>${headCell('<input type="checkbox">')}${headCell('PLAN TYPE')}${headCell('RESERVATION TYPE')}${headCell('DESCRIPTION')}${headCell('HOURS / OCC')}${headCell('FEE')}${headCell('RECURRENCE')}${headCell('')}</tr></thead>
@@ -1830,7 +1832,7 @@ screens['sch-confirm'] = {
 };
 
 screens['sch-confirm-multi'] = {
-  group:'2 · Schedule', n:'2.4', crumb:'EZUI Schedule · Booking', title:'Booking: Confirmation (Multiple clients)',
+  group:'2 · Schedule', n:'2.4b', crumb:'EZUI Schedule · Booking', title:'Booking: Confirmation (Multiple clients)',
   notes:`Confirmation state after a second client has been added for billing on the same rental. The <b>Client(s) Billed</b> grid shows all billed clients.
   <ul><li>Reached by clicking <b>Pay Now</b> after completing the Add Client flow from the single-client confirmation step.</li>
   <li>Additional clients can still be added from this step using the same <b>+ Add Client</b> pattern.</li></ul>`,
