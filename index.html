@@ -339,7 +339,7 @@ function ssBuyPortal(active, bodyHTML, guest=false, overlay=''){
     const acct = active==='account';
     sidebar = `
       <div title="My Account" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line2);cursor:pointer;${acct?'background:#eef7f3;border-left:3px solid #3aaf85':'border-left:3px solid transparent'}"><span style="width:26px;height:26px;border-radius:50%;background:#d9534f;flex:0 0 26px"></span><span style="font-weight:600;${acct?'color:#3aaf85':''}">Jordan Lee</span></div>
-      ${item(icon,'Invoices','<span style="color:#9aa1aa">+</span>')}
+      ${active==='invoices' ? `${item(icon,'Invoices','<span style="color:#9aa1aa">&#8722;</span>')}${sub('Open Invoices', true)}${sub('Closed Invoices')}` : item(icon,'Invoices','<span style="color:#9aa1aa">+</span>')}
       ${active!=='plans' ? item(greyDollar,'Buy','<span style="color:#9aa1aa">+</span>') : buyGroup}
       ${item(icon,'My Schedule')}
       ${item(icon,'Book Sessions')}
@@ -392,7 +392,7 @@ function ssGateModal(){
 /* Shared Rental Plans catalog grid body (used by guest + registered catalog screens).
    guest=true → BUY enforces login (opens the sign-in gate) instead of proceeding to purchase. */
 function ssCatalogBody(guest){
-  const buyAction = guest ? 'ssOpenGate()' : "go('ss-detail')";
+  const buyAction = guest ? 'ssOpenGate()' : "go('ss-checkout')";
   const headCell = (t)=>`<th style="background:#3aaf85;color:#fff;border:none;padding:12px 10px">${t}</th>`;
   const plans = [
     ['Individual','Court','Prepaid court time — deducts as you book','10 hrs','$100.00','$80.00','—'],
@@ -404,7 +404,7 @@ function ssCatalogBody(guest){
   const fee = (r) => `${guest ? r[4] : r[5]} / Package`;
   const rows = plans.map(r=>`<tr>
     <td style="padding:13px 10px"><input type="checkbox" style="cursor:pointer"></td>
-    <td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${fee(r)}</td><td>${r[6]}</td>
+    <td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${fee(r)}</td><td>${r[6]}</td>
     <td style="text-align:right;white-space:nowrap;padding-right:14px"><span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:4px 16px;font-weight:600" onclick="${buyAction}">BUY</span> <span style="cursor:pointer;color:#6b7280;font-size:14px" onclick="${buyAction}" title="Add to cart">&#128722;</span></td>
   </tr>`).join('');
   return `
@@ -423,7 +423,7 @@ function ssCatalogBody(guest){
         ${guest ? `<div style="display:flex;align-items:center;justify-content:flex-end;flex:1;gap:10px;color:#6b7280"><span title="Refresh" style="cursor:pointer;font-size:15px">&#8635;</span><span style="border:1px solid var(--line);border-radius:4px;padding:2px 10px">10</span><span style="cursor:pointer;font-size:15px">&#9783;</span></div>` : ''}
       </div>
       <table class="tbl" style="font-size:12.5px">
-        <thead><tr>${headCell('<input type="checkbox">')}${headCell('PLAN TYPE')}${headCell('RESERVATION TYPE')}${headCell('DESCRIPTION')}${headCell('HOURS / OCC')}${headCell('FEE')}${headCell('RECURRENCE')}${headCell('')}</tr></thead>
+        <thead><tr>${headCell('<input type="checkbox">')}${headCell('RESERVATION TYPE')}${headCell('DESCRIPTION')}${headCell('HOURS / OCC')}${headCell('FEE')}${headCell('RECURRENCE')}${headCell('')}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>`;
@@ -463,7 +463,7 @@ function ssSetPlansFilter(v, screen){ ssPlansFilter = v; go(screen); }
 function ssMyPlansSection(opts){
   const statusSel = `<span style="color:#6b7280">Status</span><select onchange="ssSetPlansFilter(this.value,'${opts.screen}')" style="border:1px solid var(--line);border-radius:4px;padding:3px 8px;font-size:12px;font-family:inherit;cursor:pointer;color:#444">${['All','Active','Pending','Expired'].map(o=>`<option${ssPlansFilter===o?' selected':''}>${o}</option>`).join('')}</select>`;
   const titleRow = `<div style="display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px">
-      <div style="display:flex;align-items:center;gap:9px"><span style="width:16px;height:16px;border-radius:3px;background:#cfd5db"></span><h4 style="margin:0;font-size:15px;font-weight:600;color:#2b2f36">My Plans</h4></div>
+      <div style="display:flex;align-items:center;gap:9px"><span style="width:16px;height:16px;border-radius:3px;background:#cfd5db"></span><h4 style="margin:0;font-size:15px;font-weight:600;color:#2b2f36">My Rental Plans</h4></div>
       ${opts.titleRight||''}
     </div>`;
   return `${titleRow}
@@ -1898,34 +1898,6 @@ screens['ss-catalog-reg'] = {
   render:()=> ssBuyPortal('plans', ssCatalogBody(false), false)
 };
 
-screens['ss-detail'] = {
-  group:'3 · Self Service', n:'3.2', crumb:'Self Service · Client portal', title:'Plan detail',
-  notes:`Expanded single-plan view before purchase: pricing, what's included, eligibility notes. <b>Buy</b> enforces login → existing checkout.
-  <ul><li>Guests can reach this page; clicking Buy prompts sign-in first.</li></ul>`,
-  render:()=> ssBuyPortal('plans', `
-    <div class="btn link" onclick="go('ss-catalog')">‹ Back to plans</div>
-    <div class="plancard-lg" style="margin-top:12px;display:flex;gap:28px">
-      <div style="flex:1">
-        <h3>10-Hour Court Pack</h3>
-        <div class="price" style="font-size:30px;font-weight:700">$100 <small style="font-size:12px;color:#6b7280;font-weight:400">/ pack</small></div>
-        <p class="lead" style="margin:10px 0">10 hours of court time, deducted automatically as you book. Perfect for regular players.</p>
-        <div class="sech">What's included</div>
-        <ul style="font-size:13px;color:#4b5159"><li>10 hours of rental credit</li><li>Use on any available court</li><li>Balance deducted by booking duration</li><li>Expires 90 days after purchase</li></ul>
-        <div class="banner info" style="margin-top:14px"><span class="bi"></span><div>Member price <b>$80</b> available with an active membership.</div></div>
-      </div>
-      <div style="width:240px">
-        <div class="pcard" style="border:1px solid var(--line2)">
-          <div class="kv"><span class="k">Price</span><span><b>$100.00</b></span></div>
-          <div class="kv"><span class="k">Includes</span><span>10 hours</span></div>
-          <div class="kv"><span class="k">Expiry</span><span>90 days</span></div>
-          <span class="btn primary" style="justify-content:center;margin-top:10px" onclick="go('ss-checkout')">Buy plan</span>
-          <div style="font-size:10.5px;color:#9aa1aa;text-align:center;margin-top:6px">Sign-in required to purchase</div>
-        </div>
-      </div>
-    </div>
-  `)
-};
-
 screens['ss-checkout'] = {
   group:'3 · Self Service', n:'3.3', crumb:'Self Service · Client portal', title:'Checkout (existing pattern)',
   notes:`<b>COMPLETE CHECKOUT</b> layout: coupon, cards accepted, new-card payment form, billing address, items, and terms on the left; the <b>Summary stays fixed (sticky) while scrolling</b> on the right. Reuses the existing Self-Service checkout pattern.`,
@@ -1937,7 +1909,7 @@ screens['ss-checkout'] = {
     const card = (lbl,col)=>`<span style="display:inline-flex;align-items:center;justify-content:center;width:54px;height:34px;border-radius:4px;border:1px solid var(--line2);font-size:9px;font-weight:800;color:${col}">${lbl}</span>`;
     const sumRow = (k,v,red)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#6b7280">${k}:</span><span style="color:${red?'#e0503a':'#2b2f36'};font-weight:${red?700:400}">${v}</span></div>`;
     const left = `
-      <div class="btn link" style="color:#3aaf85;font-weight:600;margin-bottom:14px;cursor:pointer" onclick="go('ss-detail')">&#8592; BACK</div>
+      <div class="btn link" style="color:#3aaf85;font-weight:600;margin-bottom:14px;cursor:pointer" onclick="go('ss-catalog-reg')">&#8592; BACK</div>
       ${head('Apply Coupon')}
       <div style="display:flex;gap:16px;align-items:center;margin-bottom:6px">
         <input placeholder="Coupon Code" style="flex:0 0 280px;${line}">
@@ -1995,20 +1967,45 @@ screens['ss-checkout'] = {
 
 screens['ss-purchased'] = {
   group:'3 · Self Service', n:'3.4', crumb:'Self Service · Client portal', title:'Purchase confirmation',
-  notes:`Success state — the plan is <b>immediately available</b> to book against. CTAs lead to booking or to My Plans.`,
-  render:()=> ssBuyPortal('plans', `
-    <div style="max-width:520px;margin:30px auto;text-align:center">
-      <div class="empty" style="border-style:solid;border-color:#9cc9b6;background:#f3faf6">
-        <div class="icon" style="background:#7fb8a3"></div>
-        <h3 style="margin-bottom:6px">You're all set!</h3>
-        <p class="lead">10-Hour Court Pack is now active on your account with <b>10.0 hours</b> ready to use.</p>
-        <div style="display:flex;gap:10px;justify-content:center;margin-top:8px">
-          <span class="btn" onclick="go('ss-myplans')">View my plans</span>
-          <span class="btn primary" onclick="go('ss-book-choice')">Book a court</span>
-        </div>
+  notes:`Post-checkout landing on the <b>Open Invoices</b> page (Invoices submenu active). A green success banner confirms the purchase; the open-invoices grid lists Jordan Lee's invoices at EZ Trainings - Bethpage.`,
+  render:()=>{
+    const headCell = (t)=>`<th style="background:#3aaf85;color:#fff;border:none;padding:11px 10px;font-size:10.5px;letter-spacing:.3px">${t}</th>`;
+    const pay = `<span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 16px;font-weight:600">PAY</span> <span title="Invoice" style="cursor:pointer;color:#6b7280;font-size:14px">&#128196;</span>`;
+    const inv = [
+      ['EZ Trainings - Bethpage','4102','4/1/2026','4/1/2026','$100.00','$0.00','$100.00','$100.00'],
+      ['EZ Trainings - Bethpage','4156','5/1/2026','5/1/2026','$60.00','$0.00','$60.00','$60.00'],
+      ['EZ Trainings - Bethpage','4210','6/1/2026','6/1/2026','$90.00','$0.00','$90.00','$90.00'],
+    ];
+    const rows = inv.map(r=>`<tr>
+      <td style="padding:13px 10px"><input type="checkbox" style="cursor:pointer"></td>
+      <td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${r[7]}</td>
+      <td style="text-align:right;white-space:nowrap;padding-right:12px">${pay}</td>
+    </tr>`).join('');
+    const body = `
+      <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:22px 26px;margin-bottom:16px">
+        <h3 style="margin:0 0 14px;font-weight:400;font-size:22px;color:#444">Welcome, Jordan Lee</h3>
+        <p style="margin:0 0 10px;color:#444;font-size:14px">Welcome to the EZ Trainings - Bethpage!</p>
+        <p style="margin:0;color:#444;font-size:14px">If you have any Questions, Comments, or concerns please call 555-555-5555</p>
       </div>
-    </div>
-  `)
+      <div style="font-size:14px;letter-spacing:.5px;color:#5b626b;margin:0 0 12px">OPEN INVOICES</div>
+      <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:14px;font-size:13px">
+          <div>Open Invoices <b style="margin-left:8px">Jordan Lee</b></div>
+          <div>From <b style="margin-left:8px">Past Year</b></div>
+          <div style="flex:1;display:flex;justify-content:flex-end;gap:10px;color:#6b7280;align-items:center"><span style="cursor:pointer;font-size:15px">&#8635;</span><span style="border:1px solid var(--line);border-radius:4px;padding:1px 9px;font-size:12px">10</span><span style="cursor:pointer;font-size:15px">&#9783;</span></div>
+        </div>
+        <table class="tbl" style="font-size:12px">
+          <thead><tr>${headCell('<input type="checkbox">')}${headCell('LOCATION')}${headCell('INVOICE #')}${headCell('BILL DATE')}${headCell('DUE DATE')}${headCell('TOTAL')}${headCell('PAID')}${headCell('BALANCE')}${headCell('DUE')}${headCell('')}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;font-size:11.5px">
+          <div style="display:flex;gap:4px;color:#6b7280">${['&#8230;','&#8249;','1','&#8250;','&#8230;'].map(x=>`<span style="border:1px solid var(--line2);border-radius:4px;padding:2px 9px;background:#f4f6f8">${x}</span>`).join('')}</div>
+          <span style="border:1px solid var(--line2);border-radius:4px;padding:4px 12px;color:#6b7280">Showing 1 to 3 of 3 entries</span>
+        </div>
+      </div>`;
+    const banner = `<div style="position:absolute;top:64px;right:18px;z-index:30;background:#e9f6f0;border:1px solid #9cc9b6;color:#2b6b50;border-radius:8px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 22px rgba(0,0,0,.16);max-width:320px"><span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#4f9a7c;color:#fff;font-size:11px;flex:0 0 18px">&#10003;</span>Purchase complete — your plan is now active.</div>`;
+    return ssBuyPortal('invoices', body, false, banner);
+  }
 };
 
 screens['ss-myplans'] = {
@@ -2016,7 +2013,7 @@ screens['ss-myplans'] = {
   notes:`Client's <b>My Account</b> profile page (matches the EZFacility SS profile layout): summary column, ABOUT / RELATIONSHIPS / PAYMENT INFORMATION tabs, and the standard sections. A new <b>My Plans</b> section sits under <b>My Packages</b> and lists the client's Rental Plans with unambiguous Active / Expired / Exhausted status.`,
   render:()=>{
     const book = `<span class="btn sm" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 12px;font-weight:600" onclick="go('ss-book-choice')">Book</span>`;
-    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse plans</span>`;
+    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse Rental Plans</span>`;
     const tagc = {Active:'green',Pending:'amber',Expired:'gray'};
     const all = [
       {name:'10-Hour Court Pack',start:'Jun 11, 2026',exp:'Sep 9, 2026',rem:'8.0 hrs',status:'Active'},
@@ -2043,7 +2040,7 @@ screens['ss-empty'] = {
   group:'3 · Self Service', n:'3.6', crumb:'Self Service · Client portal', title:'My Plans — empty state',
   notes:`Same <b>My Account</b> profile layout as 3.5, but the new <b>My Plans</b> section (under My Packages) shows the empty state — "You do not currently have any rental plans." — with a Browse plans path back to the catalog.`,
   render:()=>{
-    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse plans</span>`;
+    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse Rental Plans</span>`;
     return ssBuyPortal('account', ssProfileBody({
       pending: ssPendingSection('', 'Showing 0 to 0 of 0 entries'),
       packages: ssPackagesSection('', 'Showing 0 to 0 of 0 entries'),
@@ -2060,18 +2057,15 @@ screens['ss-book-choice'] = {
     const f = ssbk.filter;
     const planRow = `<div class="radio${ssbk.method==='plan'?' on':''}" onclick="ssbkPick('plan')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Use my plan — 10-Hour Court Pack</b><span>8.0 hrs available · this booking uses <b>2.0 hrs</b> → 6.0 hrs left</span></div></div>`;
     const rateRow = `<div class="radio${ssbk.method==='rate'?' on':''}" onclick="ssbkPick('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay the rental rate</b><span>$60.00 (2 hrs × $30/hr)</span></div></div>`;
-    return ssBuyPortal('rentals', `
-    <div style="max-width:560px;margin:0 auto">
-      <h3>Confirm your booking</h3>
-      <div class="pcard" style="margin:12px 0"><div class="kv"><span class="k">Court</span><span>Court 3</span></div><div class="kv"><span class="k">When</span><span>Sat Jun 14 · 5:00–7:00 PM</span></div><div class="kv"><span class="k">Duration</span><span>2 hours</span></div></div>
-      <div class="sech">How would you like to pay?</div>
+    const content = `
+      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Court 3 · Sat Jun 14 · 5:00–7:00 PM · 2 hours</div>
+      <div class="sech">PAYMENT OPTIONS</div>
       ${ssChoiceError(ssbk.err)}
       ${bkFilterChips(f,'ssbkSetFilter')}
       ${(f==='all'||f==='plans')?planRow:''}
-      ${(f==='all'||f==='rates')?rateRow:''}
-      <span class="btn primary" style="justify-content:center;width:100%;margin-top:14px" onclick="ssbkConfirm()">Confirm booking</span>
-    </div>
-  `);
+      ${(f==='all'||f==='rates')?rateRow:''}`;
+    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" onclick="ssbkConfirm()">NEXT &#8250;</span>`;
+    return ssBuyPortal('rentals', ssWizard('PAYMENT OPTIONS', content, foot));
   }
 };
 
@@ -2100,19 +2094,16 @@ screens['ss-insufficient'] = {
     const planCard = `<div class="radio" style="cursor:default;align-items:flex-start;border-color:#e3b5b5;background:#fbf2f2"><span class="dot" style="border-color:#d8a0a0;background:#fff;flex:0 0 auto"></span><div class="t" style="flex:1"><b>10-Hour Court Pack</b><span style="color:#b54a4a"><b>Not enough balance.</b> You have 1.5 hours left, but this booking needs 3.0 hours.</span><div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="ssBuyPlan()">Buy plan</span></div></div></div>`;
     const rateRow = `<div class="radio${ssins.method==='rate'?' on':''}" onclick="ssinsPick('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay the rental rate</b><span>$90.00 (3 hrs × $30/hr)</span></div></div>`;
     const contactRow = `<div class="radio${ssins.method==='contact'?' on':''}" onclick="ssinsPick('contact')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Contact staff</b><span>Only shown when facility contact info is set</span></div></div>`;
-    return ssBuyPortal('rentals', `
-    <div style="max-width:560px;margin:0 auto">
-      <h3>Confirm your booking</h3>
-      <div class="pcard" style="margin:12px 0"><div class="kv"><span class="k">Court</span><span>Court 3 · 3 hours</span></div><div class="kv"><span class="k">Plan balance</span><span>1.5 hours</span></div></div>
-      <div class="sech">How would you like to pay?</div>
+    const content = `
+      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Court 3 · 3 hours · plan balance 1.5 hours</div>
+      <div class="sech">PAYMENT OPTIONS</div>
       ${ssChoiceError(ssins.err)}
       ${bkFilterChips(f,'ssinsSetFilter')}
       ${(f==='all'||f==='plans')?planCard:''}
       ${(f==='all'||f==='rates')?rateRow:''}
-      ${(f==='all')?contactRow:''}
-      <span class="btn primary" style="justify-content:center;width:100%;margin-top:14px" onclick="ssinsConfirm()">Confirm booking</span>
-    </div>
-  `);
+      ${(f==='all')?contactRow:''}`;
+    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" onclick="ssinsConfirm()">NEXT &#8250;</span>`;
+    return ssBuyPortal('rentals', ssWizard('PAYMENT OPTIONS', content, foot));
   }
 };
 
@@ -2210,7 +2201,7 @@ screens['about'] = {
 /* ============ Nav + routing ============ */
 const order = ['s-list','s-view','s-plan-edit','s-plan-edit-pricing','s-plan-edit-history','s-add','s-add-pricing','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
   'sch-choice','sch-client','sch-insufficient','sch-confirm','sch-confirm-multi','sch-family','sch-restore','sch-restore-done',
-  'ss-catalog','ss-catalog-reg','ss-detail','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-choice','ss-book-confirm','ss-insufficient',
+  'ss-catalog','ss-catalog-reg','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-choice','ss-book-confirm','ss-insufficient',
   'ar-notice','ar-success','ar-fail','ar-cancel','ar-cancel-done'];
 function buildNav(){
   let html='', lastGroup=null;
@@ -2988,6 +2979,18 @@ function ssinsPick(m){ ssins.method=m; ssins.err=false; go('ss-insufficient'); }
 function ssinsConfirm(){ if(!ssins.method){ ssins.err=true; go('ss-insufficient'); } else { go('ss-book-confirm'); } }
 function ssBuyPlan(){ go('ss-catalog-reg'); }
 function ssChoiceError(show){ return show ? `<div style="color:#b54a4a;font-size:11.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px"><span>&#9888;&#65039;</span> Select how you'd like to pay.</div>` : ''; }
+/* Book Rentals wizard wrapper — steps incl. a PAYMENT OPTIONS step between TIME FRAME and RESULTS */
+function ssWizard(active, content, foot){
+  const steps = ['RENTAL FOR','LOCATION','RENTAL TYPES','VENUES','TIME FRAME','PAYMENT OPTIONS','RESULTS'];
+  const tabs = steps.map(s=>{ const on=s===active; return `<div style="display:flex;align-items:center;gap:8px;padding:0 0 12px;border-bottom:2px solid ${on?'#3aaf85':'transparent'};color:${on?'#2b2f36':'#9aa1aa'};font-size:12px;font-weight:${on?700:400};white-space:nowrap"><span style="width:18px;height:16px;border-radius:3px;background:${on?'#2b2f36':'#bcc3cb'};display:inline-block;flex:0 0 18px"></span>${s}</div>`; }).join('');
+  return `
+    <div style="font-size:14px;letter-spacing:.5px;color:#5b626b;margin-bottom:14px">BOOK RENTALS</div>
+    <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:24px 26px">
+      <div style="display:flex;gap:34px;border-bottom:1px solid var(--line2);margin-bottom:22px;overflow-x:auto">${tabs}</div>
+      ${content}
+      <div style="margin-top:26px;display:flex;gap:10px">${foot}</div>
+    </div>`;
+}
 function bksellBodyHTML(){
   const back = `<div style="margin-bottom:10px"><span class="btn link" style="cursor:pointer" onclick="bksellBack()">&#8249; Back</span></div>`;
   if(bksell.step==='select'){
