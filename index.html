@@ -185,8 +185,8 @@
   .emailmeta{font-size:11.5px;color:#6b7280;margin-bottom:12px}
   .emailmeta b{color:#2b2f36}
   .email{background:#fff;border:1px solid var(--line2);border-radius:8px;overflow:hidden}
-  .email .ehead{background:#2b2f36;height:54px;display:flex;align-items:center;padding:0 22px}
-  .email .ehead .logo{width:110px;height:20px;background:#525a64;border-radius:4px}
+  .email .ehead{background:#3aaf85;height:54px;display:flex;align-items:center;padding:0 22px}
+  .email .ehead .logo{color:#fff;font-weight:700;font-size:14px;letter-spacing:.3px}
   .email .ebody{padding:24px}
   .email h4{margin:0 0 12px;font-size:17px}
   .email p{margin:0 0 12px;color:#4b5159;font-size:13px}
@@ -410,7 +410,7 @@ function ssCatalogBody(guest){
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <h3 style="margin:0;font-size:18px;letter-spacing:.5px;color:#5b626b">RENTAL PLANS</h3>
-      <span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;font-weight:600">SWITCH TO WIZARD</span>
+      <span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;font-weight:600" onclick="ssCatToggle(true, ${guest})">SWITCH TO WIZARD</span>
     </div>
     <div style="background:#fff;border-radius:6px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)">
       ${guest ? '' : `<div style="display:flex;align-items:center;margin-bottom:8px;font-size:13px">
@@ -419,13 +419,83 @@ function ssCatalogBody(guest){
       </div>`}
       <div style="display:flex;align-items:center;gap:42px;margin-bottom:14px;font-size:13px">
         <div>Locations <b style="margin-left:8px">EZ Trainings - Bethpage</b></div>
-        <div>Reservation Types <b style="margin-left:8px">All</b></div>
+        <div>Rental Types <b style="margin-left:8px">All</b></div>
         ${guest ? `<div style="display:flex;align-items:center;justify-content:flex-end;flex:1;gap:10px;color:#6b7280"><span title="Refresh" style="cursor:pointer;font-size:15px">&#8635;</span><span style="border:1px solid var(--line);border-radius:4px;padding:2px 10px">10</span><span style="cursor:pointer;font-size:15px">&#9783;</span></div>` : ''}
       </div>
       <table class="tbl" style="font-size:12.5px">
-        <thead><tr>${headCell('<input type="checkbox">')}${headCell('RESERVATION TYPE')}${headCell('DESCRIPTION')}${headCell('HOURS / OCC')}${headCell('FEE')}${headCell('RECURRENCE')}${headCell('')}</tr></thead>
+        <thead><tr>${headCell('<input type="checkbox">')}${headCell('RENTAL TYPE')}${headCell('DESCRIPTION')}${headCell('HOURS / OCC')}${headCell('FEE')}${headCell('RECURRENCE')}${headCell('')}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
+    </div>`;
+}
+/* Registered catalog: toggle between table grid and the RENTAL PLANS wizard */
+var ssCatWizard = false;
+var ssCatStep = 'PLAN FOR';
+var ssCatClient = 'Jordan Lee';
+var ssCatRType = 'Court';
+var ssCatLocation = 'EZ Trainings - Bethpage';
+var ssCatGuest = false;
+function ssCatScreen(){ return ssCatGuest ? 'ss-catalog' : 'ss-catalog-reg'; }
+function ssCatToggle(v, guest){ ssCatWizard = v; ssCatGuest = !!guest; if(v){ ssCatStep = guest?'LOCATION':'PLAN FOR'; } go(ssCatScreen()); }
+function ssCatStepGo(s){ ssCatWizard = true; ssCatStep = s; go(ssCatScreen()); }
+function ssCatPick(key,val){ if(key==='client') ssCatClient=val; else if(key==='rtype') ssCatRType=val; go(ssCatScreen()); }
+function ssCatStartOver(){ ssCatStep = ssCatGuest?'LOCATION':'PLAN FOR'; ssCatClient='Jordan Lee'; ssCatRType='Court'; go(ssCatScreen()); }
+function ssCatalogWizard(guest){
+  const order = guest ? ['LOCATION','RENTAL TYPES','RESULTS'] : ['PLAN FOR','LOCATION','RENTAL TYPES','RESULTS'];
+  const tabs = order.map(s=>{ const on=s===ssCatStep; return `<div onclick="ssCatStepGo('${s}')" style="display:flex;align-items:center;gap:8px;padding:0 0 12px;border-bottom:2px solid ${on?'#3aaf85':'transparent'};color:${on?'#2b2f36':'#9aa1aa'};font-size:12px;font-weight:${on?700:400};white-space:nowrap;cursor:pointer"><span style="width:18px;height:16px;border-radius:3px;background:${on?'#2b2f36':'#bcc3cb'};display:inline-block;flex:0 0 18px"></span>${s}</div>`; }).join('');
+  const radio = (name,label,checked,sub,onchange)=>`<label style="display:flex;align-items:center;gap:12px;padding:8px 0;font-size:15px;color:#444;cursor:pointer"><input type="radio" name="${name}" ${checked?'checked':''} ${onchange?`onchange="${onchange}"`:''} style="width:18px;height:18px;accent-color:#3aaf85;cursor:pointer"> ${label}${sub?` <span style="color:#6b7280">(${sub})</span>`:''}</label>`;
+  const sicon = `<span style="width:15px;height:15px;border-radius:3px;background:#5b626b;display:inline-block;flex:0 0 15px"></span>`;
+  let content='', isResults=false;
+  if(ssCatStep==='PLAN FOR'){
+    const people=[['Jordan Lee',''],['Sam Lee','Spouse'],['Riley Lee','Child'],['Alex Lee','Child'],['Pat Lee','Parent']];
+    content=`<div style="font-size:13px;color:#6b7280;margin-bottom:6px">Who is this rental plan for?</div>${people.map(p=>radio('ss-plan-for',p[0],ssCatClient===p[0],p[1],`ssCatPick('client','${p[0]}')`)).join('')}`;
+  } else if(ssCatStep==='LOCATION'){
+    content=`<div style="font-size:13px;color:#6b7280;margin-bottom:6px">Select a location</div>${radio('ss-loc',ssCatLocation,true)}`;
+  } else if(ssCatStep==='RENTAL TYPES'){
+    content=`<div style="font-size:13px;color:#6b7280;margin-bottom:6px">Select a rental type</div>${radio('ss-rtype','Court',ssCatRType==='Court','',"ssCatPick('rtype','Court')")}${radio('ss-rtype','Field',ssCatRType==='Field','',"ssCatPick('rtype','Field')")}`;
+  } else {
+    isResults=true;
+    const catPlans=[
+      {name:'10-Hour Court Pack', rtype:'Court', desc:'Prepaid court time', price:'$100.00 / Package', qty:'Hours (10)'},
+      {name:'Pickleball 20 Play', rtype:'Court', desc:'League &amp; open play', price:'$160.00 / Package', qty:'Occurrences (20)'},
+      {name:'Drop-in 5 Pack', rtype:'Court', desc:'Casual drop-in play', price:'$60.00 / Package', qty:'Occurrences (5)'},
+      {name:'Weekend Warrior Pack', rtype:'Court', desc:'Weekend court time', price:'$90.00 / Package', qty:'Hours (8)'},
+      {name:'Field Rental 5hr', rtype:'Field', desc:'Field time bundle', price:'$75.00 / Package', qty:'Hours (5)'},
+    ];
+    const shown=catPlans.filter(p=>p.rtype===ssCatRType);
+    const buyAct = guest ? 'ssOpenGate()' : "go('ss-checkout')";
+    const planRows=shown.map(p=>`<div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-bottom:1px solid var(--line2);background:#fafbfb">
+      <div style="flex:1;font-size:13px;color:#444"><b style="color:#2b2f36">${p.name}</b> &nbsp;&nbsp;<span style="color:#6b7280">${p.desc}</span> &nbsp;&nbsp;${p.price} &nbsp;&nbsp;${p.qty}</div>
+      <span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:4px 16px;font-weight:600" onclick="${buyAct}">BUY</span>
+      <span style="cursor:pointer;color:#6b7280;font-size:14px" onclick="${buyAct}" title="Add to cart">&#128722;</span>
+    </div>`).join('');
+    content=`
+      <div style="font-size:14px;color:#444;line-height:2;margin-bottom:18px">
+        ${guest?'':`<div style="display:flex;align-items:center;gap:8px">${sicon}${ssCatClient}</div>`}
+        <div style="display:flex;align-items:center;gap:8px">${sicon}${ssCatLocation}</div>
+        <div style="display:flex;align-items:center;gap:8px">${sicon}${ssCatRType} Rental</div>
+      </div>
+      <div style="background:#3aaf85;color:#fff;font-weight:600;padding:10px 16px;font-size:12.5px;letter-spacing:.3px">DESCRIPTION</div>
+      ${planRows}
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:11.5px">
+        <div style="display:flex;gap:4px;color:#6b7280">${['&#8230;','&#8249;','1','&#8250;','&#8230;'].map(x=>`<span style="border:1px solid var(--line2);border-radius:4px;padding:2px 9px;background:#f4f6f8">${x}</span>`).join('')}</div>
+        <span style="border:1px solid var(--line2);border-radius:4px;padding:4px 12px;color:#6b7280">Showing 1 to ${shown.length} of ${shown.length} entries</span>
+      </div>`;
+  }
+  const idx = order.indexOf(ssCatStep);
+  const prevAttr = idx>0 ? `onclick="ssCatStepGo('${order[idx-1]}')"` : '';
+  const foot = isResults
+    ? `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" ${prevAttr}>&#8249; PREVIOUS</span><span class="btn" style="background:#eceef0;color:#5b626b;border:none" onclick="ssCatStartOver()">START OVER</span>`
+    : `<span class="btn" style="background:#eceef0;color:#5b626b;border:none${idx===0?';opacity:.5':''}" ${prevAttr}>&#8249; PREVIOUS</span><span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" onclick="ssCatStepGo('${order[idx+1]}')">NEXT &#8250;</span>`;
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h3 style="margin:0;font-size:18px;letter-spacing:.5px;color:#5b626b">RENTAL PLANS</h3>
+      <span class="btn" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;font-weight:600" onclick="ssCatToggle(false, ${guest})">SWITCH TO TABLE</span>
+    </div>
+    <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:24px 26px">
+      <div style="display:flex;gap:40px;border-bottom:1px solid var(--line2);margin-bottom:20px;overflow-x:auto">${tabs}</div>
+      ${content}
+      <div style="margin-top:26px;display:flex;gap:10px">${foot}</div>
     </div>`;
 }
 /* ---- Self Service profile page (My Account) helpers ---- */
@@ -1889,13 +1959,13 @@ screens['ss-catalog'] = {
   group:'3 · Self Service', n:'3.1', crumb:'Self Service · Client portal', title:'Plan catalog (guest-viewable)',
   notes:`<b>Guest-viewable</b> Rental Plans catalog. The sidebar is reduced for non-logged-in visitors: <b>Buy</b> (Packages / Memberships / Rental Plans), Book Sessions, Book Rentals, Registrations, and <b>Login</b> (no account/profile, Invoices, My Schedule, or Logout). Purchase enforces login at checkout.
   <ul><li>Registered-client version of this catalog is the next screen (3.1b), with the full sidebar.</li></ul>`,
-  render:()=> ssBuyPortal('plans', ssCatalogBody(true), true, ssGate ? ssGateModal() : '')
+  render:()=> ssBuyPortal('plans', (ssCatWizard && ssCatGuest) ? ssCatalogWizard(true) : ssCatalogBody(true), true, ssGate ? ssGateModal() : '')
 };
 
 screens['ss-catalog-reg'] = {
   group:'3 · Self Service', n:'3.1b', crumb:'Self Service · Client portal', title:'Plan catalog (registered clients)',
   notes:`<b>Registered-client</b> view of the Rental Plans catalog — same grid as the guest catalog, but with the <b>full Self Service sidebar</b> (My Account, Invoices, Buy, My Schedule, Book Sessions, Book Rentals, Registrations, Toggle Width, Logout). Rental Plans is the active submenu.`,
-  render:()=> ssBuyPortal('plans', ssCatalogBody(false), false)
+  render:()=> ssBuyPortal('plans', (ssCatWizard && !ssCatGuest) ? ssCatalogWizard(false) : ssCatalogBody(false), false)
 };
 
 screens['ss-checkout'] = {
@@ -2013,7 +2083,7 @@ screens['ss-myplans'] = {
   notes:`Client's <b>My Account</b> profile page (matches the EZFacility SS profile layout): summary column, ABOUT / RELATIONSHIPS / PAYMENT INFORMATION tabs, and the standard sections. A new <b>My Plans</b> section sits under <b>My Packages</b> and lists the client's Rental Plans with unambiguous Active / Expired / Exhausted status.`,
   render:()=>{
     const book = `<span class="btn sm" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 12px;font-weight:600" onclick="go('ss-book-choice')">Book</span>`;
-    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse Rental Plans</span>`;
+    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">BROWSE RENTAL PLANS</span>`;
     const tagc = {Active:'green',Pending:'amber',Expired:'gray'};
     const all = [
       {name:'10-Hour Court Pack',start:'Jun 11, 2026',exp:'Sep 9, 2026',rem:'8.0 hrs',status:'Active'},
@@ -2040,7 +2110,7 @@ screens['ss-empty'] = {
   group:'3 · Self Service', n:'3.6', crumb:'Self Service · Client portal', title:'My Plans — empty state',
   notes:`Same <b>My Account</b> profile layout as 3.5, but the new <b>My Plans</b> section (under My Packages) shows the empty state — "You do not currently have any rental plans." — with a Browse plans path back to the catalog.`,
   render:()=>{
-    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">Browse Rental Plans</span>`;
+    const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">BROWSE RENTAL PLANS</span>`;
     return ssBuyPortal('account', ssProfileBody({
       pending: ssPendingSection('', 'Showing 0 to 0 of 0 entries'),
       packages: ssPackagesSection('', 'Showing 0 to 0 of 0 entries'),
@@ -2113,10 +2183,9 @@ screens['ar-notice'] = {
   notes:`Sent before the renewal date. Includes a <b>cancel link</b> → cancel landing page (4.4). Background renewal itself needs no staff screen.`,
   render:()=> emailMock({sub:'Your Pickleball 20 Play renews in 3 days', to:'jordan.lee@email.com', body:`
     <h4>Your plan renews soon</h4>
-    <p>Hi Jordan, your <b>Pickleball 20 Play</b> plan is set to auto-renew on <b>Jun 14, 2026</b> for <b>$140.00</b>, charged to your saved card ending ••42.</p>
-    <div class="box"><div class="kv"><span class="k">Plan</span><span>Pickleball 20 Play</span></div><div class="kv"><span class="k">Renewal amount</span><span>$140.00</span></div><div class="kv"><span class="k">Renews on</span><span>Jun 14, 2026</span></div></div>
-    <p>No action needed to continue. If you'd prefer not to renew:</p>
-    <span class="btn primary" onclick="go('ar-cancel')">Cancel auto-renew</span>
+    <p>Hi Jordan,</p>
+    <p>Good news — your <b>Pickleball 20 Play</b> plan will renew automatically on <b>Jun 14, 2026</b>. We'll add 20 plays to your balance and charge $140.00 to your card ending ••42.</p>
+    <p style="font-size:12.5px;color:#6b7280">There's nothing you need to do to keep your plan active. If you'd prefer not to renew, you can <a href="#" onclick="go('ar-cancel');return false" style="color:#3aaf85;text-decoration:underline">cancel auto-renew</a> any time before your renewal date.</p>
   `})
 };
 screens['ar-success'] = {
@@ -2124,20 +2193,22 @@ screens['ar-success'] = {
   notes:`Confirms a successful background renewal. New balance reflected on the My Plans view.`,
   render:()=> emailMock({sub:'Your plan renewed — balance topped up', to:'jordan.lee@email.com', body:`
     <h4>Your plan renewed</h4>
+    <p>Hi Jordan,</p>
     <p>Your <b>Pickleball 20 Play</b> auto-renewed successfully. <b>20 plays</b> have been added to your balance.</p>
     <div class="box"><div class="kv"><span class="k">Charged</span><span>$140.00 · Visa ••42</span></div><div class="kv"><span class="k">New balance</span><span><b>26 plays</b></span></div><div class="kv"><span class="k">Date</span><span>Jun 14, 2026</span></div></div>
-    <span class="btn" onclick="go('ss-myplans')">View my plans</span>
+    <div style="text-align:center"><span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff" onclick="go('ss-myplans')">VIEW MY PLANS</span></div>
   `})
 };
 screens['ar-fail'] = {
   group:'4 · Auto-Renewal', n:'4.3', crumb:'Email · Client + Staff', title:'Email — renewal failure',
   notes:`Sent to client (and an alert to staff) when renewal fails, e.g. expired card. Gives a clear recovery path.`,
   render:()=> emailMock({sub:'Action needed: your plan didn\'t renew', to:'jordan.lee@email.com', body:`
-    <div class="banner danger" style="margin:0 0 14px"><span class="bi"></span><div><b>We couldn't renew your plan.</b> Your saved card was declined.</div></div>
-    <p>Your <b>Pickleball 20 Play</b> renewal on Jun 14 didn't go through. Your plan is paused until payment succeeds.</p>
-    <div class="box"><div class="kv"><span class="k">Reason</span><span>Card expired (••42)</span></div><div class="kv"><span class="k">Amount due</span><span>$140.00</span></div></div>
-    <span class="btn primary">Update payment method</span>
-    <p style="font-size:11px;color:#9aa1aa;margin-top:14px">Staff also receive an alert to follow up.</p>
+    <h4 style="color:#b54a4a">We couldn't renew your plan</h4>
+    <p>Hi Jordan,</p>
+    <p>We tried to renew your <b>Pickleball 20 Play</b> plan on Jun 14, but your card on file (ending ••42) was declined.</p>
+    <p>Update your payment method below and we'll take care of the renewal for you.</p>
+    <div style="text-align:center;margin-top:4px"><span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff">UPDATE PAYMENT METHOD</span></div>
+    <p style="font-size:12px;color:#6b7280;text-align:center;margin-top:10px">It only takes a minute — your plan will resume as soon as the payment goes through.</p>
   `})
 };
 screens['ar-cancel'] = {
@@ -2150,8 +2221,8 @@ screens['ar-cancel'] = {
         <h3 style="margin-bottom:6px;color:#3c4249">Cancel auto-renew?</h3>
         <p style="max-width:360px;margin:0 auto 16px">Auto-renew for <b>Pickleball 20 Play</b> will be turned off. You'll keep your current balance (6 plays) until it's used up, but it won't renew automatically.</p>
         <div style="display:flex;gap:10px;justify-content:center">
-          <span class="btn" onclick="go('ss-myplans')">Keep auto-renew</span>
-          <span class="btn primary" onclick="go('ar-cancel-done')">Turn off auto-renew</span>
+          <span class="btn" style="background:#eceef0;color:#5b626b;border:none" onclick="go('ss-myplans')">Keep auto-renew</span>
+          <span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff" onclick="go('ar-cancel-done')">Turn off auto-renew</span>
         </div>
       </div>
     </div>
@@ -2167,7 +2238,7 @@ screens['ar-cancel-done'] = {
         <div class="icon" style="background:#7fb8a3"></div>
         <h3 style="margin-bottom:6px;color:#3c4249">Auto-renew turned off</h3>
         <p style="max-width:340px;margin:0 auto 16px">Pickleball 20 Play won't renew automatically. You can turn it back on anytime from My Plans.</p>
-        <span class="btn primary" onclick="go('ss-myplans')">Back to my plans</span>
+        <span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff" onclick="go('ss-myplans')">Back to my plans</span>
       </div>
     </div>
   `, '', true)
@@ -2176,7 +2247,7 @@ screens['ar-cancel-done'] = {
 function emailMock(o){
   return `<div class="emailwrap">
     <div class="emailmeta"><b>Subject:</b> ${o.sub}<br/><b>To:</b> ${o.to}</div>
-    <div class="email"><div class="ehead"><div class="logo"></div></div>
+    <div class="email"><div class="ehead"><div class="logo">EZ Trainings - Bethpage</div></div>
       <div class="ebody">${o.body}</div>
       <div class="efoot">EZFacility · You're receiving this because you have an active Rental Plan · Manage preferences</div>
     </div>
