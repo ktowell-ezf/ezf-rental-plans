@@ -471,7 +471,7 @@ screens['sch-restore-done'] = {
 
 /* ---------- Group: Self Service ---------- */
 screens['ss-catalog'] = {
-  group:'3 · Self Service', n:'3.1', crumb:'Self Service · Client portal', title:'Plan catalog (guest-viewable)',
+  group:'3 · Self Service', n:'3.1', crumb:'Self Service · Client portal', title:'Plan Catalog: Guest',
   notes:`Public catalog — visible to guests without login. Purchase requires an account (enforced at checkout). Reuses the existing Self-Service portal chrome.
   <ul><li><b>Open question for you:</b> for non-members, hide member-priced plans (recommended) or show with a "membership required" badge? Shown here with the badge variant so you can compare.</li></ul>`,
   render:()=> ssChrome('Plans', `
@@ -550,7 +550,7 @@ screens['ss-purchased'] = {
 };
 
 screens['ss-myplans'] = {
-  group:'3 · Self Service', n:'3.5', crumb:'Self Service · Client portal', title:'My Plans (portfolio)',
+  group:'3 · Self Service', n:'3.5', crumb:'Self Service · Client portal', title:'My Rental Plans',
   notes:`Client's purchased plans. Status must be <b>unambiguous</b>: Active / Expired / Exhausted. Shows remaining balance and expiry.
   <ul><li>Balance shown as a progress bar for quick reading.</li></ul>`,
   render:()=> ssChrome('My Account', `
@@ -564,10 +564,10 @@ screens['ss-myplans'] = {
 };
 
 screens['ss-empty'] = {
-  group:'3 · Self Service', n:'3.6', crumb:'Self Service · Client portal', title:'My Plans — empty state',
+  group:'3 · Self Service', n:'3.6', crumb:'Self Service · Client portal', title:'My Rental Plans: Empty',
   notes:`What the client sees with no plans. Clear value statement + a single primary path to the catalog. Avoids a dead-end.`,
   render:()=> ssChrome('My Account', `
-    <h3>My Plans</h3><p class="lead">Your prepaid rental balances.</p>
+    <h3>My Rental Plans</h3><p class="lead">Your prepaid rental balances.</p>
     <div class="empty">
       <div class="icon"></div>
       <h3 style="margin-bottom:6px;color:#3c4249">No plans yet</h3>

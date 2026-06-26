@@ -516,7 +516,7 @@ function ssStaticStatus(){ return `<span style="color:#6b7280">Status</span><spa
 function ssPendingSection(rows, showing){
   return `${ssTitle('My Pending Memberships')}
     ${ssHeadRow(ssStaticStatus())}
-    <table class="tbl"><thead>${ssGHead(['TYPE','STARTS','ENDS','RENEWS'])}</thead><tbody>${rows}</tbody></table>
+    <table class="tbl"><thead>${ssGHead(['TYPE','STARTS','ENDS','RENEWS',''])}</thead><tbody>${rows}</tbody></table>
     ${rows?'':`<div style="font-size:12px;color:#6b7280;padding:8px 2px">You do not currently have any pending memberships.</div>`}
     ${ssPager(showing)}`;
 }
@@ -538,7 +538,7 @@ function ssMyPlansSection(opts){
     </div>`;
   return `${titleRow}
     ${ssHeadRow(statusSel)}
-    <table class="tbl" style="font-size:11.5px"><thead>${ssGHead(['PLAN NAME','START DATE','EXPIRATION DATE','REMAINING','STATUS'])}</thead><tbody>${opts.rows}</tbody></table>
+    <table class="tbl" style="font-size:11.5px"><thead>${ssGHead(['PLAN NAME','START DATE','EXPIRATION DATE','REMAINING','STATUS',''])}</thead><tbody>${opts.rows}</tbody></table>
     ${opts.rows?'':`<div style="font-size:12px;color:#6b7280;padding:8px 2px">You do not currently have any rental plans.</div>`}
     ${ssPager(opts.showing)}`;
 }
@@ -1956,20 +1956,20 @@ screens['sch-restore-done'] = {
 
 /* ---------- Group: Self Service ---------- */
 screens['ss-catalog'] = {
-  group:'3 · Self Service', n:'3.1', crumb:'Self Service · Client portal', title:'Plan catalog (guest-viewable)',
+  group:'3 · Self Service', n:'3.1', crumb:'Self Service · Client portal', title:'Plan Catalog: Guest',
   notes:`<b>Guest-viewable</b> Rental Plans catalog. The sidebar is reduced for non-logged-in visitors: <b>Buy</b> (Packages / Memberships / Rental Plans), Book Sessions, Book Rentals, Registrations, and <b>Login</b> (no account/profile, Invoices, My Schedule, or Logout). Purchase enforces login at checkout.
   <ul><li>Registered-client version of this catalog is the next screen (3.1b), with the full sidebar.</li></ul>`,
   render:()=> ssBuyPortal('plans', (ssCatWizard && ssCatGuest) ? ssCatalogWizard(true) : ssCatalogBody(true), true, ssGate ? ssGateModal() : '')
 };
 
 screens['ss-catalog-reg'] = {
-  group:'3 · Self Service', n:'3.1b', crumb:'Self Service · Client portal', title:'Plan catalog (registered clients)',
+  group:'3 · Self Service', n:'3.1b', crumb:'Self Service · Client portal', title:'Plan Catalog: Logged In',
   notes:`<b>Registered-client</b> view of the Rental Plans catalog — same grid as the guest catalog, but with the <b>full Self Service sidebar</b> (My Account, Invoices, Buy, My Schedule, Book Sessions, Book Rentals, Registrations, Toggle Width, Logout). Rental Plans is the active submenu.`,
   render:()=> ssBuyPortal('plans', (ssCatWizard && !ssCatGuest) ? ssCatalogWizard(false) : ssCatalogBody(false), false)
 };
 
 screens['ss-checkout'] = {
-  group:'3 · Self Service', n:'3.3', crumb:'Self Service · Client portal', title:'Checkout (existing pattern)',
+  group:'3 · Self Service', n:'3.2', crumb:'Self Service · Client portal', title:'Checkout (existing pattern)',
   notes:`<b>COMPLETE CHECKOUT</b> layout: coupon, cards accepted, new-card payment form, billing address, items, and terms on the left; the <b>Summary stays fixed (sticky) while scrolling</b> on the right. Reuses the existing Self-Service checkout pattern.`,
   render:()=>{
     const sIcon = `<span style="width:22px;height:18px;border-radius:3px;background:#5b626b;flex:0 0 22px;display:inline-block"></span>`;
@@ -2036,7 +2036,7 @@ screens['ss-checkout'] = {
 };
 
 screens['ss-purchased'] = {
-  group:'3 · Self Service', n:'3.4', crumb:'Self Service · Client portal', title:'Purchase confirmation',
+  group:'3 · Self Service', n:'3.3', crumb:'Self Service · Client portal', title:'Purchase confirmation',
   notes:`Post-checkout landing on the <b>Open Invoices</b> page (Invoices submenu active). A green success banner confirms the purchase; the open-invoices grid lists Jordan Lee's invoices at EZ Trainings - Bethpage.`,
   render:()=>{
     const headCell = (t)=>`<th style="background:#3aaf85;color:#fff;border:none;padding:11px 10px;font-size:10.5px;letter-spacing:.3px">${t}</th>`;
@@ -2079,22 +2079,24 @@ screens['ss-purchased'] = {
 };
 
 screens['ss-myplans'] = {
-  group:'3 · Self Service', n:'3.5', crumb:'Self Service · Client portal', title:'My Plans (portfolio)',
+  group:'3 · Self Service', n:'3.4', crumb:'Self Service · Client portal', title:'My Rental Plans',
   notes:`Client's <b>My Account</b> profile page (matches the EZFacility SS profile layout): summary column, ABOUT / RELATIONSHIPS / PAYMENT INFORMATION tabs, and the standard sections. A new <b>My Plans</b> section sits under <b>My Packages</b> and lists the client's Rental Plans with unambiguous Active / Expired / Exhausted status.`,
   render:()=>{
     const book = `<span class="btn sm" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 12px;font-weight:600" onclick="go('ss-book-choice')">Book</span>`;
     const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">BROWSE RENTAL PLANS</span>`;
     const tagc = {Active:'green',Pending:'amber',Expired:'gray'};
     const all = [
-      {name:'10-Hour Court Pack',start:'Jun 11, 2026',exp:'Sep 9, 2026',rem:'8.0 hrs',status:'Active'},
-      {name:'Pickleball 20 Play',start:'Feb 15, 2026',exp:'No expiry',rem:'6 occ',status:'Active'},
-      {name:'Weekend Warrior Pack',start:'Jul 1, 2026',exp:'Oct 1, 2026',rem:'8.0 hrs',status:'Pending'},
-      {name:'Summer Court 8hr',start:'May 1, 2026',exp:'May 31, 2026',rem:'4.0 hrs',status:'Expired'},
+      {name:'10-Hour Court Pack',start:'Jun 11, 2026',exp:'Sep 9, 2026',rem:'8.0 hrs',status:'Active',autoRenew:false},
+      {name:'Pickleball 20 Play',start:'Feb 15, 2026',exp:'No expiry',rem:'6 occ',status:'Active',autoRenew:true},
+      {name:'Weekend Warrior Pack',start:'Jul 1, 2026',exp:'Oct 1, 2026',rem:'8.0 hrs',status:'Pending',autoRenew:true},
+      {name:'Summer Court 8hr',start:'May 1, 2026',exp:'May 31, 2026',rem:'4.0 hrs',status:'Expired',autoRenew:false},
     ];
     const shown = all.filter(p=> ssPlansFilter==='All' ? true : p.status===ssPlansFilter);
-    const rows = shown.map(p=>`<tr><td><b>${p.name}</b></td><td>${p.start}</td><td>${p.exp}</td><td><b>${p.rem}</b></td><td><span class="tag ${tagc[p.status]||'gray'}">${p.status}</span></td></tr>`).join('');
+    const planDisableBtn = `<span class="btn sm" style="border:1px solid #b54a4a;color:#b54a4a;background:#fff;padding:3px 10px;font-weight:600;font-size:10.5px" onclick="go('ar-cancel')">Disable Renewal</span>`;
+    const rows = shown.map(p=>`<tr><td><b>${p.name}</b></td><td>${p.start}</td><td>${p.exp}</td><td><b>${p.rem}</b></td><td><span class="tag ${tagc[p.status]||'gray'}">${p.status}</span></td><td>${p.autoRenew ? planDisableBtn : ''}</td></tr>`).join('');
     const showing = shown.length ? `Showing 1 to ${shown.length} of ${shown.length} entries` : 'Showing 0 to 0 of 0 entries';
-    const pend = `<tr><td><b>Gold Membership</b></td><td>Jul 1, 2026</td><td>&#8212;</td><td>Monthly</td></tr>`;
+    const disableBtn = `<span class="btn sm" style="border:1px solid #b54a4a;color:#b54a4a;background:#fff;padding:3px 10px;font-weight:600;font-size:10.5px">Disable Renewal</span>`;
+    const pend = `<tr><td><b>Gold Membership</b></td><td>Jul 1, 2026</td><td>&#8212;</td><td>Monthly</td><td>${disableBtn}</td></tr>`;
     const pkg  = `<tr><td><b>10-Session Yoga Pack</b></td><td>Apr 1, 2026</td><td>Jul 1, 2026</td><td>6</td><td><span class="tag green">Active</span></td></tr>`
                + `<tr><td><b>3-Pack Massage</b></td><td>Aug 1, 2026</td><td>Nov 1, 2026</td><td>3</td><td><span class="tag amber">Pending</span></td></tr>`
                + `<tr style="opacity:.65"><td><b>5 PT Sessions</b></td><td>Mar 15, 2026</td><td>Jun 15, 2026</td><td>0</td><td><span class="tag gray">Expired</span></td></tr>`;
@@ -2107,7 +2109,7 @@ screens['ss-myplans'] = {
 };
 
 screens['ss-empty'] = {
-  group:'3 · Self Service', n:'3.6', crumb:'Self Service · Client portal', title:'My Plans — empty state',
+  group:'3 · Self Service', n:'3.5', crumb:'Self Service · Client portal', title:'My Rental Plans: Empty',
   notes:`Same <b>My Account</b> profile layout as 3.5, but the new <b>My Plans</b> section (under My Packages) shows the empty state — "You do not currently have any rental plans." — with a Browse plans path back to the catalog.`,
   render:()=>{
     const browse = `<span class="btn primary" style="background:#3aaf85;border-color:#3aaf85" onclick="go('ss-catalog-reg')">BROWSE RENTAL PLANS</span>`;
@@ -2119,61 +2121,189 @@ screens['ss-empty'] = {
   }
 };
 
-screens['ss-book-choice'] = {
-  group:'3 · Self Service', n:'3.7', crumb:'Self Service · Booking', title:'Book — plan or rate choice',
-  notes:`Client-facing decision point at booking confirmation, using the <b>same plan/rate choice pattern as the Schedule Billing tab (2.1)</b>: filter (Show all / Rental Plans / Rental Rates) + selectable plan and rate cards. Staff-only Custom rate / No charge are not offered to clients.
-  <ul><li>Required when the client has an eligible active plan; Confirm prompts if nothing is selected.</li></ul>`,
+var ssBookRes = {sel:{}, booked:{}, errors:{}, lastBook:null};
+function ssBookResSel(i,label){ ssBookRes.sel[i]=label; delete ssBookRes.errors[i]; go('ss-book-results'); }
+function ssBookResBook(i,start,end){
+  const sel = ssBookRes.sel[i];
+  if(!sel){ ssBookRes.errors[i]=true; go('ss-book-results'); return; }
+  if(sel.startsWith('Rental Rate')){
+    const rateMatch = sel.match(/\((.+)\)/);
+    ssBookRes.checkout = {start, end, rate: rateMatch ? rateMatch[1] : sel};
+    go('ss-book-checkout');
+  } else {
+    ssBookRes.booked[i]=true; ssBookRes.lastBook={start,end,sel}; go('ss-book-results');
+  }
+}
+
+screens['ss-book-results'] = {
+  group:'3 · Self Service', n:'3.6', crumb:'Self Service · Booking', title:'Book: Results',
+  notes:`Results grid from the Book Rentals wizard — the RESULTS step. Each row has a payment method dropdown (rental rate or any active client plan with remaining balance); the BOOK button is disabled until a selection is made. Confirming shows a success banner above the grid. <b>All preceding wizard steps (Rental For, Location, Rental Types, Venues, Time Frame) and the post-booking flow (payment confirmation, insufficient balance) re-use existing Self Service patterns.</b>`,
   render:()=>{
-    const f = ssbk.filter;
-    const planRow = `<div class="radio${ssbk.method==='plan'?' on':''}" onclick="ssbkPick('plan')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Use my plan — 10-Hour Court Pack</b><span>8.0 hrs available · this booking uses <b>2.0 hrs</b> → 6.0 hrs left</span></div></div>`;
-    const rateRow = `<div class="radio${ssbk.method==='rate'?' on':''}" onclick="ssbkPick('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay the rental rate</b><span>$60.00 (2 hrs × $30/hr)</span></div></div>`;
-    const content = `
-      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Court 3 · Sat Jun 14 · 5:00–7:00 PM · 2 hours</div>
-      <div class="sech">PAYMENT OPTIONS</div>
-      ${ssChoiceError(ssbk.err)}
-      ${bkFilterChips(f,'ssbkSetFilter')}
-      ${(f==='all'||f==='plans')?planRow:''}
-      ${(f==='all'||f==='rates')?rateRow:''}`;
-    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" onclick="ssbkConfirm()">NEXT &#8250;</span>`;
-    return ssBuyPortal('rentals', ssWizard('PAYMENT OPTIONS', content, foot));
+    const steps = ['RENTAL FOR','LOCATION','RENTAL TYPES','VENUES','TIME FRAME','RESULTS'];
+    const tabs = steps.map(s=>{ const on=s==='RESULTS'; return `<div style="display:flex;align-items:center;gap:8px;padding:0 0 12px;border-bottom:2px solid ${on?'#3aaf85':'transparent'};color:${on?'#2b2f36':'#9aa1aa'};font-size:12px;font-weight:${on?700:400};white-space:nowrap"><span style="width:18px;height:16px;border-radius:3px;background:${on?'#2b2f36':'#bcc3cb'};display:inline-block;flex:0 0 18px"></span>${s}</div>`; }).join('');
+    const ic = `<span style="width:14px;height:14px;border-radius:3px;background:#9aa1aa;display:inline-block;flex:0 0 14px"></span>`;
+    const icClock = `<span style="width:14px;height:14px;border-radius:50%;border:2px solid #9aa1aa;display:inline-block;flex:0 0 14px"></span>`;
+    const summaryLeft = `<div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:#3c4249">
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Katy Towell</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>EZ Trainings - Bethpage</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Field Rental</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Main Field</span></div>
+    </div>`;
+    const summaryRight = `<div style="font-size:13px;color:#3c4249;display:flex;gap:9px;align-items:flex-start">
+      ${icClock}
+      <div style="line-height:1.7">
+        <div>Weekdays:</div>
+        <div style="color:#6b7280">Sunday Monday Tuesday Wednesday Thursday Friday Saturday</div>
+        <div>Rental Length: 10 minutes</div>
+        <div>Start On: 6/26/2026</div>
+        <div>Start Time: 8:00 AM</div>
+        <div>End Time: 9:00 PM</div>
+      </div>
+    </div>`;
+    const hc = t=>`<th style="background:#3aaf85;color:#fff;border:none;padding:10px 12px;font-size:11px;letter-spacing:.5px;font-weight:600;text-align:left">${t}</th>`;
+    const planOpts = [
+      '10-Hour Court Pack (8.0 hrs remaining)',
+      'Pickleball 20 Play (6 occ remaining)',
+      'Weekend Warrior Pack (8.0 hrs remaining)',
+    ];
+    const slots = [
+      ['01:50 PM','02:00 PM','$50.00/hour'],['02:00 PM','02:10 PM','$50.00/hour'],
+      ['02:10 PM','02:20 PM','$50.00/hour'],['02:20 PM','02:30 PM','$50.00/hour'],
+      ['02:30 PM','02:40 PM','$50.00/hour'],['02:40 PM','02:50 PM','$50.00/hour'],
+      ['02:50 PM','03:00 PM','$50.00/hour'],['03:00 PM','03:10 PM','$100.00/hour'],
+      ['03:10 PM','03:20 PM','$100.00/hour'],['03:20 PM','03:30 PM','$100.00/hour'],
+    ];
+    const rows = slots.map((r,i)=>{
+      const sel = ssBookRes.sel[i];
+      const isBooked = ssBookRes.booked[i];
+      const hasError = ssBookRes.errors[i];
+      const allOpts = [`Rental Rate (${r[2]})`,...planOpts];
+      const dropBorder = isBooked ? 'var(--line)' : hasError ? '#b54a4a' : 'var(--line)';
+      const dropColor = isBooked ? '#2b2f36' : hasError ? '#b54a4a' : sel ? '#2b2f36' : '#9aa1aa';
+      const dropdown = `<select onchange="ssBookResSel(${i},this.value)" ${isBooked?'disabled':''} style="border:1px solid ${dropBorder};border-radius:4px;padding:4px 8px;font-size:12.5px;font-family:inherit;color:${dropColor};background:${isBooked?'#f4f6f8':'#fff'};cursor:${isBooked?'not-allowed':'pointer'};min-width:200px;opacity:${isBooked?0.6:1}">
+        <option value="" disabled ${sel?'':'selected'}>${hasError?'⚠ Select a payment option':'Select payment…'}</option>
+        ${allOpts.map(o=>`<option value="${o}" ${sel===o?'selected':''}>${o}</option>`).join('')}
+      </select>`;
+      const bookBtn = isBooked
+        ? `<span style="color:#4f9a7c;font-size:12px;font-weight:600;white-space:nowrap">&#10003; Booked</span>`
+        : `<span onclick="ssBookResBook(${i},'${r[0]}','${r[1]}')" style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 13px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;display:inline-block;white-space:nowrap">BOOK</span>`;
+      return `<tr style="border-bottom:1px solid var(--line2);${i%2===1?'background:#f9fafb':''}">
+        <td style="padding:10px 12px;font-size:13px">6/26/2026</td>
+        <td style="padding:10px 12px;font-size:13px">${r[0]}</td>
+        <td style="padding:10px 12px;font-size:13px">6/26/2026</td>
+        <td style="padding:10px 12px;font-size:13px">${r[1]}</td>
+        <td style="padding:10px 12px;font-size:13px">${r[2]}</td>
+        <td style="padding:8px 12px;white-space:nowrap">
+          <div style="display:flex;align-items:center;gap:10px">
+            ${dropdown}
+            ${bookBtn}
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+    const banner = ssBookRes.lastBook ? `<div class="banner ok" style="position:absolute;top:16px;right:16px;z-index:60;max-width:360px;box-shadow:0 4px 16px rgba(0,0,0,.12)"><span class="bi"></span><div><b>Booking confirmed.</b> Main Field · 6/26/2026 · ${ssBookRes.lastBook.start} – ${ssBookRes.lastBook.end} · ${ssBookRes.lastBook.sel}</div></div>` : '';
+    const pager = `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+      <div style="display:flex;align-items:center;gap:2px;font-size:13px">
+        <span style="padding:5px 9px;color:#9aa1aa">…</span>
+        <span style="padding:5px 9px;color:#9aa1aa;cursor:pointer">‹</span>
+        <span style="padding:5px 9px;background:#3aaf85;color:#fff;border-radius:3px;font-weight:600">1</span>
+        ${[2,3,4,5].map(n=>`<span style="padding:5px 9px;cursor:pointer;color:#5b626b">${n}</span>`).join('')}
+        <span style="padding:5px 9px;color:#9aa1aa;cursor:pointer">›</span>
+        <span style="padding:5px 9px;color:#9aa1aa">…</span>
+      </div>
+      <div style="font-size:12.5px;color:#5b626b;border:1px solid var(--line);padding:5px 12px;border-radius:3px">Showing 1 to 10 of 1591 entries</div>
+    </div>`;
+    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn" style="background:#eceef0;color:#5b626b;border:none;margin-left:4px">START OVER</span>`;
+    return ssBuyPortal('rentals', `
+      <div style="font-size:14px;letter-spacing:.5px;color:#5b626b;margin-bottom:14px">BOOK RENTALS</div>
+      <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:24px 26px">
+        <div style="display:flex;gap:34px;border-bottom:1px solid var(--line2);margin-bottom:22px;overflow-x:auto">${tabs}</div>
+        <div style="display:flex;gap:40px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line2)">
+          <div style="flex:0 0 auto">${summaryLeft}</div>
+          <div style="flex:1">${summaryRight}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>${['START DATE','START TIME','END DATE','END TIME','RATE','PAYMENT OPTIONS'].map(hc).join('')}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${pager}
+        <div style="margin-top:26px;display:flex;gap:10px">${foot}</div>
+      </div>`, false, banner);
   }
 };
 
-screens['ss-book-confirm'] = {
-  group:'3 · Self Service', n:'3.8', crumb:'Self Service · Booking', title:'Booking confirmation — deduction shown',
-  notes:`Deduction is <b>immediate</b> — no pending state. Updated balance shown clearly. Client gets a confirmation.`,
-  render:()=> ssBuyPortal('rentals', `
-    <div style="max-width:520px;margin:24px auto;text-align:center">
-      <div class="empty" style="border-style:solid;border-color:#9cc9b6;background:#f3faf6">
-        <div class="icon" style="background:#7fb8a3"></div>
-        <h3 style="margin-bottom:6px">Booking confirmed</h3>
-        <p class="lead">Court 3 · Sat Jun 14, 5:00–7:00 PM</p>
-        <div class="pcard" style="text-align:left;margin:14px auto;max-width:320px"><div class="kv"><span class="k">Paid with</span><span>10-Hour Court Pack</span></div><div class="kv"><span class="k">Used</span><span><b>2.0 hrs</b></span></div><div class="kv"><span class="k">Remaining</span><span><b>6.0 hrs</b></span></div></div>
-        <span class="btn primary" onclick="go('ss-myplans')">View my plans</span>
-      </div>
-    </div>
-  `)
-};
-
-screens['ss-insufficient'] = {
-  group:'3 · Self Service', n:'3.9', crumb:'Self Service · Booking', title:'Insufficient balance — graceful options',
-  notes:`Insufficient-balance variant of the plan/rate choice, using the <b>same pattern as the Schedule insufficient state (2.2)</b>: the "not enough balance" message sits <b>inside the plan option</b> with a <b>Buy plan</b> button; Pay the rental rate remains selectable, with the same filter.
-  <ul><li>Note: this replaces the previous three-option layout (buy / pay rate / contact staff) and the graceful-degradation note from the Brief — flag if "Contact staff" should be retained.</li></ul>`,
+screens['ss-book-checkout'] = {
+  group:'3 · Self Service', n:'3.7', crumb:'Self Service · Booking', title:'Booking: Checkout for Paying by Rate',
+  notes:`Checkout reached when client pays a rental slot by rental rate (not a plan). Reuses the existing Self Service checkout pattern (3.2) with the booked rental slot as the line item.`,
   render:()=>{
-    const f = ssins.filter;
-    const planCard = `<div class="radio" style="cursor:default;align-items:flex-start;border-color:#e3b5b5;background:#fbf2f2"><span class="dot" style="border-color:#d8a0a0;background:#fff;flex:0 0 auto"></span><div class="t" style="flex:1"><b>10-Hour Court Pack</b><span style="color:#b54a4a"><b>Not enough balance.</b> You have 1.5 hours left, but this booking needs 3.0 hours.</span><div style="margin-top:8px"><span class="btn sm primary" style="color:#fff" onclick="ssBuyPlan()">Buy plan</span></div></div></div>`;
-    const rateRow = `<div class="radio${ssins.method==='rate'?' on':''}" onclick="ssinsPick('rate')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Pay the rental rate</b><span>$90.00 (3 hrs × $30/hr)</span></div></div>`;
-    const contactRow = `<div class="radio${ssins.method==='contact'?' on':''}" onclick="ssinsPick('contact')" style="cursor:pointer"><span class="dot"></span><div class="t"><b>Contact staff</b><span>Only shown when facility contact info is set</span></div></div>`;
-    const content = `
-      <div style="font-size:13px;color:#6b7280;margin-bottom:16px">Court 3 · 3 hours · plan balance 1.5 hours</div>
-      <div class="sech">PAYMENT OPTIONS</div>
-      ${ssChoiceError(ssins.err)}
-      ${bkFilterChips(f,'ssinsSetFilter')}
-      ${(f==='all'||f==='plans')?planCard:''}
-      ${(f==='all'||f==='rates')?rateRow:''}
-      ${(f==='all')?contactRow:''}`;
-    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn primary" style="background:#5cc99a;border-color:#5cc99a" onclick="ssinsConfirm()">NEXT &#8250;</span>`;
-    return ssBuyPortal('rentals', ssWizard('PAYMENT OPTIONS', content, foot));
+    const c = ssBookRes.checkout || {start:'02:00 PM', end:'02:10 PM', rate:'$50.00/hour'};
+    const rateNum = parseFloat((c.rate||'').replace(/[^0-9.]/g,'')) || 50;
+    const amtNum = parseFloat((rateNum * 10 / 60).toFixed(2));
+    const tax = parseFloat((amtNum * 0.08).toFixed(2));
+    const total = parseFloat((amtNum + tax).toFixed(2));
+    const fmt = v=>`$${v.toFixed(2)}`;
+    const sIcon = `<span style="width:22px;height:18px;border-radius:3px;background:#5b626b;flex:0 0 22px;display:inline-block"></span>`;
+    const head = t=>`<div style="display:flex;align-items:center;gap:12px;margin:24px 0 12px">${sIcon}<b style="font-size:15px;font-weight:600;color:#2b2f36">${t}</b></div>`;
+    const line = `border:none;border-bottom:1px solid var(--line);padding:7px 2px;outline:none;font-size:14px;font-family:inherit;background:none;color:#444`;
+    const card = (lbl,col)=>`<span style="display:inline-flex;align-items:center;justify-content:center;width:54px;height:34px;border-radius:4px;border:1px solid var(--line2);font-size:9px;font-weight:800;color:${col}">${lbl}</span>`;
+    const sumRow = (k,v,red)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px"><span style="color:#6b7280">${k}:</span><span style="color:${red?'#e0503a':'#2b2f36'};font-weight:${red?700:400}">${v}</span></div>`;
+    const left = `
+      <div class="btn link" style="color:#3aaf85;font-weight:600;margin-bottom:14px;cursor:pointer" onclick="go('ss-book-results')">&#8592; BACK</div>
+      ${head('Apply Coupon')}
+      <div style="display:flex;gap:16px;align-items:center;margin-bottom:6px">
+        <input placeholder="Coupon Code" style="flex:0 0 280px;${line}">
+        <span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;padding:10px 18px">APPLY COUPON</span>
+      </div>
+      ${head('Cards Accepted')}
+      <div style="display:flex;gap:8px">${card('AMEX','#2e77bb')}${card('MC','#eb5b25')}${card('VISA','#1a1f71')}</div>
+      ${head('Payment Method')}
+      <div style="color:#3aaf85;font-weight:600;font-size:13px;margin:2px 0 14px;cursor:pointer">Use New Payment Information</div>
+      <div style="display:flex;gap:18px;margin-bottom:18px">
+        <div style="flex:1"><input placeholder="First Name" style="width:100%;${line}"></div>
+        <div style="flex:1"><input placeholder="Last Name" style="width:100%;${line}"></div>
+      </div>
+      <div style="margin-bottom:18px"><input placeholder="Debit/Credit Card Number" style="width:100%;${line}"></div>
+      <div style="display:flex;gap:18px;margin-bottom:16px">
+        <input placeholder="Month" style="flex:1;${line}"><input placeholder="Year" style="flex:1;${line}"><input placeholder="Security Code" style="flex:1;${line}">
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;font-size:14px;color:#444"><span style="color:#3aaf85;font-size:16px">&#10003;</span> Save Card (required)</div>
+      <span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;padding:10px 18px">USE THIS CARD</span>
+      ${head('Billing Address')}
+      <div style="display:flex;gap:12px;margin:6px 0 12px"><span style="color:#9aa1aa;font-size:14px">&#9998;</span><div style="font-size:14px;line-height:1.5;color:#444">88 Court Lane<br>Bethpage, NY 11714</div></div>
+      <div style="color:#3aaf85;font-weight:600;font-size:13px;cursor:pointer">+ Use New Billing Address</div>
+      ${head('Items')}
+      <div style="margin:6px 0 10px">
+        <div style="display:flex;font-size:11.5px;color:#6b7280;border-bottom:1px solid var(--line2);padding-bottom:6px"><div style="flex:1"></div><div style="width:90px;text-align:right">Quantity</div><div style="width:110px;text-align:right">Amount</div></div>
+        <div style="display:flex;padding:12px 0;font-size:13px;color:#444;align-items:flex-start">
+          <div style="flex:1"><div>Main Field &mdash; Field Rental</div><div style="font-size:12px;color:#6b7280;margin-top:3px">6/26/2026 &middot; ${c.start} – ${c.end} &middot; ${c.rate}</div></div>
+          <div style="width:90px;text-align:right">1</div>
+          <div style="width:110px;text-align:right">${fmt(amtNum)}</div>
+        </div>
+      </div>
+      ${head('Payment Terms And Conditions')}
+      <ol style="font-size:12.5px;color:#4b5159;padding-left:18px;margin:8px 0;line-height:1.6"><li><b>Missed Sessions -</b> 24 hour notice is required to cancel and reschedule your session. If at least 24 hour notice is not received the booking will forfeit the missed session(s). The lost session(s) will be deducted from your account immediately as the spot was reserved.</li></ol>
+      <div style="text-align:right;color:#3aaf85;font-weight:600;font-size:13px;cursor:pointer">Show More &#8599;</div>`;
+    const summary = `
+      <div style="border:1px solid var(--line2);border-radius:8px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,.08);background:#fff">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">${sIcon}<b style="font-size:16px">Summary</b></div>
+        ${sumRow('Items',fmt(amtNum))}
+        ${sumRow('Discount','($0.00)')}
+        ${sumRow('SubTotal',fmt(amtNum))}
+        ${sumRow('Tax',fmt(tax))}
+        ${sumRow('Total',fmt(total),true)}
+        ${sumRow('Due',fmt(total),true)}
+        ${sumRow('Credit Card Surcharge (3%)','$0.00')}
+        ${sumRow('Total Charged Today',fmt(total),true)}
+        <span class="btn primary" style="width:100%;justify-content:center;margin-top:14px;background:#8fd9bf;border-color:#8fd9bf;color:#fff" onclick="go('ss-purchased')">COMPLETE CHECKOUT</span>
+      </div>`;
+    return ssBuyPortal('rentals', `
+      <div style="font-size:14px;letter-spacing:.5px;color:#5b626b;margin-bottom:14px">COMPLETE CHECKOUT</div>
+      <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:24px 26px">
+        <div style="display:flex;gap:30px;align-items:flex-start">
+          <div style="flex:1;min-width:0">${left}</div>
+          <div style="flex:0 0 260px;position:sticky;top:0">${summary}</div>
+        </div>
+      </div>`);
   }
 };
 
@@ -2272,7 +2402,7 @@ screens['about'] = {
 /* ============ Nav + routing ============ */
 const order = ['s-list','s-view','s-plan-edit','s-plan-edit-pricing','s-plan-edit-history','s-add','s-add-pricing','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
   'sch-choice','sch-client','sch-insufficient','sch-confirm','sch-confirm-multi','sch-family','sch-restore','sch-restore-done',
-  'ss-catalog','ss-catalog-reg','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-choice','ss-book-confirm','ss-insufficient',
+  'ss-catalog','ss-catalog-reg','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-results','ss-book-checkout',
   'ar-notice','ar-success','ar-fail','ar-cancel','ar-cancel-done'];
 function buildNav(){
   let html='', lastGroup=null;
