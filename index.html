@@ -281,11 +281,9 @@
     <div class="sub">Wireframes v2 · Low-fi</div>
     <a href="changelog.html" target="_blank" style="display:flex;align-items:center;justify-content:space-between;margin:0 12px 16px;padding:9px 12px;background:#4f9a7c;color:#fff;border-radius:6px;text-decoration:none;font-size:12px;font-weight:600;border-left:none;letter-spacing:.2px">
       <span>&#128221; Changelog — v2</span>
-      <span style="font-size:10px;opacity:.8;font-weight:400">Jun 23, 2026 ↗</span>
+      <span style="font-size:10px;opacity:.8;font-weight:400">Jun 26, 2026 ↗</span>
     </a>
     <div id="navlist"></div>
-    <div class="grp" style="margin-top:22px">About</div>
-    <a onclick="go('about')"><span class="n">·</span>Overview &amp; scope</a>
   </nav>
   <main class="stagewrap">
     <div class="caption" id="caption"></div>
@@ -2233,7 +2231,7 @@ screens['ss-book-results'] = {
 };
 
 screens['ss-book-checkout'] = {
-  group:'3 · Self Service', n:'3.7', crumb:'Self Service · Booking', title:'Booking: Checkout for Paying by Rate',
+  group:'3 · Self Service', n:'3.8', crumb:'Self Service · Booking', title:'Booking: Checkout for Paying by Rate',
   notes:`Checkout reached when client pays a rental slot by rental rate (not a plan). Reuses the existing Self Service checkout pattern (3.2) with the booked rental slot as the line item.`,
   render:()=>{
     const c = ssBookRes.checkout || {start:'02:00 PM', end:'02:10 PM', rate:'$50.00/hour'};
@@ -2307,19 +2305,105 @@ screens['ss-book-checkout'] = {
   }
 };
 
+screens['ss-book-confirmed'] = {
+  group:'3 · Self Service', n:'3.7', crumb:'Self Service · Booking', title:'Booking: Confirmation for Paying by Plan',
+  notes:`Illustrates step 3.6 after a client has booked a slot using a plan — the results grid remains visible with the booked row locked, and a floating confirmation banner appears in the top-right corner of the portal.`,
+  render:()=>{
+    const steps = ['RENTAL FOR','LOCATION','RENTAL TYPES','VENUES','TIME FRAME','RESULTS'];
+    const tabs = steps.map(s=>{ const on=s==='RESULTS'; return `<div style="display:flex;align-items:center;gap:8px;padding:0 0 12px;border-bottom:2px solid ${on?'#3aaf85':'transparent'};color:${on?'#2b2f36':'#9aa1aa'};font-size:12px;font-weight:${on?700:400};white-space:nowrap"><span style="width:18px;height:16px;border-radius:3px;background:${on?'#2b2f36':'#bcc3cb'};display:inline-block;flex:0 0 18px"></span>${s}</div>`; }).join('');
+    const ic = `<span style="width:14px;height:14px;border-radius:3px;background:#9aa1aa;display:inline-block;flex:0 0 14px"></span>`;
+    const icClock = `<span style="width:14px;height:14px;border-radius:50%;border:2px solid #9aa1aa;display:inline-block;flex:0 0 14px"></span>`;
+    const summaryLeft = `<div style="display:flex;flex-direction:column;gap:9px;font-size:13px;color:#3c4249">
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Katy Towell</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>EZ Trainings - Bethpage</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Field Rental</span></div>
+      <div style="display:flex;align-items:center;gap:9px">${ic}<span>Main Field</span></div>
+    </div>`;
+    const summaryRight = `<div style="font-size:13px;color:#3c4249;display:flex;gap:9px;align-items:flex-start">
+      ${icClock}
+      <div style="line-height:1.7">
+        <div>Weekdays:</div>
+        <div style="color:#6b7280">Sunday Monday Tuesday Wednesday Thursday Friday Saturday</div>
+        <div>Rental Length: 10 minutes</div>
+        <div>Start On: 6/26/2026</div>
+        <div>Start Time: 8:00 AM</div>
+        <div>End Time: 9:00 PM</div>
+      </div>
+    </div>`;
+    const hc = t=>`<th style="background:#3aaf85;color:#fff;border:none;padding:10px 12px;font-size:11px;letter-spacing:.5px;font-weight:600;text-align:left">${t}</th>`;
+    const planOpts = ['10-Hour Court Pack (8.0 hrs remaining)','Pickleball 20 Play (6 occ remaining)','Weekend Warrior Pack (8.0 hrs remaining)'];
+    const slots = [
+      ['01:50 PM','02:00 PM','$50.00/hour'],['02:00 PM','02:10 PM','$50.00/hour'],
+      ['02:10 PM','02:20 PM','$50.00/hour'],['02:20 PM','02:30 PM','$50.00/hour'],
+      ['02:30 PM','02:40 PM','$50.00/hour'],['02:40 PM','02:50 PM','$50.00/hour'],
+      ['02:50 PM','03:00 PM','$50.00/hour'],['03:00 PM','03:10 PM','$100.00/hour'],
+      ['03:10 PM','03:20 PM','$100.00/hour'],['03:20 PM','03:30 PM','$100.00/hour'],
+    ];
+    const bookedIdx = 0;
+    const bookedSel = '10-Hour Court Pack (8.0 hrs remaining)';
+    const rows = slots.map((r,i)=>{
+      const isBooked = i===bookedIdx;
+      const sel = isBooked ? bookedSel : '';
+      const allOpts = [`Rental Rate (${r[2]})`,...planOpts];
+      const dropdown = `<select disabled style="border:1px solid var(--line);border-radius:4px;padding:4px 8px;font-size:12.5px;font-family:inherit;color:${isBooked?'#2b2f36':'#9aa1aa'};background:${isBooked?'#f4f6f8':'#fff'};cursor:not-allowed;min-width:200px;opacity:${isBooked?0.6:1}">
+        <option value="" disabled ${sel?'':'selected'}>Select payment…</option>
+        ${allOpts.map(o=>`<option value="${o}" ${sel===o?'selected':''}>${o}</option>`).join('')}
+      </select>`;
+      const bookBtn = isBooked
+        ? `<span style="color:#4f9a7c;font-size:12px;font-weight:600;white-space:nowrap">&#10003; Booked</span>`
+        : `<span style="border:1px solid #3aaf85;color:#3aaf85;background:#fff;padding:3px 13px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;display:inline-block;white-space:nowrap">BOOK</span>`;
+      return `<tr style="border-bottom:1px solid var(--line2);${i%2===1?'background:#f9fafb':''}">
+        <td style="padding:10px 12px;font-size:13px">6/26/2026</td>
+        <td style="padding:10px 12px;font-size:13px">${r[0]}</td>
+        <td style="padding:10px 12px;font-size:13px">6/26/2026</td>
+        <td style="padding:10px 12px;font-size:13px">${r[1]}</td>
+        <td style="padding:10px 12px;font-size:13px">${r[2]}</td>
+        <td style="padding:8px 12px;white-space:nowrap"><div style="display:flex;align-items:center;gap:10px">${dropdown}${bookBtn}</div></td>
+      </tr>`;
+    }).join('');
+    const pager = `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:16px">
+      <div style="display:flex;align-items:center;gap:2px;font-size:13px">
+        <span style="padding:5px 9px;color:#9aa1aa">…</span><span style="padding:5px 9px;color:#9aa1aa;cursor:pointer">‹</span>
+        <span style="padding:5px 9px;background:#3aaf85;color:#fff;border-radius:3px;font-weight:600">1</span>
+        ${[2,3,4,5].map(n=>`<span style="padding:5px 9px;cursor:pointer;color:#5b626b">${n}</span>`).join('')}
+        <span style="padding:5px 9px;color:#9aa1aa;cursor:pointer">›</span><span style="padding:5px 9px;color:#9aa1aa">…</span>
+      </div>
+      <div style="font-size:12.5px;color:#5b626b;border:1px solid var(--line);padding:5px 12px;border-radius:3px">Showing 1 to 10 of 1591 entries</div>
+    </div>`;
+    const foot = `<span class="btn primary" style="background:#5cc99a;border-color:#5cc99a">&#8249; PREVIOUS</span><span class="btn" style="background:#eceef0;color:#5b626b;border:none;margin-left:4px">START OVER</span>`;
+    const banner = `<div class="banner ok" style="position:absolute;top:16px;right:16px;z-index:60;max-width:360px;box-shadow:0 4px 16px rgba(0,0,0,.12)"><span class="bi"></span><div><b>Booking confirmed.</b> Main Field · 6/26/2026 · ${slots[bookedIdx][0]} – ${slots[bookedIdx][1]} · ${bookedSel.replace(/\s*\(.*\)$/,'')}</div></div>`;
+    return ssBuyPortal('rentals', `
+      <div style="font-size:14px;letter-spacing:.5px;color:#5b626b;margin-bottom:14px">BOOK RENTALS</div>
+      <div style="background:#fff;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);padding:24px 26px">
+        <div style="display:flex;gap:34px;border-bottom:1px solid var(--line2);margin-bottom:22px;overflow-x:auto">${tabs}</div>
+        <div style="display:flex;gap:40px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line2)">
+          <div style="flex:0 0 auto">${summaryLeft}</div>
+          <div style="flex:1">${summaryRight}</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>${['START DATE','START TIME','END DATE','END TIME','RATE','PAYMENT OPTIONS'].map(hc).join('')}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        ${pager}
+        <div style="margin-top:26px;display:flex;gap:10px">${foot}</div>
+      </div>`, false, banner);
+  }
+};
+
 /* ---------- Group: Auto-Renewal ---------- */
 screens['ar-notice'] = {
-  group:'4 · Auto-Renewal', n:'4.1', crumb:'Email · Client', title:'Email — advance renewal notice',
+  group:'4 · Auto-Renewal', n:'4.1', crumb:'Email · Client', title:'Email: Advance renewal notice',
   notes:`Sent before the renewal date. Includes a <b>cancel link</b> → cancel landing page (4.4). Background renewal itself needs no staff screen.`,
   render:()=> emailMock({sub:'Your Pickleball 20 Play renews in 3 days', to:'jordan.lee@email.com', body:`
     <h4>Your plan renews soon</h4>
     <p>Hi Jordan,</p>
     <p>Good news — your <b>Pickleball 20 Play</b> plan will renew automatically on <b>Jun 14, 2026</b>. We'll add 20 plays to your balance and charge $140.00 to your card ending ••42.</p>
     <p style="font-size:12.5px;color:#6b7280">There's nothing you need to do to keep your plan active. If you'd prefer not to renew, you can <a href="#" onclick="go('ar-cancel');return false" style="color:#3aaf85;text-decoration:underline">cancel auto-renew</a> any time before your renewal date.</p>
+    <p style="font-size:12px;border-top:1px solid #eee;padding-top:12px;margin-top:4px">You can also manage auto-renew by logging in to your account at EZ Trainings - Bethpage and going to <b>My Account → My Plans</b>.</p>
   `})
 };
 screens['ar-success'] = {
-  group:'4 · Auto-Renewal', n:'4.2', crumb:'Email · Client', title:'Email — renewal success',
+  group:'4 · Auto-Renewal', n:'4.2', crumb:'Email · Client', title:'Email: Renewal success',
   notes:`Confirms a successful background renewal. New balance reflected on the My Plans view.`,
   render:()=> emailMock({sub:'Your plan renewed — balance topped up', to:'jordan.lee@email.com', body:`
     <h4>Your plan renewed</h4>
@@ -2327,10 +2411,11 @@ screens['ar-success'] = {
     <p>Your <b>Pickleball 20 Play</b> auto-renewed successfully. <b>20 plays</b> have been added to your balance.</p>
     <div class="box"><div class="kv"><span class="k">Charged</span><span>$140.00 · Visa ••42</span></div><div class="kv"><span class="k">New balance</span><span><b>26 plays</b></span></div><div class="kv"><span class="k">Date</span><span>Jun 14, 2026</span></div></div>
     <div style="text-align:center"><span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff" onclick="go('ss-myplans')">VIEW MY PLANS</span></div>
+    <p style="font-size:12px;border-top:1px solid #eee;padding-top:12px;margin-top:16px">You can also check your updated balance any time by logging in to your account at EZ Trainings - Bethpage and visiting <b>My Account → My Plans</b>.</p>
   `})
 };
 screens['ar-fail'] = {
-  group:'4 · Auto-Renewal', n:'4.3', crumb:'Email · Client + Staff', title:'Email — renewal failure',
+  group:'4 · Auto-Renewal', n:'4.3', crumb:'Email · Client + Staff', title:'Email: Renewal failure',
   notes:`Sent to client (and an alert to staff) when renewal fails, e.g. expired card. Gives a clear recovery path.`,
   render:()=> emailMock({sub:'Action needed: your plan didn\'t renew', to:'jordan.lee@email.com', body:`
     <h4 style="color:#b54a4a">We couldn't renew your plan</h4>
@@ -2339,6 +2424,7 @@ screens['ar-fail'] = {
     <p>Update your payment method below and we'll take care of the renewal for you.</p>
     <div style="text-align:center;margin-top:4px"><span class="btn primary" style="background:#3aaf85;border-color:#3aaf85;color:#fff">UPDATE PAYMENT METHOD</span></div>
     <p style="font-size:12px;color:#6b7280;text-align:center;margin-top:10px">It only takes a minute — your plan will resume as soon as the payment goes through.</p>
+    <p style="font-size:12px;border-top:1px solid #eee;padding-top:12px;margin-top:4px">You can also update your payment method by logging in to your account at EZ Trainings - Bethpage and going to <b>My Account → Payment Information</b>. Your plan will renew automatically once a valid payment method is on file.</p>
   `})
 };
 screens['ar-cancel'] = {
@@ -2402,14 +2488,14 @@ screens['about'] = {
 /* ============ Nav + routing ============ */
 const order = ['s-list','s-view','s-plan-edit','s-plan-edit-pricing','s-plan-edit-history','s-add','s-add-pricing','s-sell-select','s-sell-pay','s-sell-confirm','s-profile','s-edit',
   'sch-choice','sch-client','sch-insufficient','sch-confirm','sch-confirm-multi','sch-family','sch-restore','sch-restore-done',
-  'ss-catalog','ss-catalog-reg','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-results','ss-book-checkout',
+  'ss-catalog','ss-catalog-reg','ss-checkout','ss-purchased','ss-myplans','ss-empty','ss-book-results','ss-book-confirmed','ss-book-checkout',
   'ar-notice','ar-success','ar-fail','ar-cancel','ar-cancel-done'];
 function buildNav(){
   let html='', lastGroup=null;
   order.forEach(id=>{
     const s=screens[id]; if(s.hideNav) return;
     if(s.group!==lastGroup){
-      const statusTag = (s.group==='1 · Staff Sales'||s.group==='2 · Schedule')
+      const statusTag = (s.group==='1 · Staff Sales'||s.group==='2 · Schedule'||s.group==='3 · Self Service'||s.group==='4 · Auto-Renewal')
         ? `<span class="tag green" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Ready for Review</span>`
         : `<span class="tag amber" style="font-size:9px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:none;letter-spacing:0">Pending</span>`;
       html+=`<div class="grp">${s.group}${statusTag}</div>`; lastGroup=s.group;
