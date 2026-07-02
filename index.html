@@ -600,9 +600,11 @@ function ssProfileBody(opts){
 function panel(opts){
   const tabs = (opts.tabs||[]).map(t=>`<span class="${t.on?'on':''}" ${t.onclick?`onclick="${t.onclick}" style="cursor:pointer"`:''}>${t.label}</span>`).join('');
   const ct = opts.closeTarget || '';
-  return `<div class="dim" onclick="panelTryClose()"></div>
+  const closeFn = opts.onClose || 'panelTryClose()';
+  const backBtn = opts.onBack ? `<span class="ph-back" onclick="${opts.onBack}" style="cursor:pointer;display:flex;align-items:center;margin-right:6px;color:#4b5159;font-size:19px;line-height:1">&#8249;</span>` : '';
+  return `<div class="dim" onclick="${closeFn}"></div>
    <div class="panel ${opts.wide?'wide':''}" id="sidePanel" data-close-target="${ct}">
-     <div class="ph-head"><h4>${opts.title}</h4><div class="x" onclick="panelTryClose()" style="cursor:pointer;">✕</div></div>
+     <div class="ph-head">${backBtn}<h4>${opts.title}</h4><div class="x" onclick="${closeFn}" style="cursor:pointer;">✕</div></div>
      ${tabs?`<div class="ptabs">${tabs}</div>`:''}
      <div class="pbody">${opts.body}</div>
      <div class="pfoot">${opts.foot}</div>
@@ -1868,6 +1870,8 @@ screens['sch-insufficient'] = {
     const mk = (t,lbl)=>({label:lbl, on:bk2.tab===t, onclick: bk2.tab===t ? null : `bk2Tab('${t}')`});
     return ezChrome('Schedule', sched,
       panel({closeTarget:'sch-insufficient', title:'New Rental · Court 3', wide:rs.modalOpen,
+        onClose: rs.modalOpen ? 'rsBack()' : null,
+        onBack: rs.modalOpen ? 'rsBack()' : null,
         tabs:[{label:'Details', onclick:"go('sch-choice')"},mk('billing','Billing'),mk('linked','Linked'),mk('history','History')],
         body, foot})
     );
@@ -3182,6 +3186,7 @@ function rsToggleSess(idx){
   go('sch-insufficient');
 }
 function rsBookSelected(){ rs.modalOpen=false; go('sch-insufficient'); }
+function rsBack(){ rs.modalOpen=false; go('sch-insufficient'); }
 
 /* 2.4 / 2.4-multi confirmation panel — defaults to the Billing tab */
 var bk3tab = 'billing';
